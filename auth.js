@@ -8,6 +8,9 @@
   const logoutBtn = document.getElementById("logoutBtn");
   const signedInUser = document.getElementById("signedInUser");
 
+  let activeUserId = null;
+  let loadingApp = false;
+
   function showLogin(message=""){
     document.body.classList.add("auth-locked");
     authScreen.classList.remove("hidden");
@@ -15,38 +18,76 @@
     loginMessage.textContent = message;
   }
 
-  async function showApp(session){
+  async function showApp(session, forceReload=false){
+    if(!session?.access_token || !session?.user){
+      showLogin();
+      return;
+    }
+
+    const userChanged = activeUserId !== session.user.id;
+    activeUserId = session.user.id;
+
     document.body.classList.remove("auth-locked");
     authScreen.classList.add("hidden");
-    signedInUser.textContent = session?.user?.email || "Signed in";
+    signedInUser.textContent = session.user.email || "Signed in";
     loginPassword.value = "";
     loginMessage.textContent = "";
-    await window.startB5App?.();
+
+    if(loadingApp) return;
+    loadingApp = true;
+    try {
+      // Always reload after a restored initial session, fresh sign-in,
+      // or token refresh so RLS requests use the current access token.
+      if(forceReload || userChanged) {
+        await window.startB5App?.();
+      }
+    } finally {
+      loadingApp = false;
+    }
   }
 
   async function initialise(){
+    document.body.classList.add("auth-locked");
+
     if(!window.db){
       showLogin("Supabase connection is unavailable.");
       return;
     }
 
+    // Register the auth listener first so INITIAL_SESSION / token refresh
+    // cannot race ahead of the application data request.
+    window.db.auth.onAuthStateChange((event, session) => {
+      // Defer async work out of the auth callback itself.
+      setTimeout(async () => {
+        if(event === "SIGNED_OUT" || !session){
+          activeUserId = null;
+          window.resetB5App?.();
+          showLogin();
+          return;
+        }
+
+        if(
+          event === "INITIAL_SESSION" ||
+          event === "SIGNED_IN" ||
+          event === "TOKEN_REFRESHED"
+        ){
+          await showApp(session, true);
+        }
+      }, 0);
+    });
+
+    // Explicitly recover the persisted browser session as a fallback.
     const { data, error } = await window.db.auth.getSession();
     if(error){
       showLogin(error.message);
       return;
     }
 
-    if(data.session) await showApp(data.session);
-    else showLogin();
-
-    window.db.auth.onAuthStateChange(async (event, session) => {
-      if(event === "SIGNED_OUT" || !session){
-        window.resetB5App?.();
-        showLogin();
-      } else if(event === "SIGNED_IN"){
-        await showApp(session);
-      }
-    });
+    if(data?.session){
+      await showApp(data.session, true);
+    } else {
+      showLogin();
+    }
   }
 
   loginForm.addEventListener("submit", async (e) => {
@@ -55,25 +96,33 @@
     loginBtn.disabled = true;
     loginBtn.textContent = "Signing In…";
 
-    const { data, error } = await window.db.auth.signInWithPassword({
-      email: loginEmail.value.trim(),
-      password: loginPassword.value
-    });
+    try {
+      const { data, error } = await window.db.auth.signInWithPassword({
+        email: loginEmail.value.trim(),
+        password: loginPassword.value
+      });
 
-    loginBtn.disabled = false;
-    loginBtn.textContent = "Sign In";
+      if(error){
+        loginMessage.textContent = error.message;
+        return;
+      }
 
-    if(error){
-      loginMessage.textContent = error.message;
-      return;
+      if(data?.session){
+        await showApp(data.session, true);
+      }
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Sign In";
     }
-    if(data.session) await showApp(data.session);
   });
 
   logoutBtn.addEventListener("click", async () => {
     logoutBtn.disabled = true;
-    await window.db.auth.signOut();
-    logoutBtn.disabled = false;
+    try {
+      await window.db.auth.signOut();
+    } finally {
+      logoutBtn.disabled = false;
+    }
   });
 
   initialise();

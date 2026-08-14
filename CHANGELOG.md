@@ -2,6 +2,13 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## V5.1 — Session Refresh Fix & Version Display
+- Fixed the authenticated-session restoration sequence after a browser refresh.
+- Registered the Supabase auth-state listener before loading operational data.
+- Reloads live Supabase data on INITIAL_SESSION, SIGNED_IN and TOKEN_REFRESHED events.
+- Keeps the login gate active until a valid session is recovered.
+- Added visible app version `v5.1` beneath the signed-in staff email on the desktop header.
+
 ## V5 — Staff Authentication & Public-Repo Hardening
 - Added Supabase email/password staff sign-in.
 - Added persistent authenticated sessions and Sign Out.

@@ -147,3 +147,8 @@ The public app package no longer includes imported business data or one-off SQL 
 The frontend now requires a valid Supabase Auth email/password session before the operational interface loads.
 
 Important: after deploying V5, update Supabase RLS policies so operational tables are readable/writable by `authenticated` users rather than `anon`. Keep the SQL migration itself in your local `_private/sql/` folder rather than committing it to GitHub.
+
+
+## V5.1 — Session refresh fix
+
+Authentication startup now waits for/restores the persisted Supabase session before live operational data is loaded. The app also reloads live data after token refresh events. Desktop header displays version `v5.1` beneath the signed-in user.
