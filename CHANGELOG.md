@@ -2,6 +2,15 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.6.2 — Required Field Validation & Pre-Release Versioning
+- Changed the visible application version from v6.1 to **v0.6.2** to clearly identify the app as pre-release software.
+- Added required-field validation to the New Rental / Booking workflow.
+- Missing required fields are now highlighted with a red border and a clear inline message.
+- All missing required fields are highlighted together after validation fails.
+- Validation styling is automatically removed as each field is corrected.
+- Invalid return dates are highlighted directly on the Return field.
+- No Supabase database or SQL changes are required for this release.
+
 ## V6.1 — Demo Data & Customer Fix
 - Fixed the New Rental customer selector so an empty customer list cannot submit an invalid UUID.
 - Added a `Create new customer…` option directly inside the New Rental customer dropdown.

@@ -419,3 +419,20 @@ body.auth-locked #app { visibility: hidden; }
   .price-line.total,.price-line.balance{grid-column:auto}
   .kpi-mini{grid-template-columns:repeat(2,1fr)}
 }
+
+
+/* ===== v0.6.2 required-field validation ===== */
+.field-invalid input,
+.field-invalid select,
+.field-invalid textarea {
+  border-color: #d92d20 !important;
+  box-shadow: 0 0 0 3px rgba(217,45,32,.10);
+  background: #fffafa;
+}
+.field-error {
+  display: block;
+  margin-top: 5px;
+  color: #b42318;
+  font-size: 11px;
+  font-weight: 700;
+}

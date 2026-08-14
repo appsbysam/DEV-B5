@@ -584,9 +584,50 @@ function renderSettings(){
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
-      <p class="note">V6.0 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
+      <p class="note">v0.6.2 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
     </div></div>
   </div>`;
+}
+
+
+function clearFieldError(id){
+  const el=$("#"+id);
+  if(!el) return;
+  const field=el.closest(".field");
+  if(!field) return;
+  field.classList.remove("field-invalid");
+  field.querySelector(".field-error")?.remove();
+}
+function markFieldError(id,message="Required"){
+  const el=$("#"+id);
+  if(!el) return;
+  const field=el.closest(".field");
+  if(!field) return;
+  field.classList.add("field-invalid");
+  if(!field.querySelector(".field-error")){
+    const msg=document.createElement("span");
+    msg.className="field-error";
+    msg.textContent=message;
+    field.appendChild(msg);
+  }
+}
+function validateRequiredFields(items){
+  let firstInvalid=null;
+  for(const item of items){
+    clearFieldError(item.id);
+    const el=$("#"+item.id);
+    const value=el?.value;
+    const invalid=item.invalid ? item.invalid(value) : !value;
+    if(invalid){
+      markFieldError(item.id,item.message||"Required");
+      if(!firstInvalid) firstInvalid=el;
+    }
+  }
+  if(firstInvalid){
+    setTimeout(()=>firstInvalid.focus(),0);
+    return false;
+  }
+  return true;
 }
 
 function openModal(title,body,onSave,saveText="Save"){
@@ -648,6 +689,11 @@ function bookingModal(prefill={}){
       $("#rConflict").innerHTML=`<div class="ok-box">Vehicle is available for this complete period.</div>`;
     }
   };
+  ["rCustomer","rVehicle","rStart","rEnd","rPickup","rDropoff","rRate"].forEach(id=>{
+    $("#"+id)?.addEventListener("input",()=>clearFieldError(id));
+    $("#"+id)?.addEventListener("change",()=>clearFieldError(id));
+  });
+
   $("#rCustomer")?.addEventListener("change",async()=>{
     if($("#rCustomer").value!=="__CREATE_NEW__") return;
     const fullName=prompt("New customer name:");
@@ -662,7 +708,10 @@ function bookingModal(prefill={}){
     sel.insertBefore(opt,sel.querySelector('option[value="__CREATE_NEW__"]'));
     sel.value=data.id;
   });
-  ["rVehicle","rStart","rEnd","rPickup","rDropoff","rRate","rDiscount","rOther","rDeposit"].forEach(id=>$("#"+id)?.addEventListener("input",refresh));
+  ["rVehicle","rStart","rEnd","rPickup","rDropoff","rRate","rDiscount","rOther","rDeposit"].forEach(id=>$("#"+id)?.addEventListener("input",()=>{
+    clearFieldError(id);
+    refresh();
+  }));
   if(selectedVehicle){const v=vehicleById(selectedVehicle);$("#rRate").value=Number(v?.rate||0);}
   refresh();
 }
@@ -670,8 +719,24 @@ function bookingModal(prefill={}){
 async function saveRentalAgreement(){
   if(!state.live){alert("Supabase is not live.");return false;}
   const customerId=$("#rCustomer").value,vehicleId=$("#rVehicle").value,start=$("#rStart").value,end=$("#rEnd").value;
-  if(!customerId||customerId==="__CREATE_NEW__"||!vehicleId){alert("Select a customer and vehicle.");return false;}
-  if(new Date(end)<=new Date(start)){alert("Return must be after pickup.");return false;}
+
+  const requiredOk=validateRequiredFields([
+    {id:"rCustomer",message:"Select or create a customer",invalid:v=>!v||v==="__CREATE_NEW__"},
+    {id:"rVehicle",message:"Select a vehicle",invalid:v=>!v},
+    {id:"rStart",message:"Pickup date and time required",invalid:v=>!v},
+    {id:"rEnd",message:"Return date and time required",invalid:v=>!v}
+  ]);
+
+  if(!requiredOk){
+    alert("Please complete the required fields highlighted in red.");
+    return false;
+  }
+
+  if(new Date(end)<=new Date(start)){
+    markFieldError("rEnd","Return must be after pickup");
+    alert("Return must be after pickup.");
+    return false;
+  }
   if(segmentConflict(vehicleId,start,end)){alert("This vehicle conflicts with another booking. Choose one of the available alternatives.");return false;}
   const vehicle=vehicleById(vehicleId);
   const rate=Number($("#rRate").value||vehicle?.rate||0);

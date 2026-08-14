@@ -168,3 +168,12 @@ This build is intended to be customer-demo capable. It adds the main operational
 The app uses the existing Supabase tables already created in the project. No SQL migration file is included in the public package.
 
 Important: imported vehicle records that do not yet have a daily rate will display `Rate not loaded`; staff can update those rates later.
+
+
+## v0.6.2 — Validation / demo refinement
+
+This release starts the pre-1.0 versioning convention. The app is now shown as `v0.6.2`.
+
+New Rental validates all required fields together. Missing fields receive a red border and inline error message, and the warning clears automatically as the user fixes each field.
+
+No database changes are required.
