@@ -321,3 +321,101 @@ body.auth-locked #app { visibility: hidden; }
 @media (max-width:760px){
   .user-version { display:none; }
 }
+
+
+/* ===== V6 core rental workflow ===== */
+.price-summary{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px;
+}
+.price-line{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fafbfd;
+  font-size:13px;
+}
+.price-line.total{
+  grid-column:1/-1;
+  font-weight:800;
+  font-size:15px;
+  background:#eef5ff;
+  border-color:#cfe1f7;
+}
+.price-line.balance{
+  grid-column:1/-1;
+  font-weight:800;
+  background:#eef8f2;
+  border-color:#cfe9da;
+}
+.action-row{display:flex;gap:8px;flex-wrap:wrap}
+.rental-card{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px;
+  background:#fff;
+  box-shadow:var(--shadow);
+}
+.rental-card h3{margin:0 0 6px}
+.rental-card .subline{font-size:12px;color:var(--muted);margin:2px 0}
+.rental-card .actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.result-section{margin-bottom:16px}
+.result-section h3{margin:0 0 10px}
+.suggestion-card{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  background:#fff;
+}
+.suggestion-card strong{display:block;margin-bottom:4px}
+.conflict-box{
+  margin-top:12px;
+  padding:12px;
+  border:1px solid #f0c7c7;
+  border-radius:10px;
+  background:#fff4f4;
+}
+.ok-box{
+  margin-top:12px;
+  padding:12px;
+  border:1px solid #cce5d6;
+  border-radius:10px;
+  background:#effaf3;
+}
+.toolbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.segment-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:10px;
+}
+.segment-item{
+  border-left:4px solid var(--blue);
+  background:#f8fbff;
+  padding:9px 10px;
+  border-radius:8px;
+  font-size:12px;
+}
+.kpi-mini{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin:12px 0;
+}
+.kpi-mini .stat{padding:11px;box-shadow:none}
+.kpi-mini .stat .value{font-size:20px}
+@media (max-width:760px){
+  .price-summary{grid-template-columns:1fr}
+  .price-line.total,.price-line.balance{grid-column:auto}
+  .kpi-mini{grid-template-columns:repeat(2,1fr)}
+}

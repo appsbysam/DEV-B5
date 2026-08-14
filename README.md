@@ -152,3 +152,19 @@ Important: after deploying V5, update Supabase RLS policies so operational table
 ## V5.1 — Session refresh fix
 
 Authentication startup now waits for/restores the persisted Supabase session before live operational data is loaded. The app also reloads live data after token refresh events. Desktop header displays version `v5.1` beneath the signed-in user.
+
+
+## V6.0 — Core rental demo
+
+This build is intended to be customer-demo capable. It adds the main operational workflow in one package:
+
+1. New bookings/rentals
+2. Availability and overlap checking
+3. Similar/alternative vehicle suggestions
+4. Indicative pricing and deposits/bonds
+5. Extensions and vehicle swaps/upgrades
+6. Improved dashboard/calendar/fleet views
+
+The app uses the existing Supabase tables already created in the project. No SQL migration file is included in the public package.
+
+Important: imported vehicle records that do not yet have a daily rate will display `Rate not loaded`; staff can update those rates later.

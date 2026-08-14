@@ -2,6 +2,22 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## V6.0 — Core Rental Demo
+- Added a complete New Rental / Booking workflow.
+- Added full date/time conflict detection before a vehicle can be booked.
+- Added own-fleet, alternative/upgrade and external partner availability results.
+- Added indicative pricing using daily rate, pickup fee, drop-off fee, other charges, discounts and deposits.
+- Added security-bond creation separately from rental revenue.
+- Added rental charge lines and payment recording.
+- Added rental extensions with automatic conflict detection and replacement suggestions.
+- Added vehicle swaps/upgrades/downgrades using rental segments so original vehicle history is preserved.
+- Added automatic rate handling for replacement vehicles: keep existing rate, use replacement rate or enter custom rate.
+- Added vehicle-return completion workflow.
+- Improved Dashboard and Today views.
+- Improved Fleet cards with current customer, return time and next booking.
+- Improved 14-day Calendar timeline using live rental segments.
+- Bumped visible application version to v6.0.
+
 ## V5.1 — Session Refresh Fix & Version Display
 - Fixed the authenticated-session restoration sequence after a browser refresh.
 - Registered the Supabase auth-state listener before loading operational data.
