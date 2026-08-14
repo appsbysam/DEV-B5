@@ -2,6 +2,15 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## V6.1 — Demo Data & Customer Fix
+- Fixed the New Rental customer selector so an empty customer list cannot submit an invalid UUID.
+- Added a `Create new customer…` option directly inside the New Rental customer dropdown.
+- New customers created there are inserted into Supabase immediately and selected automatically.
+- Changed the connection label from `Live Supabase` to `Online`.
+- Changed the sidebar build label from `GitHub + Supabase build` to `Demo Build`.
+- Added companion SQL for five test customers, the standard test locations, and authenticated access policies for the new rental workflow tables.
+- No existing vehicle or supplier data is modified by the SQL.
+
 ## V6.0 — Core Rental Demo
 - Added a complete New Rental / Booking workflow.
 - Added full date/time conflict detection before a vehicle can be booked.

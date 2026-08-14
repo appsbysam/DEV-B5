@@ -92,7 +92,7 @@ function statusClass(s){
 function updateDataMode(){
   const el=$("#dataMode");
   if(!el) return;
-  if(state.live){el.textContent="Live Supabase";el.className="badge live-status";}
+  if(state.live){el.textContent="Online";el.className="badge live-status";}
   else if(state.loading){el.textContent="Connecting…";el.className="badge badge-demo";}
   else{el.textContent="Offline";el.className="badge fallback-status";}
 }
@@ -580,7 +580,7 @@ function renderLocations(){
 function renderSettings(){
   return `<div class="grid two-col">
     <div class="panel"><div class="panel-head"><h3>Supabase Connection</h3></div><div class="panel-body">
-      <p><strong>Status:</strong> ${state.live?'<span class="badge live-status">Live Supabase</span>':'<span class="badge fallback-status">Offline</span>'}</p>
+      <p><strong>Status:</strong> ${state.live?'<span class="badge live-status">Online</span>':'<span class="badge fallback-status">Offline</span>'}</p>
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
@@ -610,7 +610,13 @@ function bookingModal(prefill={}){
   const selectedVehicle=prefill.vehicleId||"";
   openModal("New Rental / Booking",`
     <div class="grid two-col">
-      <div class="field"><label>Customer</label><select id="rCustomer"><option value="">Select customer</option>${state.customers.map(c=>`<option value="${esc(c.id)}">${esc(c.name||c.full_name)}</option>`).join("")}</select></div>
+      <div class="field"><label>Customer</label>
+        <select id="rCustomer">
+          <option value="">Select customer</option>
+          ${state.customers.map(c=>`<option value="${esc(c.id)}">${esc(c.name||c.full_name)}</option>`).join("")}
+          <option value="__CREATE_NEW__">＋ Create new customer…</option>
+        </select>
+      </div>
       <div class="field"><label>Vehicle</label><select id="rVehicle"><option value="">Select vehicle</option>${state.vehicles.filter(v=>!["Out of Order","Maintenance"].includes(v.db_status)).map(v=>`<option value="${esc(v.id)}" ${String(v.id)===String(selectedVehicle)?"selected":""}>${esc(v.make)} ${esc(v.model)} · ${esc(v.plate)}</option>`).join("")}</select></div>
       <div class="field"><label>Pickup Date/Time</label><input id="rStart" type="datetime-local" value="${localInputValue(s)}"></div>
       <div class="field"><label>Return Date/Time</label><input id="rEnd" type="datetime-local" value="${localInputValue(e)}"></div>
@@ -642,6 +648,20 @@ function bookingModal(prefill={}){
       $("#rConflict").innerHTML=`<div class="ok-box">Vehicle is available for this complete period.</div>`;
     }
   };
+  $("#rCustomer")?.addEventListener("change",async()=>{
+    if($("#rCustomer").value!=="__CREATE_NEW__") return;
+    const fullName=prompt("New customer name:");
+    if(!fullName){ $("#rCustomer").value=""; return; }
+    const mobile=prompt("Mobile number (optional):")||null;
+    const {data,error}=await window.db.from("customers").insert({full_name:fullName.trim(),mobile}).select().single();
+    if(error){ alert(error.message); $("#rCustomer").value=""; return; }
+    state.customers.push({...data,name:data.full_name,phone:data.mobile});
+    const sel=$("#rCustomer");
+    const opt=document.createElement("option");
+    opt.value=data.id; opt.textContent=data.full_name;
+    sel.insertBefore(opt,sel.querySelector('option[value="__CREATE_NEW__"]'));
+    sel.value=data.id;
+  });
   ["rVehicle","rStart","rEnd","rPickup","rDropoff","rRate","rDiscount","rOther","rDeposit"].forEach(id=>$("#"+id)?.addEventListener("input",refresh));
   if(selectedVehicle){const v=vehicleById(selectedVehicle);$("#rRate").value=Number(v?.rate||0);}
   refresh();
@@ -650,7 +670,7 @@ function bookingModal(prefill={}){
 async function saveRentalAgreement(){
   if(!state.live){alert("Supabase is not live.");return false;}
   const customerId=$("#rCustomer").value,vehicleId=$("#rVehicle").value,start=$("#rStart").value,end=$("#rEnd").value;
-  if(!customerId||!vehicleId){alert("Select a customer and vehicle.");return false;}
+  if(!customerId||customerId==="__CREATE_NEW__"||!vehicleId){alert("Select a customer and vehicle.");return false;}
   if(new Date(end)<=new Date(start)){alert("Return must be after pickup.");return false;}
   if(segmentConflict(vehicleId,start,end)){alert("This vehicle conflicts with another booking. Choose one of the available alternatives.");return false;}
   const vehicle=vehicleById(vehicleId);
