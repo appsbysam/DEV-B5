@@ -51,10 +51,10 @@ const demo = {
 
 const state = {
   page: "dashboard",
-  vehicles: JSON.parse(localStorage.getItem("ascr_vehicles") || "null") || demo.vehicles,
+  vehicles: JSON.parse(localStorage.getItem("ascr_vehicles") || "null") || window.IMPORTED_DATA?.vehicles || demo.vehicles,
   rentals: JSON.parse(localStorage.getItem("ascr_rentals") || "null") || demo.rentals,
   customers: JSON.parse(localStorage.getItem("ascr_customers") || "null") || demo.customers,
-  suppliers: JSON.parse(localStorage.getItem("ascr_suppliers") || "null") || demo.suppliers,
+  suppliers: JSON.parse(localStorage.getItem("ascr_suppliers") || "null") || window.IMPORTED_DATA?.suppliers || demo.suppliers,
   locations: JSON.parse(localStorage.getItem("ascr_locations") || "null") || demo.locations,
 };
 
@@ -274,7 +274,7 @@ function availabilityGroup(title,rows,blocked=false){
           </div>
           <h3 style="margin-top:10px">${v.make} ${v.model}</h3>
           <div class="vehicle-meta">${v.plate} · ${v.category} · ${v.seats} seats · ${v.transmission}</div>
-          <div class="vehicle-rate">${money(v.rate)}/day</div>
+          <div class="vehicle-rate">${Number(v.rate)>0?`${money(v.rate)}/day`:"Rate not loaded"}</div>
           <div class="vehicle-meta">${blocked?"Conflicts with an existing booking":`Estimated rental: ${money(v.estimate)} incl. ${money(v.locationFees)} location fees`}</div>
           ${blocked?"":`<div class="card-actions"><button class="btn btn-primary btn-small">Create Quote</button><button class="btn btn-secondary btn-small">Reserve</button></div>`}
         </div>`).join("")}</div>`:`<div class="empty">No matching vehicles.</div>`}
@@ -334,8 +334,8 @@ function renderFleet(){
             <span class="badge ${v.source==="External"?"badge-external":"badge-available"}">${v.source}</span>
           </div>
           <h3 style="margin-top:10px">${v.make} ${v.model}</h3>
-          <div class="vehicle-meta">${v.plate} · ${v.color} · ${v.category}<br>${v.seats} seats · ${v.transmission}</div>
-          <div class="vehicle-rate">${money(v.rate)}/day</div>
+          <div class="vehicle-meta">${v.plate || "Plate not recorded"} · ${v.color || "Colour not recorded"} · ${v.category}<br>${v.seats} seats · ${v.transmission}</div>${v.current_customer?`<div class="vehicle-meta" style="margin-top:8px">Current: <strong>${v.current_customer}</strong>${v.out_raw?` · OUT ${v.out_raw}`:""}</div>`:""}${v.next_rental_note?`<div class="vehicle-meta">Note: ${v.next_rental_note}</div>`:""}
+          <div class="vehicle-rate">${Number(v.rate)>0?`${money(v.rate)}/day`:"Rate not loaded"}</div>
           ${v.supplier?`<div class="vehicle-meta">Supplier: <strong>${v.supplier}</strong></div>`:""}
           <div class="card-actions"><button class="btn btn-secondary btn-small" data-vehicle="${v.id}">Details</button></div>
         </div>`).join("")}

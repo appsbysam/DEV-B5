@@ -77,3 +77,20 @@ After the visual layout is reviewed, the next stage should be:
 6. Add proper location-fee overrides.
 7. Add customer history.
 8. Add Excel/Word migration tooling.
+
+
+## Version 2 — imported business data
+
+This version preloads source data extracted from:
+
+- Daily 14--8.docx
+- maher firass 2026 (1).docx
+
+Imported records:
+- Own fleet: 110
+- External/partner vehicles: 71
+- Raw booking entries preserved for migration review: 277
+
+Important: the source files contain mixed/ambiguous date formats and operational notes. These dates have **not** been silently normalised. They remain preserved in `imported-data.js` for the next migration-review stage.
+
+The source files did not provide a reliable daily rate for each vehicle, so imported records deliberately show **Rate not loaded** instead of invented prices.
