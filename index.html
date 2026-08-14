@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>All Season Car Rental</title>
+  <link rel="icon" href="assets/logo.png" />
+  <link rel="stylesheet" href="app.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="assets/logo.png" alt="All Season Car Rental logo" />
+        <div>
+          <strong>All Season</strong>
+          <span>Car Rental</span>
+        </div>
+      </div>
+
+      <nav id="nav">
+        <button data-page="dashboard" class="nav-btn active">Dashboard</button>
+        <button data-page="today" class="nav-btn">Today</button>
+        <button data-page="availability" class="nav-btn">Availability</button>
+        <button data-page="rentals" class="nav-btn">Rentals</button>
+        <button data-page="calendar" class="nav-btn">Calendar</button>
+        <button data-page="fleet" class="nav-btn">Fleet</button>
+        <button data-page="customers" class="nav-btn">Customers</button>
+        <button data-page="suppliers" class="nav-btn">Suppliers</button>
+        <button data-page="locations" class="nav-btn">Locations & Fees</button>
+        <button data-page="settings" class="nav-btn">Settings</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="dataMode" class="badge badge-demo">Demo Data</span>
+        <small>GitHub + Supabase build</small>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button id="menuBtn" class="icon-btn" aria-label="Toggle menu">☰</button>
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSubtitle">Fleet and rental operations at a glance</p>
+        </div>
+        <div class="top-actions">
+          <button class="btn btn-secondary" id="quickAvailability">Check Availability</button>
+          <button class="btn btn-primary" id="quickRental">New Rental</button>
+        </div>
+      </header>
+
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+
+  <dialog id="modal">
+    <form method="dialog" class="modal-card" id="modalForm">
+      <div class="modal-head">
+        <h3 id="modalTitle">Details</h3>
+        <button class="icon-btn" value="cancel" aria-label="Close">✕</button>
+      </div>
+      <div id="modalBody"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" value="cancel">Cancel</button>
+        <button class="btn btn-primary" id="modalSave" value="default">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
