@@ -2311,7 +2311,7 @@ window.IMPORTED_DATA = {
       "transmission": "Automatic",
       "rate": 0,
       "source": "External",
-      "supplier": "BoSS",
+      "supplier": "Boss",
       "status": "Out on Rental",
       "current_customer": "رواد يونس",
       "out_raw": "15/8",
@@ -2330,7 +2330,7 @@ window.IMPORTED_DATA = {
       "transmission": "Automatic",
       "rate": 0,
       "source": "External",
-      "supplier": "BOSS",
+      "supplier": "Boss",
       "status": "Out on Rental",
       "current_customer": "احسان ابو سعد",
       "out_raw": "18/8",
@@ -2349,7 +2349,7 @@ window.IMPORTED_DATA = {
       "transmission": "Automatic",
       "rate": 0,
       "source": "External",
-      "supplier": "jonny",
+      "supplier": "Jonny",
       "status": "Out on Rental",
       "current_customer": "روبرتو متري",
       "out_raw": "20/8",
@@ -2482,7 +2482,7 @@ window.IMPORTED_DATA = {
       "transmission": "Automatic",
       "rate": 0,
       "source": "External",
-      "supplier": "BOSS",
+      "supplier": "Boss",
       "status": "Out on Rental",
       "current_customer": "فراس الشوفي",
       "out_raw": "8/16",
@@ -3014,7 +3014,7 @@ window.IMPORTED_DATA = {
       "transmission": "Automatic",
       "rate": 0,
       "source": "External",
-      "supplier": "Mikano",
+      "supplier": "Mekano",
       "status": "Out on Rental",
       "current_customer": "Sara Ayass",
       "out_raw": "7/8",
@@ -3223,7 +3223,7 @@ window.IMPORTED_DATA = {
       "transmission": "Automatic",
       "rate": 0,
       "source": "External",
-      "supplier": "BOSS",
+      "supplier": "Boss",
       "status": "Out on Rental",
       "current_customer": "Rinal b imad",
       "out_raw": "4/8",
@@ -3280,7 +3280,7 @@ window.IMPORTED_DATA = {
       "transmission": "Automatic",
       "rate": 0,
       "source": "External",
-      "supplier": "mekano",
+      "supplier": "Mekano",
       "status": "Out on Rental",
       "current_customer": "Goerge saadi",
       "out_raw": "14/8",
@@ -6324,92 +6324,67 @@ window.IMPORTED_DATA = {
   "suppliers": [
     {
       "id": 1,
-      "name": "BOSS",
-      "phone": ""
-    },
-    {
-      "id": 2,
-      "name": "BoSS",
-      "phone": ""
-    },
-    {
-      "id": 3,
       "name": "Boss",
       "phone": ""
     },
     {
-      "id": 4,
+      "id": 2,
       "name": "Halal",
       "phone": ""
     },
     {
-      "id": 5,
+      "id": 3,
       "name": "Icos",
       "phone": ""
     },
     {
-      "id": 6,
+      "id": 4,
       "name": "Jonny",
       "phone": ""
     },
     {
-      "id": 7,
+      "id": 5,
       "name": "Majeed",
       "phone": ""
     },
     {
-      "id": 8,
+      "id": 6,
       "name": "Majid",
       "phone": ""
     },
     {
-      "id": 9,
+      "id": 7,
       "name": "Mekano",
       "phone": ""
     },
     {
-      "id": 10,
-      "name": "Mikano",
-      "phone": ""
-    },
-    {
-      "id": 11,
+      "id": 8,
       "name": "Milad",
       "phone": ""
     },
     {
-      "id": 12,
+      "id": 9,
       "name": "Nada",
       "phone": ""
     },
     {
-      "id": 13,
+      "id": 10,
+      "name": "nada",
+      "phone": ""
+    },
+    {
+      "id": 11,
       "name": "Rasamny",
       "phone": ""
     },
     {
-      "id": 14,
+      "id": 12,
       "name": "Sign",
       "phone": ""
     },
     {
-      "id": 15,
+      "id": 13,
       "name": "Unknown supplier",
-      "phone": ""
-    },
-    {
-      "id": 16,
-      "name": "jonny",
-      "phone": ""
-    },
-    {
-      "id": 17,
-      "name": "mekano",
-      "phone": ""
-    },
-    {
-      "id": 18,
-      "name": "nada",
       "phone": ""
     }
   ],

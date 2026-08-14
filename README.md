@@ -122,3 +122,19 @@ This update:
 - Keeps the fleet timeline internally scrollable because a multi-day timeline cannot be meaningfully compressed into a phone width.
 
 Note: live writes require the Supabase tables to permit the publishable key to access them. If Row Level Security is enabled, appropriate policies must exist.
+
+
+## V4 — Supplier data cleanup
+
+This update safely canonicalises only the supplier aliases confirmed by the business:
+
+- BOSS / BoSS / Boss → **Boss**
+- Jonny / jonny / Johnny → **Jonny**
+- Mekano / mekano / Mikano → **Mekano**
+- Halal case variants → **Halal**
+
+Run `normalize-suppliers.sql` once in the Supabase SQL Editor after deploying this code update.
+
+The migration reassigns all linked vehicle records to the canonical supplier ID before deleting duplicate supplier rows. It does not merge other similar-looking supplier names such as Majid/Majeed or Nada/nada because those were not explicitly approved for merging.
+
+`imported-data.js` and `seed-imported-catalogue.sql` have also been normalised so the same duplicates are not recreated in fallback data or a future clean database build.
