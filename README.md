@@ -138,3 +138,12 @@ Run `normalize-suppliers.sql` once in the Supabase SQL Editor after deploying th
 The migration reassigns all linked vehicle records to the canonical supplier ID before deleting duplicate supplier rows. It does not merge other similar-looking supplier names such as Majid/Majeed or Nada/nada because those were not explicitly approved for merging.
 
 `imported-data.js` and `seed-imported-catalogue.sql` have also been normalised so the same duplicates are not recreated in fallback data or a future clean database build.
+
+
+## V5 — Authentication
+
+The public app package no longer includes imported business data or one-off SQL files.
+
+The frontend now requires a valid Supabase Auth email/password session before the operational interface loads.
+
+Important: after deploying V5, update Supabase RLS policies so operational tables are readable/writable by `authenticated` users rather than `anon`. Keep the SQL migration itself in your local `_private/sql/` folder rather than committing it to GitHub.

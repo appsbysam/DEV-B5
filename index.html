@@ -10,6 +10,27 @@
   
 </head>
 <body>
+
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <img src="assets/logo.png" alt="All Season Car Rental logo" class="auth-logo" />
+      <h1>All Season Car Rental</h1>
+      <p>Staff sign in</p>
+      <form id="loginForm">
+        <div class="field">
+          <label>Email</label>
+          <input id="loginEmail" type="email" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="loginPassword" type="password" autocomplete="current-password" required />
+        </div>
+        <button id="loginBtn" class="btn btn-primary" type="submit">Sign In</button>
+        <div id="loginMessage" class="auth-message" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
   <div id="app">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
@@ -47,8 +68,10 @@
           <p id="pageSubtitle">Fleet and rental operations at a glance</p>
         </div>
         <div class="top-actions">
+          <span id="signedInUser" class="signed-user"></span>
           <button class="btn btn-secondary" id="quickAvailability">Check Availability</button>
           <button class="btn btn-primary" id="quickRental">New Rental</button>
+          <button class="btn btn-secondary" id="logoutBtn">Sign Out</button>
         </div>
       </header>
 
@@ -75,7 +98,7 @@
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
-  <script src="imported-data.js"></script>
   <script src="app.js"></script>
+  <script src="auth.js"></script>
 </body>
 </html>

@@ -11,8 +11,8 @@ const fallback = {
     {id:"local-5",name:"Nabatieh",pickup_fee:25,dropoff_fee:25,turnaround_minutes:60},
   ],
   customers: [],
-  suppliers: window.IMPORTED_DATA?.suppliers || [],
-  vehicles: window.IMPORTED_DATA?.vehicles || [],
+  suppliers: [],
+  vehicles: [],
   rentals: [],
   categories: []
 };
@@ -685,5 +685,25 @@ $("#menuBtn").addEventListener("click",()=>$("#sidebar").classList.toggle("open"
 $("#quickAvailability").addEventListener("click",()=>go("availability"));
 $("#quickRental").addEventListener("click",()=>{go("rentals"); setTimeout(newRentalModal,50);});
 
-render();
-loadSupabaseData();
+let appStarted = false;
+
+window.startB5App = async function(){
+  if(!appStarted){
+    appStarted = true;
+    render();
+  }
+  await loadSupabaseData();
+};
+
+window.resetB5App = function(){
+  state.live = false;
+  state.error = "";
+  state.vehicles = [];
+  state.rentals = [];
+  state.customers = [];
+  state.suppliers = [];
+  state.locations = fallback.locations;
+  state.categories = [];
+  state.segments = [];
+  appStarted = false;
+};
