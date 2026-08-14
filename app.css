@@ -158,3 +158,101 @@ dialog::backdrop{background:rgba(8,17,31,.55)}
   .filters{grid-template-columns:1fr}
   .top-actions .btn{padding:9px 10px;font-size:12px}
 }
+
+
+/* ===== V3 responsive lock / mobile fit ===== */
+html {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+body, #app, .main, .content, .panel, .table-wrap {
+  max-width: 100%;
+}
+body {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+img, svg, canvas {
+  max-width: 100%;
+}
+input, select, textarea, button {
+  font-size: 16px; /* prevents automatic mobile browser zoom on form focus */
+}
+.brand img {
+  object-fit: contain;
+  background: #f4f7fb;
+}
+.live-status {
+  background: #e8f7ef;
+  color: #0e7747;
+}
+.fallback-status {
+  background: #fff3dc;
+  color: #936000;
+}
+
+@media (max-width:760px){
+  html, body { width:100vw; max-width:100vw; overflow-x:hidden; }
+  #app { width:100vw; max-width:100vw; overflow-x:hidden; }
+  .main { min-width:0; max-width:100vw; overflow-x:hidden; }
+  .content { width:100%; max-width:100%; padding:12px; overflow-x:hidden; }
+  .topbar { width:100%; max-width:100vw; overflow:hidden; }
+  .topbar > div:nth-child(2) { min-width:0; flex:1; }
+  .topbar p { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .top-actions { flex:0 0 auto; }
+  .panel { width:100%; max-width:100%; }
+  .filters { width:100%; max-width:100%; }
+  .field { min-width:0; }
+  .field input,.field select,.field textarea { min-width:0; max-width:100%; }
+  .vehicle-card { min-width:0; overflow:hidden; }
+  .vehicle-meta { overflow-wrap:anywhere; }
+
+  /* Tables become stacked cards on mobile so there is no horizontal page/table panning. */
+  .table-wrap { overflow-x:hidden; width:100%; }
+  .table-wrap table,
+  .table-wrap thead,
+  .table-wrap tbody,
+  .table-wrap tr,
+  .table-wrap th,
+  .table-wrap td {
+    display:block;
+    width:100%;
+    min-width:0;
+  }
+  .table-wrap table { min-width:0; border-collapse:separate; }
+  .table-wrap thead { display:none; }
+  .table-wrap tbody { padding:8px; }
+  .table-wrap tr {
+    border:1px solid var(--line);
+    border-radius:12px;
+    margin-bottom:10px;
+    background:#fff;
+    overflow:hidden;
+  }
+  .table-wrap td {
+    display:grid;
+    grid-template-columns:minmax(92px,36%) 1fr;
+    gap:8px;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    padding:8px 10px;
+    border-bottom:1px solid #eef1f5;
+    font-size:12px;
+  }
+  .table-wrap td:last-child { border-bottom:0; }
+  .table-wrap td::before {
+    content:attr(data-label);
+    color:var(--muted);
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+
+  /* Timeline is intentionally internally scrollable only; the page itself stays fixed. */
+  .timeline { max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; }
+}

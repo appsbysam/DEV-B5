@@ -94,3 +94,31 @@ Imported records:
 Important: the source files contain mixed/ambiguous date formats and operational notes. These dates have **not** been silently normalised. They remain preserved in `imported-data.js` for the next migration-review stage.
 
 The source files did not provide a reliable daily rate for each vehicle, so imported records deliberately show **Rate not loaded** instead of invented prices.
+
+
+## dev-B5 Supabase connection
+
+This package already contains the current development Supabase connection in `supabase.js`.
+
+Project URL:
+`https://hckccqvtxweulskcqhcn.supabase.co`
+
+The publishable key is already inserted.
+
+Run `schema.sql` in the Supabase SQL Editor before using live database tables.
+
+Then review and run `seed-imported-catalogue.sql` to load the imported vehicle catalogue and supplier records.
+
+
+## V3 — Live Supabase + responsive lock
+
+This update:
+- Makes Supabase the primary live data source for vehicles, suppliers, customers, locations, rental agreements and rental segments.
+- Adds live Supabase inserts for new vehicles, customers and rental agreements/segments.
+- Keeps imported data only as an offline/fallback display source.
+- Adds `Any` to both Pickup Location and Drop-off Location in Availability filters.
+- Locks the viewport for mobile use: no pinch-to-zoom, no browser input zoom, and no horizontal page expansion.
+- Converts normal data tables to stacked mobile cards so they fit the screen without sideways page scrolling.
+- Keeps the fleet timeline internally scrollable because a multi-day timeline cannot be meaningfully compressed into a phone width.
+
+Note: live writes require the Supabase tables to permit the publishable key to access them. If Row Level Security is enabled, appropriate policies must exist.
