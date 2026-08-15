@@ -1,14 +1,13 @@
 window.B5_VERSION = {
-  version: "0.7.3",
+  version: "0.7.4",
   build: "Demo Build",
   released: "2026-08-15",
-  title: "Today Dashboard Drill-Down",
+  title: "Reconciled Fleet Statuses",
   notes: [
-    "Fixed the header version display so it matches the deployed build.",
-    "Simplified the Today page into four compact summary tiles.",
-    "Returns Today, Pickups Today, Available in Office and External Action now show counts first.",
-    "Tap a tile to drill down into its detailed records.",
-    "Tap the active tile again to collapse the detailed view.",
-    "No Supabase database changes are required."
+    "Updated vehicle availability logic to respect reconciled database statuses.",
+    "Vehicles marked Needs Review are no longer treated as available.",
+    "Vehicles with unresolved Out on Rental status but no reliable segment are shown as Needs Review.",
+    "Added a Needs Review dashboard count so uncertain source records remain visible without distorting availability.",
+    "This build is designed to work with the 15 August customer/rental reconciliation imported into Supabase."
   ]
 };

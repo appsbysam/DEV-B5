@@ -231,3 +231,10 @@ The Today view now prioritises counts rather than displaying large lists by defa
 The visible version label has also been corrected to match the deployed `version.js`.
 
 No database changes are required.
+
+
+## v0.7.4 — Reconciled fleet status handling
+
+The app now respects `Needs Review` and reconciled operational statuses rather than assuming any vehicle without a live rental segment is available.
+
+This prevents unresolved legacy/import records from inflating the available-fleet count after the 15 August 2026 database reconciliation.

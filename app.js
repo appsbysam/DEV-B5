@@ -143,7 +143,7 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
 window.logAudit=logAudit;
 
 function versionInfo(){
-  return window.B5_VERSION || {version:"0.7.3",title:"Version Update",notes:[]};
+  return window.B5_VERSION || {version:"0.7.4",title:"Version Update",notes:[]};
 }
 
 function getDeviceId(){
@@ -236,6 +236,7 @@ function statusClass(s){
   const x=(s||"").toLowerCase();
   if(x.includes("available")) return "badge-available";
   if(x.includes("out of order")||x.includes("maintenance")) return "badge-oos";
+  if(x.includes("needs review")) return "badge-demo";
   if(x.includes("reserved")||x.includes("confirmed")) return "badge-reserved";
   if(x.includes("out")||x.includes("active")) return "badge-out";
   if(x.includes("complete")) return "badge-available";
@@ -283,10 +284,11 @@ function nextSegmentForVehicle(vehicleId){
     .sort((a,b)=>new Date(a.start_at)-new Date(b.start_at))[0];
 }
 function effectiveVehicleStatus(v){
-  if(["Out of Order","Maintenance","Inactive"].includes(v.db_status)) return v.db_status;
+  if(["Out of Order","Maintenance","Inactive","Needs Review"].includes(v.db_status)) return v.db_status;
   if(currentSegmentForVehicle(v.id)) return "Out on Rental";
   if(nextSegmentForVehicle(v.id)) return "Reserved";
-  return "Available";
+  if(v.db_status==="Out on Rental") return "Needs Review";
+  return v.db_status==="Available" ? "Available" : (v.db_status||"Needs Review");
 }
 function segmentAgreement(segment){
   return state.rentals.find(r=>String(r.uuid)===String(segment.rental_agreement_id));
@@ -411,6 +413,7 @@ function renderDashboard(){
   const out=state.vehicles.filter(v=>effectiveVehicleStatus(v)==="Out on Rental").length;
   const reserved=state.vehicles.filter(v=>effectiveVehicleStatus(v)==="Reserved").length;
   const external=state.vehicles.filter(v=>v.source==="External").length;
+  const needsReview=state.vehicles.filter(v=>effectiveVehicleStatus(v)==="Needs Review").length;
   const oos=state.vehicles.filter(v=>["Out of Order","Maintenance"].includes(effectiveVehicleStatus(v))).length;
   const returnsToday=state.rentals.filter(r=>["Active","Confirmed","Reserved"].includes(r.status)&&sameDay(r.end,now));
   const pickupsToday=state.rentals.filter(r=>["Reserved","Confirmed"].includes(r.status)&&sameDay(r.start,now));
@@ -424,7 +427,7 @@ function renderDashboard(){
       ${stat("Reserved",reserved,"Future bookings")}
       ${stat("Returning Today",returnsToday.length,"Expected returns")}
       ${stat("Going Out Today",pickupsToday.length,"Today's pickups")}
-      ${stat("External Vehicles",external,"Partner-sourced")}
+      ${stat("Needs Review",needsReview,"Not counted as available")}
       ${stat("Out of Order",oos,"Unavailable")}
     </div>
 
@@ -990,7 +993,7 @@ function renderSettings(){
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
-      <p class="note">v0.7.3 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
+      <p class="note">v0.7.4 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
     </div></div>
   </div>`;
 }

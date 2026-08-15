@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.4 — Reconciled Fleet Statuses
+- Updated availability logic to respect the reconciled Supabase operational status.
+- `Needs Review` vehicles are no longer incorrectly counted as available.
+- Unresolved `Out on Rental` records without a reliable rental segment fall back to `Needs Review`.
+- Added a Needs Review dashboard statistic.
+- Designed to work with the 15 August 2026 customer/rental reconciliation import.
+- No additional SQL is required after the reconciliation already applied to Supabase.
+
 ## v0.7.3 — Today Dashboard Drill-Down
 - Fixed the visible header version number so it matches the deployed application version.
 - Reworked the Today page into compact summary tiles.
