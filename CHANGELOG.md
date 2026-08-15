@@ -2,6 +2,15 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.10 — Mobile Menu Controls & Fresh Audit History
+- Added a visible close button to the mobile sidebar.
+- Added a tap-outside backdrop so touching the remaining screen closes the mobile menu.
+- Added Escape-key support for closing the navigation where available.
+- The menu continues to close automatically after selecting a navigation item.
+- Cleared 721 existing development/import audit records from Supabase to establish a clean demo audit baseline.
+- Added a private SQL record of the completed audit reset under `_private/sql/`.
+- No fleet, customer, supplier, location or rental data was deleted.
+
 ## v0.7.9 — Actionable Overdue Rentals
 - Made the Dashboard overdue warning clickable.
 - Added a drill-down list of overdue rentals.

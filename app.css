@@ -972,3 +972,64 @@ body.auth-locked #app { visibility: hidden; }
 @media(max-width:760px){
   .overdue-alert{align-items:flex-start;flex-direction:column}
 }
+
+
+/* ===== v0.7.10 mobile navigation close controls ===== */
+.sidebar-close-btn{
+  display:none;
+}
+.sidebar-backdrop{
+  display:none;
+}
+
+@media(max-width:760px){
+  .sidebar{
+    z-index:40;
+  }
+  .sidebar-close-btn{
+    display:flex;
+    position:absolute;
+    top:9px;
+    right:9px;
+    width:36px;
+    height:36px;
+    align-items:center;
+    justify-content:center;
+    border:0;
+    border-radius:10px;
+    background:rgba(255,255,255,.10);
+    color:#fff;
+    font-size:20px;
+    line-height:1;
+    cursor:pointer;
+    z-index:42;
+  }
+  .sidebar-close-btn:active{
+    background:rgba(255,255,255,.18);
+  }
+  .sidebar .brand{
+    padding-right:38px;
+  }
+  .sidebar-backdrop{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:35;
+    border:0;
+    padding:0;
+    margin:0;
+    background:rgba(8,17,31,.42);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .2s ease,visibility .2s ease;
+  }
+  #app.menu-open .sidebar-backdrop{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+  #app.menu-open{
+    overflow:hidden;
+  }
+}

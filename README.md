@@ -252,3 +252,10 @@ Manager Mode now translates audit records into plain-English summaries rather th
 ## v0.7.9 — Actionable overdue rentals
 
 The Dashboard overdue warning now opens a dedicated drill-down. Users can see exactly which agreements are overdue, how late each return is, and immediately extend, return or open the rental.
+
+
+## v0.7.10 — Mobile navigation and audit baseline
+
+The mobile sidebar can now be closed via an X button, by tapping the dimmed area outside the menu, by selecting a navigation item, or with Escape where supported.
+
+The existing development/import audit log was cleared on 15 August 2026 so subsequent audit history represents the clean demo period onward.

@@ -152,7 +152,7 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
 window.logAudit=logAudit;
 
 function versionInfo(){
-  return window.B5_VERSION || {version:"0.7.9",title:"Version Update",notes:[]};
+  return window.B5_VERSION || {version:"0.7.10",title:"Version Update",notes:[]};
 }
 
 function getDeviceId(){
@@ -1259,7 +1259,7 @@ function renderSettings(){
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
-      <p class="note">v0.7.9 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
+      <p class="note">v0.7.10 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
     </div></div>
   </div>`;
 }
@@ -1716,18 +1716,36 @@ function bindPageEvents(){
 
 }
 
+function closeMobileMenu(){
+  $("#sidebar")?.classList.remove("open");
+  $("#app")?.classList.remove("menu-open");
+}
+function toggleMobileMenu(){
+  const sidebar=$("#sidebar");
+  const opening=!sidebar?.classList.contains("open");
+  sidebar?.classList.toggle("open",opening);
+  $("#app")?.classList.toggle("menu-open",opening);
+}
 function go(page){
   if(page==="manager"&&!isManager()) return;
   state.focusRentalUuid=null;
   state.page=page;
   render();
   logAudit("page_view","page",page,{page});
-  if(window.innerWidth<760)$("#sidebar").classList.remove("open");
+  if(window.innerWidth<760) closeMobileMenu();
 }
 $$(".nav-btn").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
 $("#modalCloseBtn")?.addEventListener("click",()=>$("#modal").close());
 $("#modalCancelBtn")?.addEventListener("click",()=>$("#modal").close());
-$("#menuBtn").addEventListener("click",()=>$("#sidebar").classList.toggle("open"));
+$("#menuBtn").addEventListener("click",toggleMobileMenu);
+$("#sidebarCloseBtn")?.addEventListener("click",closeMobileMenu);
+$("#sidebarBackdrop")?.addEventListener("click",closeMobileMenu);
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && $("#sidebar")?.classList.contains("open")) closeMobileMenu();
+});
+window.addEventListener("resize",()=>{
+  if(window.innerWidth>=760) closeMobileMenu();
+});
 $("#quickAvailability").addEventListener("click",()=>go("availability"));
 $("#quickRental").addEventListener("click",()=>{go("rentals");setTimeout(()=>bookingModal(),50);});
 $("#managerTopBtn")?.addEventListener("click",()=>go("manager"));
