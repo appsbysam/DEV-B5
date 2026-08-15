@@ -177,3 +177,10 @@ This release starts the pre-1.0 versioning convention. The app is now shown as `
 New Rental validates all required fields together. Missing fields receive a red border and inline error message, and the warning clears automatically as the user fixes each field.
 
 No database changes are required.
+
+
+## v0.6.3 — Mobile modal fix
+
+The New Rental / Booking dialog is now constrained to the mobile viewport. The form uses a single-column layout on phones and scrolls vertically inside the modal without horizontal page or dialog movement.
+
+No database changes are required.

@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.6.3 — Mobile Rental Modal Fit
+- Fixed the New Rental / Booking modal on mobile so it always stays within the device viewport.
+- Removed horizontal/sideways modal movement.
+- Forced modal form fields and grids to remain within the available screen width.
+- Changed the rental modal to vertical scrolling only on smaller screens.
+- Kept the modal header and action area contained while the form body scrolls.
+- No Supabase database changes are required.
+
 ## v0.6.2 — Required Field Validation & Pre-Release Versioning
 - Changed the visible application version from v6.1 to **v0.6.2** to clearly identify the app as pre-release software.
 - Added required-field validation to the New Rental / Booking workflow.
