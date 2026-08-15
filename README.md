@@ -200,3 +200,16 @@ The companion private SQL creates:
 - database audit triggers for major operational tables
 
 Keep the SQL file in `_private/sql/`; it is intentionally not included in the public repository ZIP.
+
+
+## v0.7.1 — Manager UI / profile refinement
+
+Manager Mode is now a compact drill-down dashboard rather than an always-expanded report. Desktop managers get a header shortcut and mobile managers retain the navigation-menu entry.
+
+The signed-in user's name is clickable and opens a My Profile panel inspired by the 171 Timesheet profile design, including role, status, device type, user ID and a persistent local device ID.
+
+Audit records can be filtered by user, action, area and date. Test-rate rows are loaded visually only when the Test Rates tile is selected.
+
+The version checker now fetches `version.js` with `cache: no-store` on startup and every 10 minutes. If a different deployed version is detected, the user receives an update prompt.
+
+No database change is required.

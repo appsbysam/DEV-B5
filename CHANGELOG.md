@@ -2,6 +2,20 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.1 — Manager UI, User Profile & Update Checking
+- Added Manager Mode shortcut to the desktop header while retaining it in the mobile navigation menu.
+- Changed the signed-in identity to a clickable user name rather than displaying only the email address.
+- Added My Profile popup with username, email, role, status, device type, browser, user ID and persistent device ID.
+- Added copy controls for User ID and Device ID.
+- Added persistent local device identification to client audit events.
+- Redesigned Manager Mode into four compact dashboard tiles: User Access, Audit Log, Test Rates and System.
+- Removed the always-expanded 181+ test-rate list; records now appear only when Test Rates is selected.
+- Added drill-down User Access activity and audit filtering by user, action/log, area and date.
+- Added searchable Test Rates drill-down.
+- Added actual no-cache `version.js` update checking on startup and every 10 minutes.
+- Added an Update Available prompt with optional immediate refresh.
+- No Supabase SQL/database changes are required for this release.
+
 ## v0.7.0 — Manager Mode, Version Updates & Audit History
 - Moved application version information into `version.js`.
 - Added automatic What's New popup when a newly deployed version is detected.

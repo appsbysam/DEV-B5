@@ -34,7 +34,9 @@ const state = {
   bonds: [],
   userProfile: null,
   auditLogs: [],
-  staffProfiles: []
+  staffProfiles: [],
+  managerView: "activity",
+  managerUserFilter: ""
 };
 
 const pageMeta = {
@@ -87,7 +89,9 @@ function isManager(){ return state.userProfile?.role === "manager"; }
 
 function setManagerVisibility(){
   const btn=$("#managerNav");
+  const top=$("#managerTopBtn");
   if(btn) btn.hidden=!isManager();
+  if(top) top.hidden=!isManager();
   if(state.page==="manager" && !isManager()) state.page="dashboard";
 }
 
@@ -124,7 +128,12 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
       action,
       entity_type:entityType,
       entity_id:entityId ? String(entityId) : null,
-      details:details||{}
+      details:{
+        ...(details||{}),
+        device_id:getDeviceId(),
+        device_type:getDeviceType(),
+        browser:getBrowserName()
+      }
     });
   }catch(err){
     console.warn("Audit log failed",err);
@@ -133,10 +142,85 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
 window.logAudit=logAudit;
 
 function versionInfo(){
-  return window.B5_VERSION || {version:"0.7.0",title:"Version Update",notes:[]};
+  return window.B5_VERSION || {version:"0.7.1",title:"Version Update",notes:[]};
+}
+
+function getDeviceId(){
+  const key="b5_device_id";
+  let id=localStorage.getItem(key);
+  if(!id){
+    const raw=(crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`)
+      .replace(/[^a-z0-9]/gi,"").toUpperCase();
+    id=`B5-${raw.slice(0,4)}-${raw.slice(4,8)}-${raw.slice(8,12)}`;
+    localStorage.setItem(key,id);
+  }
+  return id;
+}
+function getDeviceType(){
+  const ua=navigator.userAgent||"";
+  if(/iPad|Tablet/i.test(ua)) return "Tablet";
+  if(/Android/i.test(ua) && /Mobile/i.test(ua)) return "Android phone";
+  if(/iPhone/i.test(ua)) return "iPhone";
+  if(/Android/i.test(ua)) return "Android device";
+  if(/Windows/i.test(ua)) return "Windows computer";
+  if(/Macintosh|Mac OS/i.test(ua)) return "Mac computer";
+  return "Web browser";
+}
+function getBrowserName(){
+  const ua=navigator.userAgent||"";
+  if(/Brave/i.test(navigator.brave?.isBrave ? "Brave" : "")) return "Brave";
+  if(/Edg\//i.test(ua)) return "Microsoft Edge";
+  if(/Chrome\//i.test(ua)) return "Chrome / Chromium";
+  if(/Safari\//i.test(ua) && !/Chrome/i.test(ua)) return "Safari";
+  if(/Firefox\//i.test(ua)) return "Firefox";
+  return "Browser";
+}
+function friendlyName(profile){
+  const raw=(profile?.display_name || profile?.email || "Signed in").trim();
+  if(raw && !raw.includes("@")) return raw;
+  const local=(profile?.email||raw).split("@")[0]||"Signed in";
+  return local
+    .replace(/[._-]+/g," ")
+    .replace(/\b\w/g,m=>m.toUpperCase());
+}
+function updateSignedInName(){
+  const el=$("#signedInUser");
+  if(el) el.textContent=friendlyName(state.userProfile);
+}
+function profileRow(label,value,copy=false){
+  const safe=esc(value||"—");
+  return `<div class="profile-row">
+    <div class="profile-row-label">${esc(label)}</div>
+    <div class="profile-row-value"><span>${safe}</span>
+      ${copy&&value?`<button class="profile-copy" type="button" data-copy-value="${esc(value)}">Copy</button>`:""}
+    </div>
+  </div>`;
+}
+function openUserProfile(){
+  const p=state.userProfile||{};
+  $("#profileBody").innerHTML=[
+    profileRow("Username",friendlyName(p)),
+    profileRow("Email",p.email||""),
+    profileRow("Role",p.role==="manager"?"Manager":"Staff"),
+    profileRow("Status",p.active===false?"Inactive":"Active"),
+    profileRow("Device Type",getDeviceType()),
+    profileRow("Browser",getBrowserName()),
+    profileRow("User ID",p.user_id||"",true),
+    profileRow("Device ID",getDeviceId(),true)
+  ].join("");
+  $$("[data-copy-value]",$("#profileBody")).forEach(btn=>btn.onclick=async()=>{
+    try{
+      await navigator.clipboard.writeText(btn.dataset.copyValue);
+      const old=btn.textContent; btn.textContent="Copied";
+      setTimeout(()=>btn.textContent=old,1000);
+    }catch(_){ }
+  });
+  $("#profileModal").showModal();
 }
 function showVersionUpdate(force=false){
   const info=versionInfo();
+  if($("#updateLater")) $("#updateLater").hidden=true;
+  if($("#updateDone")) { $("#updateDone").textContent="Got it"; $("#updateDone").dataset.mode="notes"; }
   const seen=localStorage.getItem("b5_last_seen_version");
   if(!force && seen===info.version) return;
   $("#updateTitle").textContent=info.title || "What's New";
@@ -247,6 +331,7 @@ async function loadSupabaseData(){
   try{
     state.userProfile=await loadUserProfile();
     setManagerVisibility();
+    updateSignedInName();
 
     const [categoriesRes,suppliersRes,locationsRes,customersRes,vehiclesRes,agreementsRes,segmentsRes,chargesRes,paymentsRes,bondsRes]
     =await Promise.all([
@@ -663,100 +748,150 @@ function renderLocations(){
 }
 
 function renderManager(){
-  if(!isManager()){
-    return `<div class="alert">Manager access is required.</div>`;
-  }
+  if(!isManager()) return `<div class="alert">Manager access is required.</div>`;
 
   const testRates=state.vehicles.filter(v=>{
     const n=Number(v.rate||0);
     return Math.abs((n-Math.trunc(n))-0.01)<0.001;
   });
 
-  const logRows=state.auditLogs.slice(0,200);
-  const users=state.staffProfiles;
+  const users=state.staffProfiles||[];
+  const logs=state.auditLogs||[];
+  const view=state.managerView||"activity";
+
+  const tiles=`
+    <div class="manager-dashboard">
+      <button class="manager-tile ${view==="users"?"active":""}" data-manager-view="users">
+        <div class="manager-tile-label">User Access</div>
+        <div class="manager-tile-value">${users.length}</div>
+        <div class="manager-tile-sub">Staff profiles and per-user activity</div>
+      </button>
+      <button class="manager-tile ${view==="activity"?"active":""}" data-manager-view="activity">
+        <div class="manager-tile-label">Audit Log</div>
+        <div class="manager-tile-value">${logs.length}</div>
+        <div class="manager-tile-sub">Logins, navigation and operational changes</div>
+      </button>
+      <button class="manager-tile ${view==="rates"?"active":""}" data-manager-view="rates">
+        <div class="manager-tile-label">Test Rates</div>
+        <div class="manager-tile-value">${testRates.length}</div>
+        <div class="manager-tile-sub">Only opens the list when required</div>
+      </button>
+      <button class="manager-tile ${view==="system"?"active":""}" data-manager-view="system">
+        <div class="manager-tile-label">System</div>
+        <div class="manager-tile-value">v${esc(versionInfo().version)}</div>
+        <div class="manager-tile-sub">${esc(versionInfo().build||"Build information")}</div>
+      </button>
+    </div>`;
 
   return `
     <div class="section-title">
-      <div><h2>Manager Mode</h2><p>Manager-only operational controls and history</p></div>
-      <button class="btn btn-secondary" id="refreshManager">Refresh Manager Data</button>
+      <div><h2>Manager Mode</h2><p>Choose a tile to open only the information you need.</p></div>
+      <button class="btn btn-secondary" id="refreshManager">Refresh</button>
     </div>
+    ${tiles}
+    <div class="manager-detail" id="managerDetail">${renderManagerDetail(view,testRates,users,logs)}</div>`;
+}
 
-    <div class="manager-grid">
-      <div class="manager-card">
-        <h3>User Access</h3>
-        <div class="vehicle-rate">${users.length}</div>
-        <p>Authenticated users with B5 staff profiles.</p>
-      </div>
-      <div class="manager-card">
-        <h3>Test Rates</h3>
-        <div class="vehicle-rate">${testRates.length}</div>
-        <p>Vehicles still carrying a test price ending in .01.</p>
-      </div>
-      <div class="manager-card">
-        <h3>Audit Records</h3>
-        <div class="vehicle-rate">${state.auditLogs.length}</div>
-        <p>Recent logins, navigation and business-record changes.</p>
-      </div>
-    </div>
+function renderManagerDetail(view,testRates,users,logs){
+  if(view==="users"){
+    return `
+      <div class="panel">
+        <div class="panel-head"><h3>User Access & Activity</h3></div>
+        <div class="panel-body">
+          <div class="audit-filters-v2">
+            <select id="managerUserSelect">
+              <option value="">All Users</option>
+              ${users.map(u=>`<option value="${esc(u.email||"")}" ${state.managerUserFilter===(u.email||"")?"selected":""}>${esc(u.display_name||u.email||"User")}</option>`).join("")}
+            </select>
+            <select id="auditAction"><option value="">All Logs / Actions</option>${[...new Set(logs.map(x=>x.action).filter(Boolean))].sort().map(a=>`<option>${esc(a)}</option>`).join("")}</select>
+            <select id="auditEntity"><option value="">All Areas</option>${[...new Set(logs.map(x=>x.entity_type).filter(Boolean))].sort().map(a=>`<option>${esc(a)}</option>`).join("")}</select>
+            <select id="auditDate"><option value="">All Dates</option><option value="today">Today</option><option value="7">Last 7 Days</option><option value="30">Last 30 Days</option></select>
+            <button class="btn btn-secondary" id="clearAuditFilter">Clear</button>
+          </div>
+          <div class="table-wrap" style="margin-bottom:14px">
+            <table>
+              <thead><tr><th>User</th><th>Role</th><th>Status</th></tr></thead>
+              <tbody>${users.map(u=>`<tr class="manager-user-row" data-user-email="${esc(u.email||"")}">
+                <td><strong>${esc(u.display_name||u.email||"User")}</strong><br><span class="vehicle-meta">${esc(u.email||"")}</span></td>
+                <td><span class="badge ${u.role==="manager"?"role-manager":"role-staff"}">${esc(u.role||"staff")}</span></td>
+                <td><span class="badge ${u.active?"badge-available":"badge-oos"}">${u.active?"Active":"Inactive"}</span></td>
+              </tr>`).join("")}</tbody>
+            </table>
+          </div>
+          <h3 style="margin:4px 0 10px">User Audit Log</h3>
+          <div class="table-wrap" id="auditTableWrap">${auditTable(filteredAuditRows(logs))}</div>
+        </div>
+      </div>`;
+  }
 
-    <div class="panel" style="margin-top:14px">
-      <div class="panel-head"><h3>User Access</h3></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>User</th><th>Role</th><th>Status</th></tr></thead>
-          <tbody>
-            ${users.length?users.map(u=>`<tr>
-              <td data-label="User"><strong>${esc(u.display_name||u.email||"User")}</strong><br><span class="vehicle-meta">${esc(u.email||"")}</span></td>
-              <td data-label="Role"><span class="badge ${u.role==="manager"?"role-manager":"role-staff"}">${esc(u.role||"staff")}</span></td>
-              <td data-label="Status"><span class="badge ${u.active?"badge-available":"badge-oos"}">${u.active?"Active":"Inactive"}</span></td>
-            </tr>`).join(""):`<tr><td colspan="3">No staff profiles found.</td></tr>`}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  if(view==="rates"){
+    return `
+      <div class="panel">
+        <div class="panel-head"><h3>Vehicles Still Using Test Rates</h3><span class="badge badge-reserved">${testRates.length}</span></div>
+        <div class="panel-body">
+          <div class="field"><label>Search Vehicle</label><input id="testRateSearch" placeholder="Make, model or plate"></div>
+        </div>
+        <div class="table-wrap" id="testRateTableWrap">${testRateTable(testRates)}</div>
+      </div>`;
+  }
 
-    <div class="panel" style="margin-top:14px">
-      <div class="panel-head"><h3>Vehicles Still Using Test Rates</h3><span class="badge badge-reserved">${testRates.length}</span></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Vehicle</th><th>Plate</th><th>Rate</th></tr></thead>
-          <tbody>
-            ${testRates.length?testRates.map(v=>`<tr>
-              <td data-label="Vehicle">${esc(v.make)} ${esc(v.model)}</td>
-              <td data-label="Plate">${esc(v.plate)}</td>
-              <td data-label="Rate"><strong>${money(v.rate)}</strong></td>
-            </tr>`).join(""):`<tr><td colspan="3">No test rates remain.</td></tr>`}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  if(view==="system"){
+    return `
+      <div class="panel">
+        <div class="panel-head"><h3>System Information</h3></div>
+        <div class="panel-body">
+          ${profileRow("Version",versionInfo().version)}
+          ${profileRow("Build",versionInfo().build||"")}
+          ${profileRow("Release Date",versionInfo().released||"")}
+          ${profileRow("Current Manager",friendlyName(state.userProfile))}
+          ${profileRow("Device ID",getDeviceId(),true)}
+          <div style="margin-top:12px"><button class="btn btn-secondary" id="managerShowVersion">View Release Notes</button></div>
+        </div>
+      </div>`;
+  }
 
-    <div class="panel" style="margin-top:14px">
-      <div class="panel-head"><h3>Historical Activity / Audit Log</h3><span class="badge badge-demo">Last ${logRows.length}</span></div>
+  return `
+    <div class="panel">
+      <div class="panel-head"><h3>Historical Activity / Audit Log</h3><span class="badge badge-demo">${logs.length} records</span></div>
       <div class="panel-body">
-        <div class="audit-filters">
-          <input id="auditSearch" placeholder="Search user, action or details">
-          <select id="auditAction"><option value="">All actions</option>${[...new Set(logRows.map(x=>x.action))].sort().map(a=>`<option>${esc(a)}</option>`).join("")}</select>
-          <select id="auditEntity"><option value="">All areas</option>${[...new Set(logRows.map(x=>x.entity_type))].sort().map(a=>`<option>${esc(a)}</option>`).join("")}</select>
+        <div class="audit-filters-v2">
+          <select id="managerUserSelect"><option value="">All Users</option>${users.map(u=>`<option value="${esc(u.email||"")}">${esc(u.display_name||u.email||"User")}</option>`).join("")}</select>
+          <select id="auditAction"><option value="">All Logs / Actions</option>${[...new Set(logs.map(x=>x.action).filter(Boolean))].sort().map(a=>`<option>${esc(a)}</option>`).join("")}</select>
+          <select id="auditEntity"><option value="">All Areas</option>${[...new Set(logs.map(x=>x.entity_type).filter(Boolean))].sort().map(a=>`<option>${esc(a)}</option>`).join("")}</select>
+          <select id="auditDate"><option value="">All Dates</option><option value="today">Today</option><option value="7">Last 7 Days</option><option value="30">Last 30 Days</option></select>
           <button class="btn btn-secondary" id="clearAuditFilter">Clear</button>
         </div>
       </div>
-      <div class="table-wrap" id="auditTableWrap">${auditTable(logRows)}</div>
-    </div>
-
-    <div class="panel" style="margin-top:14px">
-      <div class="panel-head"><h3>Recommended Manager-Only Controls</h3></div>
-      <div class="panel-body">
-        <div class="manager-grid">
-          <div class="manager-card"><h3>Rate Management</h3><p>Bulk update real daily rates, identify remaining .01 test pricing and approve overrides.</p></div>
-          <div class="manager-card"><h3>User & Role Management</h3><p>Add/deactivate staff and promote selected users to manager without exposing controls to normal staff.</p></div>
-          <div class="manager-card"><h3>Corrections / Voids</h3><p>Manager-only cancellation, reversal and correction tools for payments, rentals and accidental entries.</p></div>
-          <div class="manager-card"><h3>Location & Supplier Pricing</h3><p>Maintain transfer fees, partner supplier details and external-car cost structures.</p></div>
-          <div class="manager-card"><h3>Reports & Export</h3><p>Revenue, utilisation, vehicle performance, outstanding balances and downloadable CSV/Excel reports.</p></div>
-          <div class="manager-card"><h3>System / Backup</h3><p>Data export, audit retention, version information and controlled demo-to-production settings.</p></div>
-        </div>
-      </div>
+      <div class="table-wrap" id="auditTableWrap">${auditTable(filteredAuditRows(logs))}</div>
     </div>`;
+}
+
+function filteredAuditRows(logs=state.auditLogs){
+  const q=($("#auditSearch")?.value||"").toLowerCase();
+  const user=$("#managerUserSelect")?.value || state.managerUserFilter || "";
+  const action=$("#auditAction")?.value||"";
+  const entity=$("#auditEntity")?.value||"";
+  const date=$("#auditDate")?.value||"";
+  const now=new Date();
+  return logs.filter(x=>{
+    const hay=`${x.user_email||""} ${x.action||""} ${x.entity_type||""} ${JSON.stringify(x.details||{})}`.toLowerCase();
+    let dateOk=true;
+    const d=new Date(x.created_at);
+    if(date==="today") dateOk=d.toDateString()===now.toDateString();
+    if(date==="7") dateOk=d >= new Date(now.getTime()-7*86400000);
+    if(date==="30") dateOk=d >= new Date(now.getTime()-30*86400000);
+    return (!q||hay.includes(q)) &&
+      (!user||x.user_email===user) &&
+      (!action||x.action===action) &&
+      (!entity||x.entity_type===entity) &&
+      dateOk;
+  }).slice(0,250);
+}
+
+function testRateTable(rows){
+  if(!rows.length) return `<div class="empty">No test rates remain.</div>`;
+  return `<table><thead><tr><th>Vehicle</th><th>Plate</th><th>Rate</th></tr></thead>
+  <tbody>${rows.map(v=>`<tr><td>${esc(v.make)} ${esc(v.model)}</td><td>${esc(v.plate)}</td><td><strong>${money(v.rate)}</strong></td></tr>`).join("")}</tbody></table>`;
 }
 
 function auditTable(rows){
@@ -775,15 +910,8 @@ function auditTable(rows){
 
 function filterAudit(){
   if(!isManager()) return;
-  const q=($("#auditSearch")?.value||"").toLowerCase();
-  const action=$("#auditAction")?.value||"";
-  const entity=$("#auditEntity")?.value||"";
-  const rows=state.auditLogs.filter(x=>{
-    const hay=`${x.user_email||""} ${x.action||""} ${x.entity_type||""} ${JSON.stringify(x.details||{})}`.toLowerCase();
-    return (!q||hay.includes(q)) && (!action||x.action===action) && (!entity||x.entity_type===entity);
-  });
   const wrap=$("#auditTableWrap");
-  if(wrap) wrap.innerHTML=auditTable(rows.slice(0,200));
+  if(wrap) wrap.innerHTML=auditTable(filteredAuditRows());
 }
 
 function renderSettings(){
@@ -1170,13 +1298,48 @@ function bindPageEvents(){
     <div class="field" style="margin-top:10px"><label>Mobile</label><input id="cPhone"></div>`,saveCustomer));
 
   $("#refreshManager")?.addEventListener("click",loadSupabaseData);
-  ["auditSearch","auditAction","auditEntity"].forEach(id=>$("#"+id)?.addEventListener("input",filterAudit));
+
+  $$("[data-manager-view]").forEach(btn=>btn.addEventListener("click",()=>{
+    state.managerView=btn.dataset.managerView;
+    state.managerUserFilter="";
+    render();
+  }));
+
+  ["managerUserSelect","auditAction","auditEntity","auditDate","auditSearch"].forEach(id=>{
+    $("#"+id)?.addEventListener("input",()=>{
+      if(id==="managerUserSelect") state.managerUserFilter=$("#managerUserSelect").value;
+      filterAudit();
+    });
+    $("#"+id)?.addEventListener("change",()=>{
+      if(id==="managerUserSelect") state.managerUserFilter=$("#managerUserSelect").value;
+      filterAudit();
+    });
+  });
+
+  $$(".manager-user-row").forEach(row=>row.addEventListener("click",()=>{
+    state.managerUserFilter=row.dataset.userEmail||"";
+    if($("#managerUserSelect")) $("#managerUserSelect").value=state.managerUserFilter;
+    filterAudit();
+  }));
+
   $("#clearAuditFilter")?.addEventListener("click",()=>{
-    if($("#auditSearch")) $("#auditSearch").value="";
-    if($("#auditAction")) $("#auditAction").value="";
-    if($("#auditEntity")) $("#auditEntity").value="";
+    state.managerUserFilter="";
+    ["managerUserSelect","auditAction","auditEntity","auditDate","auditSearch"].forEach(id=>{if($("#"+id)) $("#"+id).value="";});
     filterAudit();
   });
+
+  $("#testRateSearch")?.addEventListener("input",()=>{
+    const q=$("#testRateSearch").value.toLowerCase();
+    const rows=state.vehicles.filter(v=>{
+      const n=Number(v.rate||0);
+      const test=Math.abs((n-Math.trunc(n))-0.01)<0.001;
+      const hay=`${v.make||""} ${v.model||""} ${v.plate||""}`.toLowerCase();
+      return test && (!q||hay.includes(q));
+    });
+    if($("#testRateTableWrap")) $("#testRateTableWrap").innerHTML=testRateTable(rows);
+  });
+
+  $("#managerShowVersion")?.addEventListener("click",()=>showVersionUpdate(true));
 }
 
 function go(page){
@@ -1190,13 +1353,56 @@ $$(".nav-btn").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
 $("#menuBtn").addEventListener("click",()=>$("#sidebar").classList.toggle("open"));
 $("#quickAvailability").addEventListener("click",()=>go("availability"));
 $("#quickRental").addEventListener("click",()=>{go("rentals");setTimeout(()=>bookingModal(),50);});
+$("#managerTopBtn")?.addEventListener("click",()=>go("manager"));
+
+$("#signedInUser")?.addEventListener("click",openUserProfile);
+$("#profileClose")?.addEventListener("click",()=>$("#profileModal").close());
+$("#profileDone")?.addEventListener("click",()=>$("#profileModal").close());
 
 $("#versionBtn")?.addEventListener("click",()=>showVersionUpdate(true));
 $("#updateClose")?.addEventListener("click",()=>$("#updateModal").close());
+$("#updateLater")?.addEventListener("click",()=>$("#updateModal").close());
 $("#updateDone")?.addEventListener("click",()=>{
+  if($("#updateDone").dataset.mode==="refresh"){
+    location.reload();
+    return;
+  }
   localStorage.setItem("b5_last_seen_version",versionInfo().version);
   $("#updateModal").close();
 });
+
+async function fetchDeployedVersion(){
+  try{
+    const response=await fetch(`version.js?update-check=${Date.now()}`,{cache:"no-store"});
+    if(!response.ok) return "";
+    const source=await response.text();
+    const match=source.match(/version\s*:\s*["']([^"']+)["']/);
+    return match?match[1]:"";
+  }catch(err){
+    console.warn("Version check unavailable:",err);
+    return "";
+  }
+}
+async function checkForDeployedUpdate(){
+  const deployed=await fetchDeployedVersion();
+  const current=versionInfo().version;
+  if(!deployed || deployed===current) return;
+  const dismissed=sessionStorage.getItem("b5_update_dismissed");
+  if(dismissed===deployed) return;
+  $("#updateTitle").textContent="Update Available";
+  $("#updateVersion").textContent=`Version ${deployed} is available`;
+  $("#updateNotes").innerHTML="<li>A newer B5 build has been deployed.</li><li>Refresh to load the latest version.</li>";
+  $("#updateLater").hidden=false;
+  $("#updateLater").onclick=()=>{
+    sessionStorage.setItem("b5_update_dismissed",deployed);
+    $("#updateModal").close();
+  };
+  $("#updateDone").textContent="Update Now";
+  $("#updateDone").dataset.mode="refresh";
+  $("#updateModal").showModal();
+}
+setTimeout(checkForDeployedUpdate,1200);
+setInterval(checkForDeployedUpdate,10*60*1000);
 
 let appStarted=false;
 window.startB5App=async function(){
@@ -1208,5 +1414,5 @@ window.startB5App=async function(){
 window.resetB5App=function(){
   state.live=false;state.error="";state.vehicles=[];state.rentals=[];state.customers=[];state.suppliers=[];
   state.locations=fallback.locations;state.categories=[];state.segments=[];state.charges=[];state.payments=[];state.bonds=[];
-  state.userProfile=null;state.auditLogs=[];state.staffProfiles=[];appStarted=false;
+  state.userProfile=null;state.auditLogs=[];state.staffProfiles=[];state.managerView="activity";state.managerUserFilter="";appStarted=false;
 };
