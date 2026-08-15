@@ -1,13 +1,13 @@
 window.B5_VERSION = {
-  version: "0.7.7",
+  version: "0.7.8",
   build: "Demo Build",
   released: "2026-08-15",
-  title: "Critical Data Load Fix & White Icon Pack",
+  title: "User-Friendly Audit Log",
   notes: [
-    "Fixed the customerDisplayName JavaScript error that prevented Supabase data from loading.",
-    "Fixed visible version display so it is driven by version.js.",
-    "Improved Update Now to reload using the deployed version and bypass stale cached page assets.",
-    "Rebuilt the login logo and complete Android, iOS and web icon pack on a white background.",
-    "Retained searchable customer selection, split customer names and dashboard drill-down."
+    "Replaced raw JSON in the Manager audit log with plain-English activity summaries.",
+    "Changed technical action and area labels into manager-friendly wording.",
+    "Added View Details for each audit entry.",
+    "Audit Details now shows clean record information and before/after changes without exposing raw JSON.",
+    "The complete technical audit data remains stored unchanged in Supabase."
   ]
 };

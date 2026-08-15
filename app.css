@@ -867,3 +867,59 @@ body.auth-locked #app { visibility: hidden; }
 .dashboard-drill-panel{max-height:480px;overflow:hidden}
 .dashboard-drill-panel .table-wrap{max-height:420px;overflow:auto}
 @media(max-width:760px){.customer-results{max-height:240px}}
+
+
+/* ===== v0.7.8 friendly audit log ===== */
+.audit-detail-friendly{
+  max-width:560px;
+  line-height:1.45;
+  color:var(--text);
+  white-space:normal;
+}
+.audit-view-btn{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:var(--blue);
+  font-size:11px;
+  font-weight:800;
+  padding:5px 0 0;
+  cursor:pointer;
+}
+.audit-view-btn:hover{text-decoration:underline}
+.audit-detail-heading{
+  margin:5px 0 2px;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.audit-change-row{
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  background:#fafbfd;
+}
+.audit-change-label{
+  font-size:10px;
+  font-weight:900;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.audit-change-values{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:8px;
+  align-items:start;
+  line-height:1.35;
+  overflow-wrap:anywhere;
+}
+.audit-change-values strong{color:var(--muted)}
+.audit-friendly-table td:last-child{min-width:300px}
+
+@media(max-width:760px){
+  .audit-friendly-table td:last-child{min-width:0}
+  .audit-change-values{grid-template-columns:1fr}
+  .audit-change-values strong{display:none}
+}

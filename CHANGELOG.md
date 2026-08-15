@@ -2,6 +2,16 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.8 — User-Friendly Audit Log
+- Replaced raw JSON in the Manager audit table with concise plain-English summaries.
+- Humanised action names such as `page_view`, `update`, `login` and `logout`.
+- Humanised technical areas such as `rental_agreements`, `vehicles` and `auth`.
+- Added View Details to each audit record.
+- Vehicle/database updates now display meaningful before → after field changes.
+- Login/logout details display device, browser and Device ID in a readable layout.
+- Full underlying audit data remains unchanged in Supabase.
+- No Supabase database changes are required.
+
 ## v0.7.7 — Critical Data Load Fix & White Icon Pack
 - Fixed `customerDisplayName is not defined`, which stopped the Supabase load pipeline and caused dashboard values to display as zero.
 - Restored searchable customer autocomplete and First Name / Family Name customer creation.

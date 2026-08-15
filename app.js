@@ -150,7 +150,7 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
 window.logAudit=logAudit;
 
 function versionInfo(){
-  return window.B5_VERSION || {version:"0.7.7",title:"Version Update",notes:[]};
+  return window.B5_VERSION || {version:"0.7.8",title:"Version Update",notes:[]};
 }
 
 function getDeviceId(){
@@ -982,16 +982,189 @@ function testRateTable(rows){
   <tbody>${rows.map(v=>`<tr><td>${esc(v.make)} ${esc(v.model)}</td><td>${esc(v.plate)}</td><td><strong>${money(v.rate)}</strong></td></tr>`).join("")}</tbody></table>`;
 }
 
+
+function humaniseAuditAction(action){
+  const map={
+    login:"Login",logout:"Logout",page_view:"Page View",insert:"Created",
+    update:"Updated",delete:"Deleted",rental_created:"Rental Created",
+    rental_extended:"Rental Extended",vehicle_changed:"Vehicle Changed",
+    payment_recorded:"Payment Recorded",vehicle_returned:"Vehicle Returned",
+    vehicle_created:"Vehicle Created",customer_created:"Customer Created"
+  };
+  return map[action] || String(action||"Activity").replaceAll("_"," ").replace(/\b\w/g,m=>m.toUpperCase());
+}
+
+function humaniseAuditArea(area){
+  const map={
+    auth:"Sign In / Out",page:"Navigation",vehicles:"Vehicle",vehicle:"Vehicle",
+    customers:"Customer",customer:"Customer",rental_agreements:"Rental",
+    rental_agreement:"Rental",rental_segments:"Rental Segment",
+    rental_charges:"Rental Charge",payments:"Payment",security_bonds:"Security Bond",
+    locations:"Location",suppliers:"Supplier",vehicle_unavailability:"Vehicle Availability"
+  };
+  return map[area] || String(area||"System").replaceAll("_"," ").replace(/\b\w/g,m=>m.toUpperCase());
+}
+
+function titleCaseText(value){
+  return String(value||"").replaceAll("_"," ").replace(/\b\w/g,m=>m.toUpperCase());
+}
+
+function auditRecordName(row){
+  const d=row.details||{}, n=d.new||{}, o=d.old||{};
+  if(row.entity_type==="vehicles" || row.entity_type==="vehicle"){
+    const x=Object.keys(n).length?n:o;
+    const name=[x.make,x.model].filter(Boolean).join(" ");
+    return `${name||"Vehicle"}${x.plate?` · ${x.plate}`:""}`;
+  }
+  if(row.entity_type==="customers" || row.entity_type==="customer"){
+    const x=Object.keys(n).length?n:o;
+    return x.full_name || d.name || "Customer";
+  }
+  return "";
+}
+
+function changedAuditFields(row){
+  const d=row.details||{}, n=d.new||{}, o=d.old||{};
+  if(!n || !o || typeof n!=="object" || typeof o!=="object") return [];
+  const ignore=new Set(["id","created_at","updated_at"]);
+  const labels={
+    operational_status:"Status",standard_daily_rate:"Daily Rate",colour:"Colour",
+    make:"Make",model:"Model",plate:"Plate",active:"Active",notes:"Notes",
+    source_type:"Source",long_term_contract:"Long-Term Contract",
+    expected_final_return_at:"Expected Return",actual_final_return_at:"Actual Return",
+    original_pickup_at:"Pickup",status:"Status",full_name:"Name",
+    first_name:"First Name",family_name:"Family Name",mobile:"Mobile",email:"Email"
+  };
+  return Object.keys({...o,...n}).filter(k=>!ignore.has(k)&&JSON.stringify(o[k])!==JSON.stringify(n[k]))
+    .map(k=>({key:k,label:labels[k]||titleCaseText(k),old:o[k],new:n[k]}));
+}
+
+function shortAuditValue(value,key=""){
+  if(value===null || value===undefined || value==="") return "Not set";
+  if(typeof value==="boolean") return value?"Yes":"No";
+  if(key.includes("rate") && !isNaN(Number(value))) return money(value);
+  if(key.includes("_at")){
+    const d=new Date(value);
+    if(!isNaN(d)) return fmtDate(d);
+  }
+  const text=String(value);
+  return text.length>90 ? text.slice(0,87)+"…" : text;
+}
+
+function auditSummary(row){
+  const d=row.details||{};
+  if(row.action==="login"){
+    return `Signed in${d.method==="email_password"?" using email and password":""}${d.device_type?` · ${d.device_type}`:""}${d.browser?` · ${d.browser}`:""}`;
+  }
+  if(row.action==="logout"){
+    return `Signed out${d.device_type?` · ${d.device_type}`:""}${d.browser?` · ${d.browser}`:""}`;
+  }
+  if(row.action==="page_view"){
+    return `Viewed ${titleCaseText(d.page||row.entity_id||"page")}${d.device_type?` · ${d.device_type}`:""}`;
+  }
+  if(row.action==="update"){
+    const name=auditRecordName(row);
+    const changes=changedAuditFields(row);
+    if(changes.length){
+      const first=changes.find(x=>x.key==="operational_status") || changes[0];
+      return `Updated ${name||humaniseAuditArea(row.entity_type)} · ${first.label}: ${shortAuditValue(first.old,first.key)} → ${shortAuditValue(first.new,first.key)}${changes.length>1?` · +${changes.length-1} more change${changes.length-1===1?"":"s"}`:""}`;
+    }
+    return `Updated ${name||humaniseAuditArea(row.entity_type)}`;
+  }
+  if(row.action==="insert"){
+    const name=auditRecordName(row);
+    return `Created ${name||humaniseAuditArea(row.entity_type)}`;
+  }
+  if(row.action==="delete"){
+    const name=auditRecordName(row);
+    return `Deleted ${name||humaniseAuditArea(row.entity_type)}`;
+  }
+  if(row.action==="customer_created") return `Created customer${d.name?`: ${d.name}`:""}`;
+  if(row.action==="vehicle_created") return `Created vehicle${d.make||d.model?`: ${[d.make,d.model].filter(Boolean).join(" ")}`:""}${d.plate?` · ${d.plate}`:""}`;
+  if(row.action==="rental_created") return `Created rental${d.vehicle_id?" · Vehicle assigned":""}`;
+  if(row.action==="rental_extended") return `Extended rental${d.new_end?` · New return: ${fmtDate(d.new_end)}`:""}`;
+  if(row.action==="vehicle_changed") return `Changed rental vehicle${d.reason?` · ${d.reason}`:""}`;
+  if(row.action==="payment_recorded") return `Recorded ${d.type||"payment"}${d.amount!==undefined?` · ${money(d.amount)}`:""}${d.method?` · ${d.method}`:""}`;
+  if(row.action==="vehicle_returned") return `Completed vehicle return${d.returned_at?` · ${fmtDate(d.returned_at)}`:""}`;
+  return `${humaniseAuditAction(row.action)} · ${humaniseAuditArea(row.entity_type)}`;
+}
+
+function auditDetailHtml(row){
+  const d=row.details||{};
+  const rows=[];
+  const add=(label,value)=>{ if(value!==undefined && value!==null && value!=="") rows.push(profileRow(label,String(value))); };
+
+  add("Date / Time",fmtDate(row.created_at));
+  add("User",row.user_email||"System");
+  add("Action",humaniseAuditAction(row.action));
+  add("Area",humaniseAuditArea(row.entity_type));
+
+  const recordName=auditRecordName(row);
+  if(recordName) add("Record",recordName);
+
+  if(row.action==="login" || row.action==="logout"){
+    add("Device",d.device_type);
+    add("Browser",d.browser);
+    add("Device ID",d.device_id);
+  }else if(row.action==="page_view"){
+    add("Page",titleCaseText(d.page||row.entity_id));
+    add("Device",d.device_type);
+    add("Browser",d.browser);
+    add("Device ID",d.device_id);
+  }else if(row.action==="update"){
+    const changes=changedAuditFields(row);
+    if(changes.length){
+      rows.push(`<div class="audit-detail-heading">Changes</div>`);
+      rows.push(...changes.map(c=>`<div class="audit-change-row">
+        <div class="audit-change-label">${esc(c.label)}</div>
+        <div class="audit-change-values"><span>${esc(shortAuditValue(c.old,c.key))}</span><strong>→</strong><span>${esc(shortAuditValue(c.new,c.key))}</span></div>
+      </div>`));
+    }
+  }else{
+    const friendlyKeys={
+      name:"Name",make:"Make",model:"Model",plate:"Plate",amount:"Amount",
+      type:"Type",method:"Payment Method",reason:"Reason",new_end:"New Return",
+      returned_at:"Returned At",page:"Page",created_from:"Created From"
+    };
+    Object.entries(d).forEach(([k,v])=>{
+      if(["browser","device_id","device_type"].includes(k)) return;
+      if(typeof v==="object") return;
+      const label=friendlyKeys[k]||titleCaseText(k);
+      const value=k.includes("amount")?money(v):shortAuditValue(v,k);
+      add(label,value);
+    });
+    add("Device",d.device_type);
+    add("Browser",d.browser);
+    add("Device ID",d.device_id);
+  }
+
+  return rows.join("") || `<div class="manager-empty-help">No additional details are available for this event.</div>`;
+}
+
+function openAuditDetails(id){
+  const row=state.auditLogs.find(x=>String(x.id)===String(id));
+  if(!row) return;
+  $("#profileBody").innerHTML=auditDetailHtml(row);
+  const title=$("#profileModal .modal-head h3");
+  const sub=$("#profileModal .vehicle-meta");
+  if(title) title.textContent="Audit Details";
+  if(sub) sub.textContent=auditSummary(row);
+  $("#profileModal").showModal();
+}
+
 function auditTable(rows){
   if(!rows.length) return `<div class="empty">No audit activity recorded yet.</div>`;
-  return `<table>
+  return `<table class="audit-friendly-table">
     <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Area</th><th>Details</th></tr></thead>
     <tbody>${rows.map(x=>`<tr>
       <td data-label="Time" class="audit-time">${fmtDate(x.created_at)}</td>
       <td data-label="User">${esc(x.user_email||"System")}</td>
-      <td data-label="Action" class="audit-action">${esc(x.action)}</td>
-      <td data-label="Area">${esc(x.entity_type||"")}</td>
-      <td data-label="Details"><div class="audit-detail">${esc(JSON.stringify(x.details||{}))}</div></td>
+      <td data-label="Action" class="audit-action">${esc(humaniseAuditAction(x.action))}</td>
+      <td data-label="Area">${esc(humaniseAuditArea(x.entity_type))}</td>
+      <td data-label="Details">
+        <div class="audit-detail-friendly">${esc(auditSummary(x))}</div>
+        <button type="button" class="audit-view-btn" data-audit-id="${esc(x.id)}">View details</button>
+      </td>
     </tr>`).join("")}</tbody>
   </table>`;
 }
@@ -999,7 +1172,10 @@ function auditTable(rows){
 function filterAudit(){
   if(!isManager()) return;
   const wrap=$("#auditTableWrap");
-  if(wrap) wrap.innerHTML=auditTable(filteredAuditRows());
+  if(wrap){
+    wrap.innerHTML=auditTable(filteredAuditRows());
+    $$("[data-audit-id]",wrap).forEach(btn=>btn.addEventListener("click",()=>openAuditDetails(btn.dataset.auditId)));
+  }
 }
 
 function renderSettings(){
@@ -1009,7 +1185,7 @@ function renderSettings(){
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
-      <p class="note">v0.7.7 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
+      <p class="note">v0.7.8 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
     </div></div>
   </div>`;
 }
@@ -1450,6 +1626,8 @@ function bindPageEvents(){
   });
 
   $("#managerShowVersion")?.addEventListener("click",()=>showVersionUpdate(true));
+  $$("[data-audit-id]").forEach(btn=>btn.addEventListener("click",()=>openAuditDetails(btn.dataset.auditId)));
+
 }
 
 function go(page){

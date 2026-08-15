@@ -242,3 +242,8 @@ This prevents unresolved legacy/import records from inflating the available-flee
 
 ## v0.7.7
 Critical client-side fix for customer display-name loading, version/cache refresh and white-background mobile/web icon assets.
+
+
+## v0.7.8 — Friendly audit history
+
+Manager Mode now translates audit records into plain-English summaries rather than exposing raw JSON. Managers can use View Details to inspect readable before/after changes and device information while the complete underlying audit payload remains preserved in Supabase.
