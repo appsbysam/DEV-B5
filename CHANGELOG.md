@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.2 — Modal Exit & Smarter Update Checks
+- Fixed the New Rental / Booking close X so it exits the modal immediately.
+- Fixed the Cancel button so it exits without running booking validation.
+- Required-field validation now runs only when Create Booking is submitted.
+- Replaced the 10-minute repeating version check with a lighter update schedule.
+- Version checks now run shortly after startup, again after 5 minutes, every 6 hours while open, and when the user returns after at least 30 minutes away.
+- No Supabase database changes are required.
+
 ## v0.7.1 — Manager UI, User Profile & Update Checking
 - Added Manager Mode shortcut to the desktop header while retaining it in the mobile navigation menu.
 - Changed the signed-in identity to a clickable user name rather than displaying only the email address.

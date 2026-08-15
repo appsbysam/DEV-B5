@@ -142,7 +142,7 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
 window.logAudit=logAudit;
 
 function versionInfo(){
-  return window.B5_VERSION || {version:"0.7.1",title:"Version Update",notes:[]};
+  return window.B5_VERSION || {version:"0.7.2",title:"Version Update",notes:[]};
 }
 
 function getDeviceId(){
@@ -1350,6 +1350,8 @@ function go(page){
   if(window.innerWidth<760)$("#sidebar").classList.remove("open");
 }
 $$(".nav-btn").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+$("#modalCloseBtn")?.addEventListener("click",()=>$("#modal").close());
+$("#modalCancelBtn")?.addEventListener("click",()=>$("#modal").close());
 $("#menuBtn").addEventListener("click",()=>$("#sidebar").classList.toggle("open"));
 $("#quickAvailability").addEventListener("click",()=>go("availability"));
 $("#quickRental").addEventListener("click",()=>{go("rentals");setTimeout(()=>bookingModal(),50);});
@@ -1401,8 +1403,30 @@ async function checkForDeployedUpdate(){
   $("#updateDone").dataset.mode="refresh";
   $("#updateModal").showModal();
 }
-setTimeout(checkForDeployedUpdate,1200);
-setInterval(checkForDeployedUpdate,10*60*1000);
+let lastVersionCheckAt=0;
+
+async function scheduledVersionCheck(){
+  lastVersionCheckAt=Date.now();
+  await checkForDeployedUpdate();
+}
+
+/* Version check strategy:
+   1. Shortly after startup
+   2. Five minutes after startup
+   3. Every six hours while the app remains open
+   4. When the user returns to the tab/window after at least 30 minutes
+*/
+setTimeout(scheduledVersionCheck,1200);
+setTimeout(scheduledVersionCheck,5*60*1000);
+setInterval(scheduledVersionCheck,6*60*60*1000);
+
+async function checkWhenReturningToApp(){
+  if(document.visibilityState && document.visibilityState!=="visible") return;
+  if(Date.now()-lastVersionCheckAt < 30*60*1000) return;
+  await scheduledVersionCheck();
+}
+document.addEventListener("visibilitychange",checkWhenReturningToApp);
+window.addEventListener("focus",checkWhenReturningToApp);
 
 let appStarted=false;
 window.startB5App=async function(){

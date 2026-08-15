@@ -213,3 +213,12 @@ Audit records can be filtered by user, action, area and date. Test-rate rows are
 The version checker now fetches `version.js` with `cache: no-store` on startup and every 10 minutes. If a different deployed version is detected, the user receives an update prompt.
 
 No database change is required.
+
+
+## v0.7.2 — Modal exit and update-check refinement
+
+The generic modal close X and Cancel controls are now explicit non-submit buttons. This prevents New Rental validation from firing when a user simply wants to leave the form. Only the Create Booking submit action validates required fields.
+
+Version checks now use a lower-frequency schedule: startup, five minutes after startup, every six hours while open, and when the app becomes active again after at least 30 minutes.
+
+No database changes are required.
