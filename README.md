@@ -238,3 +238,14 @@ No database changes are required.
 The app now respects `Needs Review` and reconciled operational statuses rather than assuming any vehicle without a live rental segment is available.
 
 This prevents unresolved legacy/import records from inflating the available-fleet count after the 15 August 2026 database reconciliation.
+
+
+## v0.7.5 — Search, customer and dashboard UX
+
+The login/sidebar logo is now served from a substantially smaller WebP asset and is preloaded for the login screen.
+
+New Rental uses a searchable customer picker instead of a long native select list. Create New Customer remains at the top, and customer creation now writes `first_name`, `family_name` and the compatible combined `full_name`.
+
+Dashboard statistics are clickable drill-down controls.
+
+The ZIP now includes `_private/sql`, `_private/imports` and `_private/notes`; `.gitignore` excludes the entire `_private/` tree.

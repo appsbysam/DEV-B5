@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1220" />
   <title>All Season Car Rental</title>
-  <link rel="icon" href="assets/logo.png" />
+  <link rel="icon" href="assets/logo.webp" />
+  <link rel="preload" as="image" href="assets/logo.webp" type="image/webp" fetchpriority="high" />
   <link rel="stylesheet" href="app.css" />
   
 </head>
@@ -13,7 +14,7 @@
 
   <div id="authScreen" class="auth-screen">
     <div class="auth-card">
-      <img src="assets/logo.png" alt="All Season Car Rental logo" class="auth-logo" />
+      <img src="assets/logo.webp" alt="All Season Car Rental logo" class="auth-logo" width="160" height="100" fetchpriority="high" decoding="sync" />
       <h1>All Season Car Rental</h1>
       <p>Staff sign in</p>
       <form id="loginForm">
@@ -34,7 +35,7 @@
   <div id="app">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <img src="assets/logo.png" alt="All Season Car Rental logo" />
+        <img src="assets/logo.webp" alt="All Season Car Rental logo" width="60" height="60" decoding="async" />
         <div>
           <strong>All Season</strong>
           <span>Car Rental</span>
@@ -69,7 +70,7 @@
           <p id="pageSubtitle">Fleet and rental operations at a glance</p>
         </div>
         <div class="top-actions">
-          <div class="user-version"><button type="button" id="signedInUser" class="signed-user signed-user-btn"></button><button type="button" id="versionBtn" class="app-version version-link">v0.7.4</button></div>
+          <div class="user-version"><button type="button" id="signedInUser" class="signed-user signed-user-btn"></button><button type="button" id="versionBtn" class="app-version version-link">v0.7.5</button></div>
           <button class="btn btn-secondary" id="quickAvailability">Check Availability</button>
           <button class="btn btn-primary" id="quickRental">New Rental</button>
           <button class="btn btn-secondary manager-only" id="managerTopBtn" hidden>Manager Mode</button>

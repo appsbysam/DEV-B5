@@ -2,6 +2,19 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.5 — Search, Customer & Dashboard UX
+- Replaced the 1.1 MB login/sidebar PNG request with a cropped and compressed WebP asset.
+- Added image preload and explicit dimensions to improve first-paint performance on slower connections.
+- Replaced the New Rental customer select list with searchable autocomplete.
+- `Create new customer…` is always displayed first in the autocomplete results.
+- Customer search supports name, mobile and email matching and prioritises names beginning with the typed characters.
+- Added inline customer creation from the rental form using First Name, Family Name, Mobile and Email.
+- Updated the Customers Add form to use First Name and Family Name while continuing to populate `full_name`.
+- Made all Dashboard summary tiles actionable with drill-down details.
+- Added `_private/sql`, `_private/imports` and `_private/notes` to the standard ZIP package.
+- Ensured `_private/` is excluded through `.gitignore`.
+- No Supabase schema changes are required.
+
 ## v0.7.4 — Reconciled Fleet Statuses
 - Updated availability logic to respect the reconciled Supabase operational status.
 - `Needs Review` vehicles are no longer incorrectly counted as available.
