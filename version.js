@@ -1,18 +1,13 @@
 window.B5_VERSION = {
-  version: "0.7.6",
+  version: "0.7.7",
   build: "Demo Build",
   released: "2026-08-15",
-  title: "Mobile & Web App Icons",
+  title: "Critical Data Load Fix & White Icon Pack",
   notes: [
-    "Added Android/PWA home-screen icons including maskable icons.",
-    "Added iOS Apple Touch icon and mobile web-app metadata.",
-    "Added browser favicon ICO and PNG variants.",
-    "Added a web app manifest so Add to Home Screen uses the All Season icon.",
-    "Optimised the All Season logo for faster loading on slower connections.",
-    "Added a searchable customer autocomplete picker to New Rental / Booking.",
-    "Create New Customer is now always the first option in the customer search results.",
-    "New customer forms now use First Name and Family Name while keeping Full Name compatible in Supabase.",
-    "Added clickable Dashboard summary tiles with drill-down details.",
-    "Added the standard _private package structure for private SQL, import and development reference files."
+    "Fixed the customerDisplayName JavaScript error that prevented Supabase data from loading.",
+    "Fixed visible version display so it is driven by version.js.",
+    "Improved Update Now to reload using the deployed version and bypass stale cached page assets.",
+    "Rebuilt the login logo and complete Android, iOS and web icon pack on a white background.",
+    "Retained searchable customer selection, split customer names and dashboard drill-down."
   ]
 };

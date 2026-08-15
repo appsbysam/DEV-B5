@@ -2,27 +2,16 @@
 
 All notable changes to dev-B5 are recorded here.
 
-## v0.7.6 — Mobile & Web App Icons
-- Added browser favicon files in ICO and PNG formats.
-- Added Apple Touch icon for iPhone/iPad home-screen installation.
-- Added 192px and 512px Android/PWA icons.
-- Added maskable Android icons with extra safe-area padding.
-- Added `manifest.webmanifest` and mobile web-app metadata.
-- Existing All Season logo artwork is used throughout.
-
-
-## v0.7.5 — Search, Customer & Dashboard UX
-- Replaced the 1.1 MB login/sidebar PNG request with a cropped and compressed WebP asset.
-- Added image preload and explicit dimensions to improve first-paint performance on slower connections.
-- Replaced the New Rental customer select list with searchable autocomplete.
-- `Create new customer…` is always displayed first in the autocomplete results.
-- Customer search supports name, mobile and email matching and prioritises names beginning with the typed characters.
-- Added inline customer creation from the rental form using First Name, Family Name, Mobile and Email.
-- Updated the Customers Add form to use First Name and Family Name while continuing to populate `full_name`.
-- Made all Dashboard summary tiles actionable with drill-down details.
-- Added `_private/sql`, `_private/imports` and `_private/notes` to the standard ZIP package.
-- Ensured `_private/` is excluded through `.gitignore`.
-- No Supabase schema changes are required.
+## v0.7.7 — Critical Data Load Fix & White Icon Pack
+- Fixed `customerDisplayName is not defined`, which stopped the Supabase load pipeline and caused dashboard values to display as zero.
+- Restored searchable customer autocomplete and First Name / Family Name customer creation.
+- Made the displayed version derive from `version.js`.
+- Added versioned CSS/JavaScript asset URLs to reduce stale GitHub Pages caching.
+- Changed Update Now to reopen the page with the deployed version query string.
+- Rebuilt the login/sidebar logo on a white background.
+- Rebuilt all favicon, Android/PWA, maskable and Apple Touch icons on white backgrounds.
+- Restored Dashboard drill-down functionality.
+- No Supabase database changes are required.
 
 ## v0.7.4 — Reconciled Fleet Statuses
 - Updated availability logic to respect the reconciled Supabase operational status.

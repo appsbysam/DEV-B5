@@ -59,6 +59,12 @@ function esc(v){
   return String(v ?? "").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 }
 function money(n){ return `$${Number(n||0).toFixed(2)}`; }
+
+function customerDisplayName(c){
+  const parts=[c?.first_name,c?.family_name].filter(Boolean).join(" ").trim();
+  return parts || c?.full_name || c?.name || "Unnamed customer";
+}
+
 function dbReady(){ return !!window.db; }
 function todayDate(){ return new Date(); }
 function sameDay(a,b){ return a && new Date(a).toDateString()===b.toDateString(); }
@@ -144,7 +150,7 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
 window.logAudit=logAudit;
 
 function versionInfo(){
-  return window.B5_VERSION || {version:"0.7.5",title:"Version Update",notes:[]};
+  return window.B5_VERSION || {version:"0.7.7",title:"Version Update",notes:[]};
 }
 
 function getDeviceId(){
@@ -184,6 +190,10 @@ function friendlyName(profile){
   return local
     .replace(/[._-]+/g," ")
     .replace(/\b\w/g,m=>m.toUpperCase());
+}
+function updateVisibleVersion(){
+  const el=$("#versionBtn");
+  if(el) el.textContent=`v${versionInfo().version}`;
 }
 function updateSignedInName(){
   const el=$("#signedInUser");
@@ -409,9 +419,7 @@ function stat(label,value,sub){
 }
 function dashboardStat(key,label,value,sub){
   return `<button type="button" class="stat dashboard-stat ${state.dashboardDetail===key?"active":""}" data-dashboard-detail="${esc(key)}">
-    <div class="label">${esc(label)}</div>
-    <div class="value">${esc(value)}</div>
-    <div class="sub">${esc(sub)}</div>
+    <div class="label">${esc(label)}</div><div class="value">${esc(value)}</div><div class="sub">${esc(sub)}</div>
   </button>`;
 }
 
@@ -425,17 +433,7 @@ function renderDashboard(){
   const returnsToday=state.rentals.filter(r=>["Active","Confirmed","Reserved"].includes(r.status)&&sameDay(r.end,now));
   const pickupsToday=state.rentals.filter(r=>["Reserved","Confirmed"].includes(r.status)&&sameDay(r.start,now));
   const overdue=state.rentals.filter(r=>r.status==="Active"&&new Date(r.end)<now);
-
-  const data={
-    total:state.vehicles,
-    available:availableVehicles,
-    out:outVehicles,
-    reserved:reservedVehicles,
-    returns:returnsToday,
-    pickups:pickupsToday,
-    review:needsReviewVehicles,
-    oos:oosVehicles
-  };
+  const data={total:state.vehicles,available:availableVehicles,out:outVehicles,reserved:reservedVehicles,returns:returnsToday,pickups:pickupsToday,review:needsReviewVehicles,oos:oosVehicles};
 
   return `
     <div class="grid stats">
@@ -448,65 +446,30 @@ function renderDashboard(){
       ${dashboardStat("review","Needs Review",needsReviewVehicles.length,"Not counted as available")}
       ${dashboardStat("oos","Out of Order",oosVehicles.length,"Unavailable")}
     </div>
-
-    <div id="dashboardDetailPanel" class="dashboard-detail-panel">
-      ${renderDashboardDetail(state.dashboardDetail,data)}
-    </div>
-
+    <div id="dashboardDetailPanel" class="dashboard-detail-panel">${renderDashboardDetail(state.dashboardDetail,data)}</div>
     ${overdue.length?`<div class="alert"><strong>${overdue.length} overdue rental${overdue.length>1?"s":""}</strong> require attention.</div>`:""}
-
     <div class="grid two-col">
-      <div class="panel">
-        <div class="panel-head"><h2>Today's Returns</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div>
-        <div class="table-wrap">${rentalTable(returnsToday.slice(0,5))}</div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><h2>Today's Pickups</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div>
-        <div class="table-wrap">${rentalTable(pickupsToday.slice(0,5))}</div>
-      </div>
+      <div class="panel"><div class="panel-head"><h2>Today's Returns</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div><div class="table-wrap">${rentalTable(returnsToday.slice(0,5))}</div></div>
+      <div class="panel"><div class="panel-head"><h2>Today's Pickups</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div><div class="table-wrap">${rentalTable(pickupsToday.slice(0,5))}</div></div>
     </div>
-
     <div class="panel" style="margin-top:14px">
-      <div class="panel-head">
-        <h2>Upcoming Rentals</h2>
-        <div class="toolbar">
-          <button class="btn btn-small btn-primary" data-goto="availability">Check Availability</button>
-          <button class="btn btn-small btn-secondary" data-goto="rentals">Manage Rentals</button>
-        </div>
-      </div>
+      <div class="panel-head"><h2>Upcoming Rentals</h2><div class="toolbar"><button class="btn btn-small btn-primary" data-goto="availability">Check Availability</button><button class="btn btn-small btn-secondary" data-goto="rentals">Manage Rentals</button></div></div>
       <div class="table-wrap">${rentalTable([...state.rentals].filter(r=>!["Completed","Cancelled"].includes(r.status)).sort((a,b)=>new Date(a.start)-new Date(b.start)).slice(0,10))}</div>
     </div>`;
 }
-
 function dashboardVehicleTable(rows){
   if(!rows.length) return `<div class="empty">No vehicles in this group.</div>`;
-  return `<table>
-    <thead><tr><th>Vehicle</th><th>Plate</th><th>Source</th><th>Status</th><th>Rate</th></tr></thead>
-    <tbody>${rows.map(v=>`<tr>
-      <td data-label="Vehicle">${esc(v.make)} ${esc(v.model)}</td>
-      <td data-label="Plate">${esc(v.plate||"—")}</td>
-      <td data-label="Source">${esc(v.source||v.source_type||"")}</td>
-      <td data-label="Status"><span class="badge ${statusClass(effectiveVehicleStatus(v))}">${esc(effectiveVehicleStatus(v))}</span></td>
-      <td data-label="Rate">${money(v.rate)}</td>
-    </tr>`).join("")}</tbody>
-  </table>`;
+  return `<table><thead><tr><th>Vehicle</th><th>Plate</th><th>Source</th><th>Status</th><th>Rate</th></tr></thead><tbody>${rows.map(v=>`<tr>
+    <td data-label="Vehicle">${esc(v.make)} ${esc(v.model)}</td><td data-label="Plate">${esc(v.plate||"—")}</td>
+    <td data-label="Source">${esc(v.source||v.source_type||"")}</td><td data-label="Status"><span class="badge ${statusClass(effectiveVehicleStatus(v))}">${esc(effectiveVehicleStatus(v))}</span></td><td data-label="Rate">${money(v.rate)}</td>
+  </tr>`).join("")}</tbody></table>`;
 }
-
 function renderDashboardDetail(view,data){
   if(!view) return "";
-  const labels={
-    total:"Total Fleet",available:"Available Now",out:"Out on Rental",reserved:"Reserved",
-    returns:"Returning Today",pickups:"Going Out Today",review:"Needs Review",oos:"Out of Order"
-  };
+  const labels={total:"Total Fleet",available:"Available Now",out:"Out on Rental",reserved:"Reserved",returns:"Returning Today",pickups:"Going Out Today",review:"Needs Review",oos:"Out of Order"};
   const rows=data[view]||[];
   const rentals=["returns","pickups"].includes(view);
-  return `<div class="panel dashboard-drill-panel">
-    <div class="panel-head">
-      <h2>${esc(labels[view]||"Details")}</h2>
-      <button type="button" class="btn btn-small btn-secondary" id="closeDashboardDetail">Close</button>
-    </div>
-    <div class="table-wrap">${rentals?rentalTable(rows):dashboardVehicleTable(rows)}</div>
-  </div>`;
+  return `<div class="panel dashboard-drill-panel"><div class="panel-head"><h2>${esc(labels[view]||"Details")}</h2><button type="button" class="btn btn-small btn-secondary" id="closeDashboardDetail">Close</button></div><div class="table-wrap">${rentals?rentalTable(rows):dashboardVehicleTable(rows)}</div></div>`;
 }
 
 function rentalTable(rows){
@@ -1046,7 +1009,7 @@ function renderSettings(){
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
-      <p class="note">v0.7.5 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
+      <p class="note">v0.7.7 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
     </div></div>
   </div>`;
 }
@@ -1114,19 +1077,10 @@ function bookingModal(prefill={}){
   openModal("New Rental / Booking",`
     <div class="grid two-col">
       <div class="field customer-picker-field"><label>Customer</label>
-        <div class="customer-picker">
-          <input id="rCustomerSearch" type="text" placeholder="Select or search customer" autocomplete="off" />
-          <input id="rCustomer" type="hidden" value="" />
-          <div id="rCustomerResults" class="customer-results" hidden></div>
-        </div>
+        <div class="customer-picker"><input id="rCustomerSearch" type="text" placeholder="Select or search customer" autocomplete="off"><input id="rCustomer" type="hidden"><div id="rCustomerResults" class="customer-results" hidden></div></div>
         <div id="rNewCustomerInline" class="inline-new-customer" hidden>
-          <div class="inline-new-head"><strong>Create new customer</strong><button type="button" class="icon-btn" id="rNewCustomerCancel" aria-label="Cancel new customer">✕</button></div>
-          <div class="grid two-col">
-            <div class="field"><label>First Name</label><input id="rNewFirst" autocomplete="given-name"></div>
-            <div class="field"><label>Family Name</label><input id="rNewFamily" autocomplete="family-name"></div>
-            <div class="field"><label>Mobile</label><input id="rNewMobile" autocomplete="tel"></div>
-            <div class="field"><label>Email</label><input id="rNewEmail" type="email" autocomplete="email"></div>
-          </div>
+          <div class="inline-new-head"><strong>Create new customer</strong><button type="button" class="icon-btn" id="rNewCustomerCancel">✕</button></div>
+          <div class="grid two-col"><div class="field"><label>First Name</label><input id="rNewFirst"></div><div class="field"><label>Family Name</label><input id="rNewFamily"></div><div class="field"><label>Mobile</label><input id="rNewMobile"></div><div class="field"><label>Email</label><input id="rNewEmail" type="email"></div></div>
           <button type="button" class="btn btn-primary btn-small" id="rNewCustomerSave">Save Customer</button>
         </div>
       </div>
@@ -1167,85 +1121,28 @@ function bookingModal(prefill={}){
   });
 
   function renderCustomerResults(query=""){
-    const results=$("#rCustomerResults");
-    if(!results) return;
+    const box=$("#rCustomerResults"); if(!box) return;
     const q=query.trim().toLowerCase();
-    const matches=state.customers
-      .map(c=>({c,label:customerDisplayName(c),phone:c.mobile||c.phone||""}))
-      .filter(x=>{
-        if(!q) return true;
-        const hay=`${x.label} ${x.phone} ${x.c.email||""}`.toLowerCase();
-        return hay.includes(q);
-      })
-      .sort((a,b)=>{
-        const as=a.label.toLowerCase().startsWith(q)?0:1;
-        const bs=b.label.toLowerCase().startsWith(q)?0:1;
-        return as-bs || a.label.localeCompare(b.label);
-      })
-      .slice(0,12);
-
-    results.innerHTML=`
-      <button type="button" class="customer-result create-customer-result" data-create-customer="1">＋ Create new customer…</button>
-      ${matches.map(x=>`<button type="button" class="customer-result" data-customer-id="${esc(x.c.id)}">
-        <strong>${esc(x.label)}</strong>${x.phone?`<span>${esc(x.phone)}</span>`:""}
-      </button>`).join("")}
-      ${!matches.length?`<div class="customer-no-results">No matching customers</div>`:""}`;
-    results.hidden=false;
-
-    $$("[data-customer-id]",results).forEach(btn=>btn.onclick=()=>{
-      const c=state.customers.find(x=>String(x.id)===String(btn.dataset.customerId));
-      $("#rCustomer").value=c?.id||"";
-      $("#rCustomerSearch").value=customerDisplayName(c);
-      results.hidden=true;
-      clearFieldError("rCustomer");
-    });
-    $("[data-create-customer]",results)?.addEventListener("click",()=>{
-      results.hidden=true;
-      $("#rNewCustomerInline").hidden=false;
-      $("#rNewFirst").focus();
-    });
+    const matches=state.customers.map(c=>({c,label:customerDisplayName(c),phone:c.mobile||""}))
+      .filter(x=>!q||`${x.label} ${x.phone} ${x.c.email||""}`.toLowerCase().includes(q))
+      .sort((a,b)=>(a.label.toLowerCase().startsWith(q)?0:1)-(b.label.toLowerCase().startsWith(q)?0:1)||a.label.localeCompare(b.label)).slice(0,12);
+    box.innerHTML=`<button type="button" class="customer-result create-customer-result" data-create-customer>＋ Create new customer…</button>${matches.map(x=>`<button type="button" class="customer-result" data-customer-id="${esc(x.c.id)}"><strong>${esc(x.label)}</strong>${x.phone?`<span>${esc(x.phone)}</span>`:""}</button>`).join("")}${!matches.length?`<div class="customer-no-results">No matching customers</div>`:""}`;
+    box.hidden=false;
+    $$("[data-customer-id]",box).forEach(btn=>btn.onclick=()=>{const c=state.customers.find(x=>String(x.id)===String(btn.dataset.customerId));$("#rCustomer").value=c.id;$("#rCustomerSearch").value=customerDisplayName(c);box.hidden=true;clearFieldError("rCustomer");});
+    $("[data-create-customer]",box)?.addEventListener("click",()=>{box.hidden=true;$("#rNewCustomerInline").hidden=false;$("#rNewFirst").focus();});
   }
-
   $("#rCustomerSearch")?.addEventListener("focus",()=>renderCustomerResults($("#rCustomerSearch").value));
-  $("#rCustomerSearch")?.addEventListener("input",()=>{
-    $("#rCustomer").value="";
-    clearFieldError("rCustomer");
-    renderCustomerResults($("#rCustomerSearch").value);
-  });
-  $("#rCustomerSearch")?.addEventListener("keydown",e=>{
-    const results=$("#rCustomerResults");
-    const buttons=results?[...results.querySelectorAll("button.customer-result")]:[];
-    if(e.key==="Escape"){results.hidden=true;return;}
-    if(!buttons.length) return;
-    let i=buttons.indexOf(document.activeElement);
-    if(e.key==="ArrowDown"){e.preventDefault();(buttons[Math.min(i+1,buttons.length-1)]||buttons[0]).focus();}
-    if(e.key==="ArrowUp"){e.preventDefault();(buttons[Math.max(i-1,0)]||buttons[0]).focus();}
-  });
-
+  $("#rCustomerSearch")?.addEventListener("input",()=>{$("#rCustomer").value="";clearFieldError("rCustomer");renderCustomerResults($("#rCustomerSearch").value);});
   $("#rNewCustomerCancel")?.addEventListener("click",()=>$("#rNewCustomerInline").hidden=true);
   $("#rNewCustomerSave")?.addEventListener("click",async()=>{
-    const first=$("#rNewFirst").value.trim();
-    const family=$("#rNewFamily").value.trim();
-    if(!first){alert("First name is required.");$("#rNewFirst").focus();return;}
+    const first=$("#rNewFirst").value.trim(),family=$("#rNewFamily").value.trim();
+    if(!first){alert("First name is required.");return;}
     const full=[first,family].filter(Boolean).join(" ");
-    const payload={
-      first_name:first,
-      family_name:family||null,
-      full_name:full,
-      mobile:$("#rNewMobile").value.trim()||null,
-      email:$("#rNewEmail").value.trim()||null
-    };
-    const btn=$("#rNewCustomerSave");btn.disabled=true;btn.textContent="Saving…";
+    const payload={first_name:first,family_name:family||null,full_name:full,mobile:$("#rNewMobile").value.trim()||null,email:$("#rNewEmail").value.trim()||null};
     const {data,error}=await window.db.from("customers").insert(payload).select().single();
-    btn.disabled=false;btn.textContent="Save Customer";
     if(error){alert(error.message);return;}
-    const mapped={...data,name:customerDisplayName(data),phone:data.mobile};
-    state.customers.push(mapped);
-    state.customers.sort((a,b)=>customerDisplayName(a).localeCompare(customerDisplayName(b)));
-    $("#rCustomer").value=data.id;
-    $("#rCustomerSearch").value=customerDisplayName(data);
-    $("#rNewCustomerInline").hidden=true;
-    clearFieldError("rCustomer");
+    state.customers.push({...data,name:customerDisplayName(data),phone:data.mobile});
+    $("#rCustomer").value=data.id;$("#rCustomerSearch").value=customerDisplayName(data);$("#rNewCustomerInline").hidden=true;clearFieldError("rCustomer");
     await logAudit("customer_created","customer",data.id,{name:full,created_from:"rental_booking"});
   });
   ["rVehicle","rStart","rEnd","rPickup","rDropoff","rRate","rDiscount","rOther","rDeposit"].forEach(id=>$("#"+id)?.addEventListener("input",()=>{
@@ -1470,22 +1367,12 @@ async function saveVehicle(){
   const {data,error}=await window.db.from("vehicles").insert(payload).select().single();if(error){alert(error.message);return false;}await logAudit("vehicle_created","vehicle",data?.id,{plate,make,model});await loadSupabaseData();return true;
 }
 async function saveCustomer(){
-  const first=$("#cFirst").value.trim();
-  const family=$("#cFamily").value.trim();
+  const first=$("#cFirst").value.trim(),family=$("#cFamily").value.trim();
   if(!first){alert("First name is required.");return false;}
   const full=[first,family].filter(Boolean).join(" ");
-  const payload={
-    first_name:first,
-    family_name:family||null,
-    full_name:full,
-    mobile:$("#cPhone").value.trim()||null,
-    email:$("#cEmail").value.trim()||null
-  };
-  const {data,error}=await window.db.from("customers").insert(payload).select().single();
+  const {data,error}=await window.db.from("customers").insert({first_name:first,family_name:family||null,full_name:full,mobile:$("#cPhone").value.trim()||null,email:$("#cEmail").value.trim()||null}).select().single();
   if(error){alert(error.message);return false;}
-  await logAudit("customer_created","customer",data?.id,{name:full});
-  await loadSupabaseData();
-  return true;
+  await logAudit("customer_created","customer",data?.id,{name:full});await loadSupabaseData();return true;
 }
 
 function bindPageEvents(){
@@ -1495,15 +1382,8 @@ function bindPageEvents(){
     state.todayDetail = state.todayDetail===target ? null : target;
     render();
   }));
-  $$("[data-dashboard-detail]").forEach(btn=>btn.addEventListener("click",()=>{
-    const target=btn.dataset.dashboardDetail;
-    state.dashboardDetail = state.dashboardDetail===target ? null : target;
-    render();
-  }));
-  $("#closeDashboardDetail")?.addEventListener("click",()=>{
-    state.dashboardDetail=null;
-    render();
-  });
+  $$("[data-dashboard-detail]").forEach(btn=>btn.addEventListener("click",()=>{const target=btn.dataset.dashboardDetail;state.dashboardDetail=state.dashboardDetail===target?null:target;render();}));
+  $("#closeDashboardDetail")?.addEventListener("click",()=>{state.dashboardDetail=null;render();});
   $("#searchAvailability")?.addEventListener("click",availabilitySearch);
   $("#refreshSupabase")?.addEventListener("click",loadSupabaseData);
   $$("[data-book-vehicle]").forEach(b=>b.onclick=()=>bookingModal({vehicleId:b.dataset.bookVehicle,start:b.dataset.start,end:b.dataset.end,pickup:b.dataset.pickup,dropoff:b.dataset.dropoff}));
@@ -1525,12 +1405,7 @@ function bindPageEvents(){
       <div class="field"><label>Supplier</label><select id="vSupplier"><option value="">None</option>${state.suppliers.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("")}</select></div>
     </div>`,saveVehicle));
   $("#newCustomerBtn")?.addEventListener("click",()=>openModal("Add Customer",`
-    <div class="grid two-col">
-      <div class="field"><label>First Name</label><input id="cFirst" autocomplete="given-name"></div>
-      <div class="field"><label>Family Name</label><input id="cFamily" autocomplete="family-name"></div>
-      <div class="field"><label>Mobile</label><input id="cPhone" autocomplete="tel"></div>
-      <div class="field"><label>Email</label><input id="cEmail" type="email" autocomplete="email"></div>
-    </div>`,saveCustomer));
+    <div class="grid two-col"><div class="field"><label>First Name</label><input id="cFirst"></div><div class="field"><label>Family Name</label><input id="cFamily"></div><div class="field"><label>Mobile</label><input id="cPhone"></div><div class="field"><label>Email</label><input id="cEmail" type="email"></div></div>`,saveCustomer));
 
   $("#refreshManager")?.addEventListener("click",loadSupabaseData);
 
@@ -1601,7 +1476,10 @@ $("#updateClose")?.addEventListener("click",()=>$("#updateModal").close());
 $("#updateLater")?.addEventListener("click",()=>$("#updateModal").close());
 $("#updateDone")?.addEventListener("click",()=>{
   if($("#updateDone").dataset.mode==="refresh"){
-    location.reload();
+    const deployed=$("#updateDone").dataset.deployedVersion || Date.now();
+    const url=new URL(location.href);
+    url.searchParams.set("v",deployed);
+    location.replace(url.toString());
     return;
   }
   localStorage.setItem("b5_last_seen_version",versionInfo().version);
@@ -1636,6 +1514,7 @@ async function checkForDeployedUpdate(){
   };
   $("#updateDone").textContent="Update Now";
   $("#updateDone").dataset.mode="refresh";
+  $("#updateDone").dataset.deployedVersion=deployed;
   $("#updateModal").showModal();
 }
 let lastVersionCheckAt=0;
@@ -1665,6 +1544,7 @@ window.addEventListener("focus",checkWhenReturningToApp);
 
 let appStarted=false;
 window.startB5App=async function(){
+  updateVisibleVersion();
   if(!appStarted){appStarted=true;render();}
   await loadSupabaseData();
   setManagerVisibility();
