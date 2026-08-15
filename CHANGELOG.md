@@ -2,6 +2,16 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.3 — Today Dashboard Drill-Down
+- Fixed the visible header version number so it matches the deployed application version.
+- Reworked the Today page into compact summary tiles.
+- Returns Today now displays a count first and opens its detailed list only when selected.
+- Pickups Today now displays a count first and opens its detailed list only when selected.
+- Vehicles Available in Office now displays only the count until the tile is selected.
+- External Vehicles Requiring Action now uses the same drill-down pattern.
+- Tapping an active Today tile again collapses the detail area.
+- No Supabase database changes are required.
+
 ## v0.7.2 — Modal Exit & Smarter Update Checks
 - Fixed the New Rental / Booking close X so it exits the modal immediately.
 - Fixed the Cancel button so it exits without running booking validation.

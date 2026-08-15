@@ -36,7 +36,8 @@ const state = {
   auditLogs: [],
   staffProfiles: [],
   managerView: "activity",
-  managerUserFilter: ""
+  managerUserFilter: "",
+  todayDetail: null
 };
 
 const pageMeta = {
@@ -142,7 +143,7 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
 window.logAudit=logAudit;
 
 function versionInfo(){
-  return window.B5_VERSION || {version:"0.7.2",title:"Version Update",notes:[]};
+  return window.B5_VERSION || {version:"0.7.3",title:"Version Update",notes:[]};
 }
 
 function getDeviceId(){
@@ -475,20 +476,88 @@ function renderToday(){
   const pick=state.rentals.filter(r=>["Reserved","Confirmed"].includes(r.status)&&sameDay(r.start,today));
   const avail=state.vehicles.filter(v=>effectiveVehicleStatus(v)==="Available");
   const external=state.vehicles.filter(v=>v.source==="External"&&effectiveVehicleStatus(v)!=="Available");
-  return `
-    <div class="section-title"><div><h2>${esc(fmtDay(today))}</h2><p>Daily operations view</p></div></div>
-    <div class="grid two-col">
-      <div class="panel"><div class="panel-head"><h3>Returns Today</h3><span class="badge badge-out">${ret.length}</span></div><div class="table-wrap">${rentalTable(ret)}</div></div>
-      <div class="panel"><div class="panel-head"><h3>Pickups Today</h3><span class="badge badge-reserved">${pick.length}</span></div><div class="table-wrap">${rentalTable(pick)}</div></div>
-    </div>
-    <div class="grid two-col" style="margin-top:14px">
-      <div class="panel"><div class="panel-head"><h3>Vehicles Available in Office</h3><span class="badge badge-available">${avail.length}</span></div>
-        <div class="panel-body"><div class="kpi-row">${avail.slice(0,50).map(v=>`<span class="badge badge-available">${esc(v.model)} · ${esc(v.plate)}</span>`).join("")}</div></div>
-      </div>
-      <div class="panel"><div class="panel-head"><h3>External Vehicles Requiring Action</h3></div><div class="panel-body">
-        ${external.length?external.slice(0,20).map(v=>`<div class="note" style="margin-bottom:8px"><strong>${esc(v.make)} ${esc(v.model)}</strong> · ${esc(v.plate)}<br>Supplier: ${esc(v.supplier||"Unknown")} · ${esc(effectiveVehicleStatus(v))}</div>`).join(""):`<div class="empty">No external action items.</div>`}
-      </div></div>
+
+  const tiles=`
+    <div class="today-summary-grid">
+      <button class="today-summary-tile ${state.todayDetail==="returns"?"active":""}" data-today-detail="returns">
+        <div class="today-summary-label">Returns Today</div>
+        <div class="today-summary-value">${ret.length}</div>
+        <div class="today-summary-sub">Tap to view scheduled returns</div>
+      </button>
+      <button class="today-summary-tile ${state.todayDetail==="pickups"?"active":""}" data-today-detail="pickups">
+        <div class="today-summary-label">Pickups Today</div>
+        <div class="today-summary-value">${pick.length}</div>
+        <div class="today-summary-sub">Tap to view today's pickups</div>
+      </button>
+      <button class="today-summary-tile ${state.todayDetail==="available"?"active":""}" data-today-detail="available">
+        <div class="today-summary-label">Available in Office</div>
+        <div class="today-summary-value">${avail.length}</div>
+        <div class="today-summary-sub">Tap to view available vehicles</div>
+      </button>
+      <button class="today-summary-tile ${state.todayDetail==="external"?"active":""}" data-today-detail="external">
+        <div class="today-summary-label">External Action</div>
+        <div class="today-summary-value">${external.length}</div>
+        <div class="today-summary-sub">Tap to view partner vehicles needing action</div>
+      </button>
     </div>`;
+
+  return `
+    <div class="section-title">
+      <div><h2>${esc(fmtDay(today))}</h2><p>Daily operations view</p></div>
+    </div>
+    ${tiles}
+    <div id="todayDetailPanel" class="today-detail-panel">
+      ${renderTodayDetail(state.todayDetail,{ret,pick,avail,external})}
+    </div>`;
+}
+
+function renderTodayDetail(view,data){
+  if(!view){
+    return `<div class="panel"><div class="panel-body"><div class="manager-empty-help">Select a tile above to view the details.</div></div></div>`;
+  }
+
+  if(view==="returns"){
+    return `<div class="panel">
+      <div class="panel-head"><h3>Returns Today</h3><span class="badge badge-out">${data.ret.length}</span></div>
+      <div class="table-wrap">${rentalTable(data.ret)}</div>
+    </div>`;
+  }
+
+  if(view==="pickups"){
+    return `<div class="panel">
+      <div class="panel-head"><h3>Pickups Today</h3><span class="badge badge-reserved">${data.pick.length}</span></div>
+      <div class="table-wrap">${rentalTable(data.pick)}</div>
+    </div>`;
+  }
+
+  if(view==="available"){
+    return `<div class="panel">
+      <div class="panel-head"><h3>Vehicles Available in Office</h3><span class="badge badge-available">${data.avail.length}</span></div>
+      <div class="panel-body">
+        ${data.avail.length
+          ? `<div class="vehicle-grid">${data.avail.map(v=>`<div class="vehicle-card">
+              <div class="kpi-row"><span class="badge badge-available">Available</span></div>
+              <h3 style="margin-top:10px">${esc(v.make)} ${esc(v.model)}</h3>
+              <div class="vehicle-meta">${esc(v.plate||"Plate not recorded")} · ${esc(v.category||"")}</div>
+              <div class="vehicle-rate">${Number(v.rate)>0?`${money(v.rate)}/day`:"Rate not loaded"}</div>
+            </div>`).join("")}</div>`
+          : `<div class="empty">No vehicles currently available.</div>`}
+      </div>
+    </div>`;
+  }
+
+  return `<div class="panel">
+    <div class="panel-head"><h3>External Vehicles Requiring Action</h3><span class="badge badge-external">${data.external.length}</span></div>
+    <div class="panel-body">
+      ${data.external.length
+        ? `<div class="vehicle-grid">${data.external.map(v=>`<div class="vehicle-card">
+            <div class="kpi-row"><span class="badge badge-external">${esc(v.supplier||"External")}</span></div>
+            <h3 style="margin-top:10px">${esc(v.make)} ${esc(v.model)}</h3>
+            <div class="vehicle-meta">${esc(v.plate||"")} · ${esc(effectiveVehicleStatus(v))}</div>
+          </div>`).join("")}</div>`
+        : `<div class="empty">No external action items.</div>`}
+    </div>
+  </div>`;
 }
 
 function anyLocationOptions(selected="Any"){
@@ -921,7 +990,7 @@ function renderSettings(){
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
-      <p class="note">v0.7.0 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
+      <p class="note">v0.7.3 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
     </div></div>
   </div>`;
 }
@@ -1273,6 +1342,11 @@ async function saveCustomer(){
 
 function bindPageEvents(){
   $$("[data-goto]").forEach(b=>b.onclick=()=>go(b.dataset.goto));
+  $$("[data-today-detail]").forEach(btn=>btn.addEventListener("click",()=>{
+    const target=btn.dataset.todayDetail;
+    state.todayDetail = state.todayDetail===target ? null : target;
+    render();
+  }));
   $("#searchAvailability")?.addEventListener("click",availabilitySearch);
   $("#refreshSupabase")?.addEventListener("click",loadSupabaseData);
   $$("[data-book-vehicle]").forEach(b=>b.onclick=()=>bookingModal({vehicleId:b.dataset.bookVehicle,start:b.dataset.start,end:b.dataset.end,pickup:b.dataset.pickup,dropoff:b.dataset.dropoff}));
@@ -1438,5 +1512,5 @@ window.startB5App=async function(){
 window.resetB5App=function(){
   state.live=false;state.error="";state.vehicles=[];state.rentals=[];state.customers=[];state.suppliers=[];
   state.locations=fallback.locations;state.categories=[];state.segments=[];state.charges=[];state.payments=[];state.bonds=[];
-  state.userProfile=null;state.auditLogs=[];state.staffProfiles=[];state.managerView="activity";state.managerUserFilter="";appStarted=false;
+  state.userProfile=null;state.auditLogs=[];state.staffProfiles=[];state.managerView="activity";state.managerUserFilter="";state.todayDetail=null;appStarted=false;
 };

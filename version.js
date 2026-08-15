@@ -1,13 +1,14 @@
 window.B5_VERSION = {
-  version: "0.7.2",
+  version: "0.7.3",
   build: "Demo Build",
   released: "2026-08-15",
-  title: "Modal Exit & Smarter Update Checks",
+  title: "Today Dashboard Drill-Down",
   notes: [
-    "Fixed New Rental / Booking so X and Cancel close immediately without triggering required-field validation.",
-    "Required-field validation now runs only when Create Booking is pressed.",
-    "Changed version checking from every 10 minutes to a lighter schedule.",
-    "B5 now checks shortly after startup, again after 5 minutes, every 6 hours while open, and when returning after a long absence.",
+    "Fixed the header version display so it matches the deployed build.",
+    "Simplified the Today page into four compact summary tiles.",
+    "Returns Today, Pickups Today, Available in Office and External Action now show counts first.",
+    "Tap a tile to drill down into its detailed records.",
+    "Tap the active tile again to collapse the detailed view.",
     "No Supabase database changes are required."
   ]
 };

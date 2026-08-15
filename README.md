@@ -222,3 +222,12 @@ The generic modal close X and Cancel controls are now explicit non-submit button
 Version checks now use a lower-frequency schedule: startup, five minutes after startup, every six hours while open, and when the app becomes active again after at least 30 minutes.
 
 No database changes are required.
+
+
+## v0.7.3 — Today page drill-down
+
+The Today view now prioritises counts rather than displaying large lists by default. Returns, pickups, available vehicles and external-action vehicles each appear as compact clickable tiles. Selecting a tile opens only that section's details.
+
+The visible version label has also been corrected to match the deployed `version.js`.
+
+No database changes are required.
