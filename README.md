@@ -247,3 +247,8 @@ Critical client-side fix for customer display-name loading, version/cache refres
 ## v0.7.8 — Friendly audit history
 
 Manager Mode now translates audit records into plain-English summaries rather than exposing raw JSON. Managers can use View Details to inspect readable before/after changes and device information while the complete underlying audit payload remains preserved in Supabase.
+
+
+## v0.7.9 — Actionable overdue rentals
+
+The Dashboard overdue warning now opens a dedicated drill-down. Users can see exactly which agreements are overdue, how late each return is, and immediately extend, return or open the rental.

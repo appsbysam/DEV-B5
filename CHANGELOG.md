@@ -2,6 +2,15 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.9 — Actionable Overdue Rentals
+- Made the Dashboard overdue warning clickable.
+- Added a drill-down list of overdue rentals.
+- Each overdue record now shows customer, vehicle, expected return time and elapsed overdue time.
+- Added direct Extend and Return Vehicle actions.
+- Added Open Rental to navigate directly to and highlight the matching rental agreement.
+- Clarified that overdue means the expected return time has passed while the rental remains active.
+- No Supabase database changes are required.
+
 ## v0.7.8 — User-Friendly Audit Log
 - Replaced raw JSON in the Manager audit table with concise plain-English summaries.
 - Humanised action names such as `page_view`, `update`, `login` and `logout`.

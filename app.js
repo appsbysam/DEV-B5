@@ -38,7 +38,9 @@ const state = {
   managerView: "activity",
   managerUserFilter: "",
   todayDetail: null,
-  dashboardDetail: null
+  dashboardDetail: null,
+  overdueOpen: false,
+  focusRentalUuid: null
 };
 
 const pageMeta = {
@@ -150,7 +152,7 @@ async function logAudit(action, entityType="app", entityId=null, details={}){
 window.logAudit=logAudit;
 
 function versionInfo(){
-  return window.B5_VERSION || {version:"0.7.8",title:"Version Update",notes:[]};
+  return window.B5_VERSION || {version:"0.7.9",title:"Version Update",notes:[]};
 }
 
 function getDeviceId(){
@@ -423,6 +425,66 @@ function dashboardStat(key,label,value,sub){
   </button>`;
 }
 
+
+function overdueRentals(){
+  const now=new Date();
+  return state.rentals.filter(r =>
+    r.status==="Active" &&
+    r.end &&
+    new Date(r.end) < now
+  );
+}
+
+function overdueText(r){
+  const end=new Date(r.end);
+  const ms=Math.max(0,Date.now()-end.getTime());
+  const mins=Math.floor(ms/60000);
+  const days=Math.floor(mins/1440);
+  const hours=Math.floor((mins%1440)/60);
+  const rem=mins%60;
+  if(days>0) return `${days}d ${hours}h overdue`;
+  if(hours>0) return `${hours}h ${rem}m overdue`;
+  return `${rem}m overdue`;
+}
+
+function overdueRentalTable(rows){
+  if(!rows.length) return `<div class="empty">No overdue rentals.</div>`;
+  return `<table>
+    <thead><tr><th>Rental</th><th>Customer</th><th>Vehicle</th><th>Expected Return</th><th>Overdue</th><th>Actions</th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const v=vehicleById(r.vehicle_id);
+      return `<tr>
+        <td data-label="Rental">#${esc(r.id)}</td>
+        <td data-label="Customer"><strong>${esc(r.customer)}</strong></td>
+        <td data-label="Vehicle">${v?`${esc(v.make)} ${esc(v.model)} · ${esc(v.plate||"")}`:"Unassigned"}</td>
+        <td data-label="Expected Return">${fmtDate(r.end)}</td>
+        <td data-label="Overdue"><span class="badge overdue-badge">${esc(overdueText(r))}</span></td>
+        <td data-label="Actions">
+          <div class="actions overdue-actions">
+            <button class="btn btn-secondary btn-small" data-overdue-extend="${esc(r.uuid)}">Extend</button>
+            <button class="btn btn-primary btn-small" data-overdue-return="${esc(r.uuid)}">Return Vehicle</button>
+            <button class="btn btn-secondary btn-small" data-open-rental="${esc(r.uuid)}">Open Rental</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join("")}</tbody>
+  </table>`;
+}
+
+function openRentalInRentals(uuid){
+  state.focusRentalUuid=uuid;
+  state.page="rentals";
+  render();
+  setTimeout(()=>{
+    const card=document.querySelector(`[data-rental-card="${CSS.escape(String(uuid))}"]`);
+    if(card){
+      card.scrollIntoView({behavior:"smooth",block:"center"});
+      card.classList.add("rental-focus");
+      setTimeout(()=>card.classList.remove("rental-focus"),2500);
+    }
+  },80);
+}
+
 function renderDashboard(){
   const now=todayDate();
   const availableVehicles=state.vehicles.filter(v=>effectiveVehicleStatus(v)==="Available");
@@ -432,7 +494,7 @@ function renderDashboard(){
   const oosVehicles=state.vehicles.filter(v=>["Out of Order","Maintenance"].includes(effectiveVehicleStatus(v)));
   const returnsToday=state.rentals.filter(r=>["Active","Confirmed","Reserved"].includes(r.status)&&sameDay(r.end,now));
   const pickupsToday=state.rentals.filter(r=>["Reserved","Confirmed"].includes(r.status)&&sameDay(r.start,now));
-  const overdue=state.rentals.filter(r=>r.status==="Active"&&new Date(r.end)<now);
+  const overdue=overdueRentals();
   const data={total:state.vehicles,available:availableVehicles,out:outVehicles,reserved:reservedVehicles,returns:returnsToday,pickups:pickupsToday,review:needsReviewVehicles,oos:oosVehicles};
 
   return `
@@ -447,7 +509,19 @@ function renderDashboard(){
       ${dashboardStat("oos","Out of Order",oosVehicles.length,"Unavailable")}
     </div>
     <div id="dashboardDetailPanel" class="dashboard-detail-panel">${renderDashboardDetail(state.dashboardDetail,data)}</div>
-    ${overdue.length?`<div class="alert"><strong>${overdue.length} overdue rental${overdue.length>1?"s":""}</strong> require attention.</div>`:""}
+    ${overdue.length?`
+      <button type="button" class="overdue-alert ${state.overdueOpen?"active":""}" id="overdueAlert">
+        <div><strong>${overdue.length} overdue rental${overdue.length>1?"s":""}</strong> require attention.</div>
+        <span>${state.overdueOpen?"Hide details":"View overdue rentals"} ›</span>
+      </button>
+      ${state.overdueOpen?`<div class="panel overdue-panel">
+        <div class="panel-head">
+          <div><h2>Overdue Rentals</h2><div class="vehicle-meta">Expected return time has passed and the rental has not been completed or extended.</div></div>
+          <button class="btn btn-small btn-secondary" id="closeOverduePanel">Close</button>
+        </div>
+        <div class="table-wrap">${overdueRentalTable(overdue)}</div>
+      </div>`:""}
+    `:""}
     <div class="grid two-col">
       <div class="panel"><div class="panel-head"><h2>Today's Returns</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div><div class="table-wrap">${rentalTable(returnsToday.slice(0,5))}</div></div>
       <div class="panel"><div class="panel-head"><h2>Today's Pickups</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div><div class="table-wrap">${rentalTable(pickupsToday.slice(0,5))}</div></div>
@@ -759,7 +833,7 @@ function renderRentals(){
 function rentalCard(r,readOnly=false){
   const v=vehicleById(r.vehicle_id);
   const f=rentalFinancials(r.uuid);
-  return `<div class="rental-card" style="margin-bottom:12px">
+  return `<div class="rental-card ${String(state.focusRentalUuid)===String(r.uuid)?"rental-focus":""}" data-rental-card="${esc(r.uuid)}" style="margin-bottom:12px">
     <div class="kpi-row"><span class="badge ${statusClass(r.status)}">${esc(r.status)}</span><span class="badge badge-reserved">${esc(r.guarantee)}</span></div>
     <h3>#${esc(r.id)} · ${esc(r.customer)}</h3>
     <div class="subline">${v?`${esc(v.make)} ${esc(v.model)} · ${esc(v.plate)}`:"Unassigned"}</div>
@@ -1185,7 +1259,7 @@ function renderSettings(){
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
-      <p class="note">v0.7.8 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
+      <p class="note">v0.7.9 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
     </div></div>
   </div>`;
 }
@@ -1560,6 +1634,18 @@ function bindPageEvents(){
   }));
   $$("[data-dashboard-detail]").forEach(btn=>btn.addEventListener("click",()=>{const target=btn.dataset.dashboardDetail;state.dashboardDetail=state.dashboardDetail===target?null:target;render();}));
   $("#closeDashboardDetail")?.addEventListener("click",()=>{state.dashboardDetail=null;render();});
+  $("#overdueAlert")?.addEventListener("click",()=>{
+    state.overdueOpen=!state.overdueOpen;
+    render();
+  });
+  $("#closeOverduePanel")?.addEventListener("click",()=>{
+    state.overdueOpen=false;
+    render();
+  });
+  $$("[data-overdue-extend]").forEach(btn=>btn.addEventListener("click",()=>extendModal(btn.dataset.overdueExtend)));
+  $$("[data-overdue-return]").forEach(btn=>btn.addEventListener("click",()=>returnModal(btn.dataset.overdueReturn)));
+  $$("[data-open-rental]").forEach(btn=>btn.addEventListener("click",()=>openRentalInRentals(btn.dataset.openRental)));
+
   $("#searchAvailability")?.addEventListener("click",availabilitySearch);
   $("#refreshSupabase")?.addEventListener("click",loadSupabaseData);
   $$("[data-book-vehicle]").forEach(b=>b.onclick=()=>bookingModal({vehicleId:b.dataset.bookVehicle,start:b.dataset.start,end:b.dataset.end,pickup:b.dataset.pickup,dropoff:b.dataset.dropoff}));
@@ -1632,6 +1718,7 @@ function bindPageEvents(){
 
 function go(page){
   if(page==="manager"&&!isManager()) return;
+  state.focusRentalUuid=null;
   state.page=page;
   render();
   logAudit("page_view","page",page,{page});
@@ -1731,5 +1818,5 @@ window.startB5App=async function(){
 window.resetB5App=function(){
   state.live=false;state.error="";state.vehicles=[];state.rentals=[];state.customers=[];state.suppliers=[];
   state.locations=fallback.locations;state.categories=[];state.segments=[];state.charges=[];state.payments=[];state.bonds=[];
-  state.userProfile=null;state.auditLogs=[];state.staffProfiles=[];state.managerView="activity";state.managerUserFilter="";state.todayDetail=null;state.dashboardDetail=null;appStarted=false;
+  state.userProfile=null;state.auditLogs=[];state.staffProfiles=[];state.managerView="activity";state.managerUserFilter="";state.todayDetail=null;state.dashboardDetail=null;state.overdueOpen=false;state.focusRentalUuid=null;appStarted=false;
 };

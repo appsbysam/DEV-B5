@@ -1,13 +1,13 @@
 window.B5_VERSION = {
-  version: "0.7.8",
+  version: "0.7.9",
   build: "Demo Build",
   released: "2026-08-15",
-  title: "User-Friendly Audit Log",
+  title: "Actionable Overdue Rentals",
   notes: [
-    "Replaced raw JSON in the Manager audit log with plain-English activity summaries.",
-    "Changed technical action and area labels into manager-friendly wording.",
-    "Added View Details for each audit entry.",
-    "Audit Details now shows clean record information and before/after changes without exposing raw JSON.",
-    "The complete technical audit data remains stored unchanged in Supabase."
+    "Made the overdue-rental warning on the Dashboard clickable.",
+    "Added an Overdue Rentals drill-down showing customer, vehicle, expected return time and how overdue each rental is.",
+    "Added direct Extend, Return Vehicle and Open Rental actions from the overdue drill-down.",
+    "Open Rental takes the user directly to the matching rental card and highlights it.",
+    "Overdue means the expected return time has passed while the rental is still active."
   ]
 };

@@ -923,3 +923,52 @@ body.auth-locked #app { visibility: hidden; }
   .audit-change-values{grid-template-columns:1fr}
   .audit-change-values strong{display:none}
 }
+
+
+/* ===== v0.7.9 actionable overdue rentals ===== */
+.overdue-alert{
+  appearance:none;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 14px;
+  padding:14px 16px;
+  border:1px solid #f2b8b5;
+  border-radius:12px;
+  background:#fff1f0;
+  color:#a22b25;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.overdue-alert:hover,
+.overdue-alert.active{
+  border-color:#db6259;
+  background:#ffebe9;
+}
+.overdue-alert span{
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.overdue-panel{
+  margin:-2px 0 14px;
+  border-color:#f2b8b5;
+}
+.overdue-badge{
+  background:#fff1f0;
+  color:#a22b25;
+}
+.overdue-actions{
+  flex-wrap:wrap;
+}
+.rental-focus{
+  outline:3px solid rgba(27,120,211,.35);
+  box-shadow:0 0 0 5px rgba(27,120,211,.08);
+  transition:outline .2s ease,box-shadow .2s ease;
+}
+@media(max-width:760px){
+  .overdue-alert{align-items:flex-start;flex-direction:column}
+}
