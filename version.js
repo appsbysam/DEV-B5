@@ -1,9 +1,13 @@
 window.B5_VERSION = {
-  version: "0.7.5",
+  version: "0.7.6",
   build: "Demo Build",
   released: "2026-08-15",
-  title: "Search, Customer & Dashboard UX",
+  title: "Mobile & Web App Icons",
   notes: [
+    "Added Android/PWA home-screen icons including maskable icons.",
+    "Added iOS Apple Touch icon and mobile web-app metadata.",
+    "Added browser favicon ICO and PNG variants.",
+    "Added a web app manifest so Add to Home Screen uses the All Season icon.",
     "Optimised the All Season logo for faster loading on slower connections.",
     "Added a searchable customer autocomplete picker to New Rental / Booking.",
     "Create New Customer is now always the first option in the customer search results.",

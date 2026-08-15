@@ -2,6 +2,15 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.6 — Mobile & Web App Icons
+- Added browser favicon files in ICO and PNG formats.
+- Added Apple Touch icon for iPhone/iPad home-screen installation.
+- Added 192px and 512px Android/PWA icons.
+- Added maskable Android icons with extra safe-area padding.
+- Added `manifest.webmanifest` and mobile web-app metadata.
+- Existing All Season logo artwork is used throughout.
+
+
 ## v0.7.5 — Search, Customer & Dashboard UX
 - Replaced the 1.1 MB login/sidebar PNG request with a cropped and compressed WebP asset.
 - Added image preload and explicit dimensions to improve first-paint performance on slower connections.
