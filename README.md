@@ -184,3 +184,19 @@ No database changes are required.
 The New Rental / Booking dialog is now constrained to the mobile viewport. The form uses a single-column layout on phones and scrolls vertically inside the modal without horizontal page or dialog movement.
 
 No database changes are required.
+
+
+## v0.7.0 — Manager mode, versioning and audit history
+
+Version metadata now lives in `version.js`. Each new deployment can show a one-time What's New popup, and the version number in the header can reopen the release notes.
+
+Manager-only functionality is controlled through `staff_profiles.role`. Normal Staff users do not see the Manager Mode navigation item.
+
+The companion private SQL creates:
+- `staff_profiles`
+- `audit_log`
+- role helper/RLS policies
+- profile backfill for existing Supabase Auth users
+- database audit triggers for major operational tables
+
+Keep the SQL file in `_private/sql/`; it is intentionally not included in the public repository ZIP.

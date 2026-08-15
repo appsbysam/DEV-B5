@@ -31,7 +31,10 @@ const state = {
   segments: [],
   charges: [],
   payments: [],
-  bonds: []
+  bonds: [],
+  userProfile: null,
+  auditLogs: [],
+  staffProfiles: []
 };
 
 const pageMeta = {
@@ -44,7 +47,8 @@ const pageMeta = {
   customers:["Customers","Customer directory and rental history"],
   suppliers:["Suppliers","Partner companies and external vehicle sources"],
   locations:["Locations & Fees","Pickup, drop-off and transfer pricing"],
-  settings:["Settings","System connection and configuration"]
+  settings:["Settings","System connection and configuration"],
+  manager:["Manager Mode","Manager-only controls, access and historical activity"]
 };
 
 function esc(v){
@@ -78,6 +82,70 @@ function customerById(id){ return state.customers.find(v=>String(v.id)===String(
 function locationById(id){ return state.locations.find(v=>String(v.id)===String(id)); }
 function supplierById(id){ return state.suppliers.find(v=>String(v.id)===String(id)); }
 function agreementByUuid(id){ return state.rentals.find(r=>String(r.uuid)===String(id)); }
+
+function isManager(){ return state.userProfile?.role === "manager"; }
+
+function setManagerVisibility(){
+  const btn=$("#managerNav");
+  if(btn) btn.hidden=!isManager();
+  if(state.page==="manager" && !isManager()) state.page="dashboard";
+}
+
+async function currentAuthUser(){
+  const {data}=await window.db.auth.getUser();
+  return data?.user||null;
+}
+
+async function loadUserProfile(){
+  if(!window.db) return null;
+  const user=await currentAuthUser();
+  if(!user) return null;
+  const {data,error}=await window.db
+    .from("staff_profiles")
+    .select("user_id,email,display_name,role,active")
+    .eq("user_id",user.id)
+    .maybeSingle();
+  if(error){
+    console.warn("Could not load staff profile",error);
+    return {user_id:user.id,email:user.email,display_name:user.email,role:"staff",active:true};
+  }
+  return data || {user_id:user.id,email:user.email,display_name:user.email,role:"staff",active:true};
+}
+
+async function logAudit(action, entityType="app", entityId=null, details={}){
+  try{
+    if(!window.db) return;
+    const {data}=await window.db.auth.getUser();
+    const user=data?.user;
+    if(!user) return;
+    await window.db.from("audit_log").insert({
+      user_id:user.id,
+      user_email:user.email||null,
+      action,
+      entity_type:entityType,
+      entity_id:entityId ? String(entityId) : null,
+      details:details||{}
+    });
+  }catch(err){
+    console.warn("Audit log failed",err);
+  }
+}
+window.logAudit=logAudit;
+
+function versionInfo(){
+  return window.B5_VERSION || {version:"0.7.0",title:"Version Update",notes:[]};
+}
+function showVersionUpdate(force=false){
+  const info=versionInfo();
+  const seen=localStorage.getItem("b5_last_seen_version");
+  if(!force && seen===info.version) return;
+  $("#updateTitle").textContent=info.title || "What's New";
+  $("#updateVersion").textContent=`Version ${info.version} · ${info.build||""}`;
+  $("#updateNotes").innerHTML=(info.notes||[]).map(n=>`<li>${esc(n)}</li>`).join("");
+  $("#updateModal").showModal();
+}
+window.showVersionUpdate=showVersionUpdate;
+
 
 function statusClass(s){
   const x=(s||"").toLowerCase();
@@ -177,6 +245,9 @@ async function loadSupabaseData(){
   state.loading=true;state.error="";updateDataMode();
 
   try{
+    state.userProfile=await loadUserProfile();
+    setManagerVisibility();
+
     const [categoriesRes,suppliersRes,locationsRes,customersRes,vehiclesRes,agreementsRes,segmentsRes,chargesRes,paymentsRes,bondsRes]
     =await Promise.all([
       window.db.from("vehicle_categories").select("*").order("name"),
@@ -205,6 +276,19 @@ async function loadSupabaseData(){
     state.payments=paymentsRes.data||[];
     state.bonds=bondsRes.data||[];
     state.rentals=rebuildRentals(agreementsRes.data||[],state.segments);
+
+    if(isManager()){
+      const [staffRes,auditRes]=await Promise.all([
+        window.db.from("staff_profiles").select("user_id,email,display_name,role,active,created_at").order("email"),
+        window.db.from("audit_log").select("*").order("created_at",{ascending:false}).limit(500)
+      ]);
+      state.staffProfiles=staffRes.error?[]:(staffRes.data||[]);
+      state.auditLogs=auditRes.error?[]:(auditRes.data||[]);
+    }else{
+      state.staffProfiles=[];
+      state.auditLogs=[];
+    }
+
     state.live=true;
   }catch(err){
     console.error(err);
@@ -225,7 +309,7 @@ function render(){
     dashboard:renderDashboard,today:renderToday,availability:renderAvailability,
     rentals:renderRentals,calendar:renderCalendar,fleet:renderFleet,
     customers:renderCustomers,suppliers:renderSuppliers,locations:renderLocations,
-    settings:renderSettings
+    settings:renderSettings,manager:renderManager
   };
   $("#content").innerHTML=(state.error?`<div class="alert">${esc(state.error)}</div>`:"")+map[state.page]();
   bindPageEvents();
@@ -577,6 +661,131 @@ function renderLocations(){
       <tbody>${state.locations.map(l=>`<tr><td data-label="Location">${esc(l.name)}</td><td data-label="Pickup">${money(l.pickup_fee)}</td><td data-label="Drop-off">${money(l.dropoff_fee)}</td><td data-label="Buffer">${esc(l.turnaround_minutes||0)} mins</td></tr>`).join("")}</tbody>
     </table></div></div>`;
 }
+
+function renderManager(){
+  if(!isManager()){
+    return `<div class="alert">Manager access is required.</div>`;
+  }
+
+  const testRates=state.vehicles.filter(v=>{
+    const n=Number(v.rate||0);
+    return Math.abs((n-Math.trunc(n))-0.01)<0.001;
+  });
+
+  const logRows=state.auditLogs.slice(0,200);
+  const users=state.staffProfiles;
+
+  return `
+    <div class="section-title">
+      <div><h2>Manager Mode</h2><p>Manager-only operational controls and history</p></div>
+      <button class="btn btn-secondary" id="refreshManager">Refresh Manager Data</button>
+    </div>
+
+    <div class="manager-grid">
+      <div class="manager-card">
+        <h3>User Access</h3>
+        <div class="vehicle-rate">${users.length}</div>
+        <p>Authenticated users with B5 staff profiles.</p>
+      </div>
+      <div class="manager-card">
+        <h3>Test Rates</h3>
+        <div class="vehicle-rate">${testRates.length}</div>
+        <p>Vehicles still carrying a test price ending in .01.</p>
+      </div>
+      <div class="manager-card">
+        <h3>Audit Records</h3>
+        <div class="vehicle-rate">${state.auditLogs.length}</div>
+        <p>Recent logins, navigation and business-record changes.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="panel-head"><h3>User Access</h3></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Role</th><th>Status</th></tr></thead>
+          <tbody>
+            ${users.length?users.map(u=>`<tr>
+              <td data-label="User"><strong>${esc(u.display_name||u.email||"User")}</strong><br><span class="vehicle-meta">${esc(u.email||"")}</span></td>
+              <td data-label="Role"><span class="badge ${u.role==="manager"?"role-manager":"role-staff"}">${esc(u.role||"staff")}</span></td>
+              <td data-label="Status"><span class="badge ${u.active?"badge-available":"badge-oos"}">${u.active?"Active":"Inactive"}</span></td>
+            </tr>`).join(""):`<tr><td colspan="3">No staff profiles found.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="panel-head"><h3>Vehicles Still Using Test Rates</h3><span class="badge badge-reserved">${testRates.length}</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Vehicle</th><th>Plate</th><th>Rate</th></tr></thead>
+          <tbody>
+            ${testRates.length?testRates.map(v=>`<tr>
+              <td data-label="Vehicle">${esc(v.make)} ${esc(v.model)}</td>
+              <td data-label="Plate">${esc(v.plate)}</td>
+              <td data-label="Rate"><strong>${money(v.rate)}</strong></td>
+            </tr>`).join(""):`<tr><td colspan="3">No test rates remain.</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="panel-head"><h3>Historical Activity / Audit Log</h3><span class="badge badge-demo">Last ${logRows.length}</span></div>
+      <div class="panel-body">
+        <div class="audit-filters">
+          <input id="auditSearch" placeholder="Search user, action or details">
+          <select id="auditAction"><option value="">All actions</option>${[...new Set(logRows.map(x=>x.action))].sort().map(a=>`<option>${esc(a)}</option>`).join("")}</select>
+          <select id="auditEntity"><option value="">All areas</option>${[...new Set(logRows.map(x=>x.entity_type))].sort().map(a=>`<option>${esc(a)}</option>`).join("")}</select>
+          <button class="btn btn-secondary" id="clearAuditFilter">Clear</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="auditTableWrap">${auditTable(logRows)}</div>
+    </div>
+
+    <div class="panel" style="margin-top:14px">
+      <div class="panel-head"><h3>Recommended Manager-Only Controls</h3></div>
+      <div class="panel-body">
+        <div class="manager-grid">
+          <div class="manager-card"><h3>Rate Management</h3><p>Bulk update real daily rates, identify remaining .01 test pricing and approve overrides.</p></div>
+          <div class="manager-card"><h3>User & Role Management</h3><p>Add/deactivate staff and promote selected users to manager without exposing controls to normal staff.</p></div>
+          <div class="manager-card"><h3>Corrections / Voids</h3><p>Manager-only cancellation, reversal and correction tools for payments, rentals and accidental entries.</p></div>
+          <div class="manager-card"><h3>Location & Supplier Pricing</h3><p>Maintain transfer fees, partner supplier details and external-car cost structures.</p></div>
+          <div class="manager-card"><h3>Reports & Export</h3><p>Revenue, utilisation, vehicle performance, outstanding balances and downloadable CSV/Excel reports.</p></div>
+          <div class="manager-card"><h3>System / Backup</h3><p>Data export, audit retention, version information and controlled demo-to-production settings.</p></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function auditTable(rows){
+  if(!rows.length) return `<div class="empty">No audit activity recorded yet.</div>`;
+  return `<table>
+    <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Area</th><th>Details</th></tr></thead>
+    <tbody>${rows.map(x=>`<tr>
+      <td data-label="Time" class="audit-time">${fmtDate(x.created_at)}</td>
+      <td data-label="User">${esc(x.user_email||"System")}</td>
+      <td data-label="Action" class="audit-action">${esc(x.action)}</td>
+      <td data-label="Area">${esc(x.entity_type||"")}</td>
+      <td data-label="Details"><div class="audit-detail">${esc(JSON.stringify(x.details||{}))}</div></td>
+    </tr>`).join("")}</tbody>
+  </table>`;
+}
+
+function filterAudit(){
+  if(!isManager()) return;
+  const q=($("#auditSearch")?.value||"").toLowerCase();
+  const action=$("#auditAction")?.value||"";
+  const entity=$("#auditEntity")?.value||"";
+  const rows=state.auditLogs.filter(x=>{
+    const hay=`${x.user_email||""} ${x.action||""} ${x.entity_type||""} ${JSON.stringify(x.details||{})}`.toLowerCase();
+    return (!q||hay.includes(q)) && (!action||x.action===action) && (!entity||x.entity_type===entity);
+  });
+  const wrap=$("#auditTableWrap");
+  if(wrap) wrap.innerHTML=auditTable(rows.slice(0,200));
+}
+
 function renderSettings(){
   return `<div class="grid two-col">
     <div class="panel"><div class="panel-head"><h3>Supabase Connection</h3></div><div class="panel-body">
@@ -584,7 +793,7 @@ function renderSettings(){
       <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
     </div></div>
     <div class="panel"><div class="panel-head"><h3>Demo Status</h3></div><div class="panel-body">
-      <p class="note">v0.6.2 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
+      <p class="note">v0.7.0 includes live booking, conflict checking, pricing, similar vehicle suggestions, extensions, vehicle swaps/upgrades, payments, returns and the improved calendar/dashboard.</p>
     </div></div>
   </div>`;
 }
@@ -790,6 +999,7 @@ async function saveRentalAgreement(){
     });
     if(bErr) alert("Booking created, but bond could not be saved: "+bErr.message);
   }
+  await logAudit("rental_created","rental_agreement",agreement.id,{vehicle_id:vehicleId,customer_id:customerId,total:p.total});
   await loadSupabaseData();state.page="rentals";render();return true;
 }
 
@@ -810,6 +1020,7 @@ function extendModal(uuid){
       const {error:u2}=await window.db.from("rental_segments").update({end_at:new Date(newEnd).toISOString()}).eq("id",currentSeg.id);
       if(u2){alert(u2.message);return false;}
       if(extra>0) await window.db.from("rental_charges").insert({rental_agreement_id:r.uuid,charge_type:"Extension",description:`${extraDays} additional day(s)`,amount:extra});
+      await logAudit("rental_extended","rental_agreement",r.uuid,{new_end:newEnd,vehicle_id:v.id,extra_days:extraDays,extra_charge:extra});
       await loadSupabaseData();return true;
     },"Extend Rental");
 
@@ -866,6 +1077,7 @@ function swapModal(uuid){
       if(Math.abs(adjustment)>0.001){
         await window.db.from("rental_charges").insert({rental_agreement_id:r.uuid,charge_type:"Vehicle Change Adjustment",description:$("#sReason").value,amount:adjustment});
       }
+      await logAudit("vehicle_changed","rental_agreement",r.uuid,{from_vehicle_id:currentV?.id,to_vehicle_id:newVid,reason:$("#sReason").value});
       await loadSupabaseData();return true;
     },"Change Vehicle");
 
@@ -893,7 +1105,7 @@ function paymentModal(uuid){
       const amount=Number($("#pAmount").value||0);if(amount<=0){alert("Enter a payment amount.");return false;}
       const signedAmount=$("#pType").value==="Refund"?-amount:amount;
       const {error}=await window.db.from("payments").insert({rental_agreement_id:uuid,payment_type:$("#pType").value,amount:signedAmount,payment_method:$("#pMethod").value,reference:$("#pReference").value||null});
-      if(error){alert(error.message);return false;}await loadSupabaseData();return true;
+      if(error){alert(error.message);return false;}await logAudit("payment_recorded","rental_agreement",uuid,{amount:signedAmount,type:$("#pType").value,method:$("#pMethod").value});await loadSupabaseData();return true;
     },"Record Payment");
 }
 
@@ -914,6 +1126,7 @@ function returnModal(uuid){
       if($("#retLocation").value) payload.actual_dropoff_location_id=$("#retLocation").value;
       const {error:u2}=await window.db.from("rental_agreements").update(payload).eq("id",uuid);
       if(u2){alert(u2.message);return false;}
+      await logAudit("vehicle_returned","rental_agreement",uuid,{returned_at:ret,location_id:$("#retLocation").value||null});
       await loadSupabaseData();return true;
     },"Complete Return");
 }
@@ -923,11 +1136,11 @@ async function saveVehicle(){
   if(!model||!plate){alert("Model and plate are required.");return false;}
   const source=$("#vSource").value;
   const payload={make,model,plate,colour:$("#vColor").value.trim()||null,category_id:$("#vCategory").value||null,standard_daily_rate:Number($("#vRate").value||0),source_type:source,supplier_id:source==="External"?($("#vSupplier").value||null):null,transmission:"Automatic",seats:5,operational_status:"Available"};
-  const {error}=await window.db.from("vehicles").insert(payload);if(error){alert(error.message);return false;}await loadSupabaseData();return true;
+  const {data,error}=await window.db.from("vehicles").insert(payload).select().single();if(error){alert(error.message);return false;}await logAudit("vehicle_created","vehicle",data?.id,{plate,make,model});await loadSupabaseData();return true;
 }
 async function saveCustomer(){
   const name=$("#cName").value.trim();if(!name){alert("Customer name is required.");return false;}
-  const {error}=await window.db.from("customers").insert({full_name:name,mobile:$("#cPhone").value.trim()||null});if(error){alert(error.message);return false;}await loadSupabaseData();return true;
+  const {data,error}=await window.db.from("customers").insert({full_name:name,mobile:$("#cPhone").value.trim()||null}).select().single();if(error){alert(error.message);return false;}await logAudit("customer_created","customer",data?.id,{name});await loadSupabaseData();return true;
 }
 
 function bindPageEvents(){
@@ -955,17 +1168,45 @@ function bindPageEvents(){
   $("#newCustomerBtn")?.addEventListener("click",()=>openModal("Add Customer",`
     <div class="field"><label>Full Name</label><input id="cName"></div>
     <div class="field" style="margin-top:10px"><label>Mobile</label><input id="cPhone"></div>`,saveCustomer));
+
+  $("#refreshManager")?.addEventListener("click",loadSupabaseData);
+  ["auditSearch","auditAction","auditEntity"].forEach(id=>$("#"+id)?.addEventListener("input",filterAudit));
+  $("#clearAuditFilter")?.addEventListener("click",()=>{
+    if($("#auditSearch")) $("#auditSearch").value="";
+    if($("#auditAction")) $("#auditAction").value="";
+    if($("#auditEntity")) $("#auditEntity").value="";
+    filterAudit();
+  });
 }
 
-function go(page){state.page=page;render();if(window.innerWidth<760)$("#sidebar").classList.remove("open");}
+function go(page){
+  if(page==="manager"&&!isManager()) return;
+  state.page=page;
+  render();
+  logAudit("page_view","page",page,{page});
+  if(window.innerWidth<760)$("#sidebar").classList.remove("open");
+}
 $$(".nav-btn").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
 $("#menuBtn").addEventListener("click",()=>$("#sidebar").classList.toggle("open"));
 $("#quickAvailability").addEventListener("click",()=>go("availability"));
 $("#quickRental").addEventListener("click",()=>{go("rentals");setTimeout(()=>bookingModal(),50);});
 
+$("#versionBtn")?.addEventListener("click",()=>showVersionUpdate(true));
+$("#updateClose")?.addEventListener("click",()=>$("#updateModal").close());
+$("#updateDone")?.addEventListener("click",()=>{
+  localStorage.setItem("b5_last_seen_version",versionInfo().version);
+  $("#updateModal").close();
+});
+
 let appStarted=false;
-window.startB5App=async function(){if(!appStarted){appStarted=true;render();}await loadSupabaseData();};
+window.startB5App=async function(){
+  if(!appStarted){appStarted=true;render();}
+  await loadSupabaseData();
+  setManagerVisibility();
+  setTimeout(()=>showVersionUpdate(false),200);
+};
 window.resetB5App=function(){
   state.live=false;state.error="";state.vehicles=[];state.rentals=[];state.customers=[];state.suppliers=[];
-  state.locations=fallback.locations;state.categories=[];state.segments=[];state.charges=[];state.payments=[];state.bonds=[];appStarted=false;
+  state.locations=fallback.locations;state.categories=[];state.segments=[];state.charges=[];state.payments=[];state.bonds=[];
+  state.userProfile=null;state.auditLogs=[];state.staffProfiles=[];appStarted=false;
 };

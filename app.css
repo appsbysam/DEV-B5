@@ -544,3 +544,105 @@ body.auth-locked #app { visibility: hidden; }
     padding: 12px;
   }
 }
+
+
+/* ===== v0.7.0 version/update + manager mode ===== */
+.manager-only[hidden] { display: none !important; }
+
+.version-link {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+.version-link:hover { text-decoration: underline; }
+
+.update-dialog {
+  width: min(560px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(11,18,32,.28);
+}
+.update-dialog::backdrop { background: rgba(11,18,32,.55); }
+.update-card { background: #fff; }
+.update-body { padding: 18px 22px 6px; }
+.update-eyebrow {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  color: var(--blue);
+  margin-bottom: 4px;
+}
+.update-version {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #eef5ff;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+.update-body ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.update-body li {
+  margin: 8px 0;
+  line-height: 1.45;
+}
+
+.manager-grid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 12px;
+}
+.manager-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px;
+}
+.manager-card h3 { margin: 0 0 6px; }
+.manager-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+.audit-filters {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr .8fr auto;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.audit-detail {
+  max-width: 440px;
+  white-space: normal;
+  word-break: break-word;
+  font-size: 11px;
+  color: var(--muted);
+}
+.audit-action {
+  font-weight: 800;
+}
+.audit-time {
+  white-space: nowrap;
+}
+.role-manager {
+  background: #eef5ff;
+  color: #175cd3;
+}
+.role-staff {
+  background: #f2f4f7;
+  color: #344054;
+}
+
+@media (max-width:900px){
+  .manager-grid { grid-template-columns: 1fr; }
+  .audit-filters { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width:600px){
+  .audit-filters { grid-template-columns: 1fr; }
+  .update-dialog { width: calc(100vw - 16px); }
+}

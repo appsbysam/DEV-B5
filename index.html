@@ -52,6 +52,7 @@
         <button data-page="suppliers" class="nav-btn">Suppliers</button>
         <button data-page="locations" class="nav-btn">Locations & Fees</button>
         <button data-page="settings" class="nav-btn">Settings</button>
+        <button data-page="manager" id="managerNav" class="nav-btn manager-only" hidden>Manager Mode</button>
       </nav>
 
       <div class="sidebar-footer">
@@ -68,7 +69,7 @@
           <p id="pageSubtitle">Fleet and rental operations at a glance</p>
         </div>
         <div class="top-actions">
-          <div class="user-version"><span id="signedInUser" class="signed-user"></span><span class="app-version">v0.6.3</span></div>
+          <div class="user-version"><span id="signedInUser" class="signed-user"></span><button type="button" id="versionBtn" class="app-version version-link">v0.7.0</button></div>
           <button class="btn btn-secondary" id="quickAvailability">Check Availability</button>
           <button class="btn btn-primary" id="quickRental">New Rental</button>
           <button class="btn btn-secondary" id="logoutBtn">Sign Out</button>
@@ -93,11 +94,28 @@
     </form>
   </dialog>
 
-  
-  
-  
+  <dialog id="updateModal" class="update-dialog">
+    <div class="update-card">
+      <div class="modal-head">
+        <div>
+          <div class="update-eyebrow">VERSION UPDATE</div>
+          <h3 id="updateTitle">What's New</h3>
+        </div>
+        <button class="icon-btn" id="updateClose" type="button" aria-label="Close">✕</button>
+      </div>
+      <div class="update-body">
+        <div class="update-version" id="updateVersion"></div>
+        <ul id="updateNotes"></ul>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="updateDone" type="button">Got it</button>
+      </div>
+    </div>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
+  <script src="version.js"></script>
   <script src="app.js"></script>
   <script src="auth.js"></script>
 </body>

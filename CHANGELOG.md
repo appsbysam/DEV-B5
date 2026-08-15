@@ -2,6 +2,19 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.7.0 — Manager Mode, Version Updates & Audit History
+- Moved application version information into `version.js`.
+- Added automatic What's New popup when a newly deployed version is detected.
+- Added clickable version number to reopen release notes at any time.
+- Added staff-profile roles with Manager / Staff support.
+- Added a Manager Mode navigation item that is hidden completely for Staff users.
+- Added manager-only user access overview.
+- Added manager-only list of vehicles still using `.01` test rates.
+- Added historical audit/activity area with search and filtering.
+- Added app audit events for login, logout, page navigation, rental creation, extensions, vehicle changes, payments, returns, new customers and new vehicles.
+- Added database-trigger audit support for insert/update/delete changes to major business tables.
+- No SQL is included in the public GitHub package; the companion SQL belongs in `_private/sql/`.
+
 ## v0.6.3 — Mobile Rental Modal Fit
 - Fixed the New Rental / Booking modal on mobile so it always stays within the device viewport.
 - Removed horizontal/sideways modal movement.

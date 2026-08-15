@@ -108,6 +108,7 @@
       }
 
       if(data?.session){
+        await window.logAudit?.("login","auth",data.session.user.id,{method:"email_password"});
         await showApp(data.session, true);
       }
     } finally {
@@ -119,6 +120,7 @@
   logoutBtn.addEventListener("click", async () => {
     logoutBtn.disabled = true;
     try {
+      await window.logAudit?.("logout","auth",activeUserId,{});
       await window.db.auth.signOut();
     } finally {
       logoutBtn.disabled = false;
