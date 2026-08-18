@@ -1,13 +1,13 @@
 window.B5_VERSION = {
-  version: "0.7.10",
+  version: "0.8.0",
   build: "Demo Build",
-  released: "2026-08-15",
-  title: "Mobile Menu Controls & Fresh Audit History",
+  released: "2026-08-18",
+  title: "Client Workflow Enhancements",
   notes: [
-    "Added a close X to the mobile hamburger navigation.",
-    "Tapping anywhere outside the open mobile menu now closes it.",
-    "The Escape key also closes the menu on supported devices.",
-    "Cleared the pre-demo audit history so new activity starts from a clean baseline.",
-    "No operational fleet, customer or rental data was removed."
+    "Added dynamic pickup and drop-off locations with Add New Location at the top of the Availability lists.",
+    "Added a searchable English Lebanon area/suburb reference list when creating locations.",
+    "Made rental cards clickable to open customer, vehicle, rental-period and financial details.",
+    "Added multi-colour calendar bookings so renter changes are easier to identify visually.",
+    "Added Calendar search, vehicle type, source, status, price range and sorting controls."
   ]
 };
