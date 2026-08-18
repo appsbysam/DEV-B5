@@ -1,13 +1,16 @@
 window.B5_VERSION = {
-  version: "0.8.0",
+  version: "0.8.1",
   build: "Demo Build",
   released: "2026-08-18",
-  title: "Client Workflow Enhancements",
+  title: "Rental, Fleet, Finance & Maintenance Expansion",
   notes: [
-    "Added dynamic pickup and drop-off locations with Add New Location at the top of the Availability lists.",
-    "Added a searchable English Lebanon area/suburb reference list when creating locations.",
-    "Made rental cards clickable to open customer, vehicle, rental-period and financial details.",
-    "Added multi-colour calendar bookings so renter changes are easier to identify visually.",
-    "Added Calendar search, vehicle type, source, status, price range and sorting controls."
+    "Added rental search and rental history views.",
+    "Added fleet filtering, sorting and vehicle drill-down with rental history.",
+    "Added customer outstanding balances and partial-payment tracking.",
+    "Added automatic payment references and a 5% card surcharge.",
+    "Added Reports with cash flow, receivables and vehicle profitability in USD.",
+    "Added unique single-use promo codes for 5%, 10%, 15%, 20% or one free day.",
+    "Added vehicle purchase costs, expenses and maintenance history.",
+    "Added kilometre-based maintenance reminders at 5,000, 3,000 and 1,000 km thresholds."
   ]
 };
