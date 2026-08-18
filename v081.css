@@ -1,0 +1,27 @@
+/* B5 v0.8.1 */
+.rental-search-panel,.fleet-filter-panel,.report-range{margin-bottom:14px}
+.rental-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end}
+.rental-tabs{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:1px}
+.rental-results-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.fleet-filter-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.vehicle-drill-card{appearance:none;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.vehicle-drill-card h3{margin:10px 0 6px}
+.vehicle-drill-card:hover{border-color:#b9d3f5;transform:translateY(-1px)}
+.vehicle-drill-hint{margin-top:10px;color:var(--blue);font-size:11px;font-weight:800}
+.vehicle-detail-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.vehicle-detail-summary .stat{height:100%;box-shadow:none}
+.vehicle-detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.vehicle-detail-sections{margin-top:10px}
+.detail-tabs-section{margin-top:14px}.detail-tabs-section h3{font-size:14px;margin:0 0 8px}
+.maintenance-alert-line{margin:7px 0;line-height:1.5}.maintenance-alert-line .badge{margin-right:5px}
+.payment-summary-box{margin-top:12px;padding:11px 12px;border-radius:10px;background:#eef5ff;border:1px solid #cfe1f7;font-size:12px}
+.maintenance-return-list{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.maintenance-return-item{border:1px solid var(--line);border-radius:10px;padding:10px}.maintenance-return-item strong{display:block;margin:5px 0 2px}
+.promo-input-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px}
+.report-range-row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.report-range-row .field{min-width:180px}
+.report-stats{grid-template-columns:repeat(5,minmax(0,1fr))}
+.report-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.report-line:last-child{border-bottom:0}.link-button{border:0;background:transparent;padding:0;color:var(--blue);font:inherit;font-weight:700;cursor:pointer;text-align:left}
+@media(max-width:1200px){.fleet-filter-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.report-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.vehicle-detail-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.rental-results-grid{grid-template-columns:1fr}.fleet-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.report-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.rental-search-row{grid-template-columns:1fr}.fleet-filter-grid{grid-template-columns:1fr}.vehicle-detail-summary{grid-template-columns:1fr 1fr}.report-stats{grid-template-columns:1fr 1fr}.promo-input-row{grid-template-columns:1fr}}
