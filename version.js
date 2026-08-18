@@ -1,16 +1,16 @@
 window.B5_VERSION = {
-  version: "0.8.1",
+  version: "0.8.2",
   build: "Demo Build",
   released: "2026-08-18",
-  title: "Rental, Fleet, Finance & Maintenance Expansion",
+  title: "Connected Workflows & Communications",
   notes: [
-    "Added rental search and rental history views.",
-    "Added fleet filtering, sorting and vehicle drill-down with rental history.",
-    "Added customer outstanding balances and partial-payment tracking.",
-    "Added automatic payment references and a 5% card surcharge.",
-    "Added Reports with cash flow, receivables and vehicle profitability in USD.",
-    "Added unique single-use promo codes for 5%, 10%, 15%, 20% or one free day.",
-    "Added vehicle purchase costs, expenses and maintenance history.",
-    "Added kilometre-based maintenance reminders at 5,000, 3,000 and 1,000 km thresholds."
+    "Made Dashboard and Today rental rows clickable so pickups and returns open their rental workflow.",
+    "Fixed the Rentals search field so typing no longer loses focus after every character.",
+    "Customer rows now open a current rental when one exists, otherwise they open the customer profile.",
+    "Made customer balances in Reports clickable and added sortable Customer and Outstanding columns.",
+    "Made supplier tiles clickable with supplier details and linked vehicles.",
+    "Added supplier create, edit, deactivate and reactivate workflows while preserving historical links.",
+    "Added customer profile drill-down with rental history and outstanding balance.",
+    "Added WhatsApp customer communication from customer and rental details using pre-filled messages."
   ]
 };
