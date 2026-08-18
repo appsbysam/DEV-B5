@@ -1,0 +1,18 @@
+/* B5 v0.8.0 client workflow enhancements */
+.location-reference-results{margin-top:6px;max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.location-reference-results:empty{display:none}
+.location-reference-item{width:100%;display:flex;justify-content:space-between;gap:10px;padding:9px 10px;border:0;border-bottom:1px solid #eef1f5;background:#fff;text-align:left;cursor:pointer}
+.location-reference-item:hover{background:#f3f8ff}.location-reference-item span{font-size:11px;color:var(--muted)}
+.rental-card-clickable{cursor:pointer}.rental-card-clickable:hover{border-color:#b9d3f5;box-shadow:0 10px 26px rgba(13,27,52,.12)}
+.rental-card-clickable:focus{outline:3px solid rgba(27,120,211,.18)}
+.rental-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.rental-detail-section{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fafbfd}
+.rental-detail-section h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.calendar-controls{overflow:visible}.calendar-filter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.calendar-filter-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;color:var(--muted);font-size:12px}
+.timeline-bar{color:#162033;border:1px solid rgba(0,0,0,.08)}
+.cal-shade-1{background:#d9eaff}.cal-shade-2{background:#e7ddff}.cal-shade-3{background:#dff4e7}
+.cal-shade-4{background:#ffe8c8}.cal-shade-5{background:#ffdfe6}.cal-shade-6{background:#dff3f5}
+@media(max-width:1000px){.calendar-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.rental-detail-grid{grid-template-columns:1fr}.calendar-filter-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.calendar-filter-grid{grid-template-columns:1fr}.calendar-filter-footer{align-items:flex-start;flex-direction:column}}
