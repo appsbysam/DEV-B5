@@ -1,16 +1,16 @@
 window.B5_VERSION = {
-  version: "0.8.2",
+  version: "0.8.3",
   build: "Demo Build",
-  released: "2026-08-18",
-  title: "Connected Workflows & Communications",
+  released: "2026-08-21",
+  title: "Business Expenses & Vehicle Profitability",
   notes: [
-    "Made Dashboard and Today rental rows clickable so pickups and returns open their rental workflow.",
-    "Fixed the Rentals search field so typing no longer loses focus after every character.",
-    "Customer rows now open a current rental when one exists, otherwise they open the customer profile.",
-    "Made customer balances in Reports clickable and added sortable Customer and Outstanding columns.",
-    "Made supplier tiles clickable with supplier details and linked vehicles.",
-    "Added supplier create, edit, deactivate and reactivate workflows while preserving historical links.",
-    "Added customer profile drill-down with rental history and outstanding balance.",
-    "Added WhatsApp customer communication from customer and rental details using pre-filled messages."
+    "Added a dedicated Expenses section for general business and vehicle-specific expenses.",
+    "Added expense categories, supplier/payee, payment method, invoice/reference, notes and date tracking.",
+    "Vehicle expenses can be assigned through a searchable fleet list or directly from the vehicle profile.",
+    "Added expense search, type, category, vehicle, date-range and sorting filters.",
+    "Added general business and vehicle expense totals in USD.",
+    "Expanded Reports with expense totals and vehicle investment recovery / break-even reporting.",
+    "Vehicle profitability now compares rental income, operating expenses and purchase cost.",
+    "Vehicle profiles now show how much of the original purchase investment remains to be recovered."
   ]
 };
