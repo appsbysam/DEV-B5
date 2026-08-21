@@ -1,16 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.3",
+  version: "0.8.4",
   build: "Demo Build",
   released: "2026-08-21",
-  title: "Business Expenses & Vehicle Profitability",
+  title: "Version Display Fix",
   notes: [
-    "Added a dedicated Expenses section for general business and vehicle-specific expenses.",
-    "Added expense categories, supplier/payee, payment method, invoice/reference, notes and date tracking.",
-    "Vehicle expenses can be assigned through a searchable fleet list or directly from the vehicle profile.",
-    "Added expense search, type, category, vehicle, date-range and sorting filters.",
-    "Added general business and vehicle expense totals in USD.",
-    "Expanded Reports with expense totals and vehicle investment recovery / break-even reporting.",
-    "Vehicle profitability now compares rental income, operating expenses and purchase cost.",
-    "Vehicle profiles now show how much of the original purchase investment remains to be recovered."
+    "Added a prominent version indicator to the mobile header so the current build can be checked without opening Settings.",
+    "Fixed Settings so the displayed version is taken automatically from the current app version instead of the old hard-coded v0.7.10 text.",
+    "Added current release information and a Release Notes button to Settings.",
+    "Kept the existing desktop version indicator in sync with the same version source."
   ]
 };
