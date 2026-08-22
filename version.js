@@ -1,15 +1,14 @@
 window.B5_VERSION = {
-  version: "0.8.5",
+  version: "0.8.51",
   build: "Demo Build",
   released: "2026-08-22",
-  title: "Integrated Rental Contracts",
+  title: "Compact Mobile Layouts",
   notes: [
-    "Added integrated rental contracts launched directly from a rental.",
-    "Contracts automatically pre-fill available customer, vehicle, rental, pricing and payment information.",
-    "Added unique B5 contract numbers, draft saving, contract status and archived final PDF storage.",
-    "Added customer and vehicle contract history links.",
-    "Added reusable customer identity, licence and passport fields for future rentals.",
-    "Vehicle damage drawings are stored against the contract and included in the final PDF.",
-    "Completed contracts retain their template version and audit history."
+    "Compacted the Customers page so substantially more customers fit on a mobile screen.",
+    "Added clear Rental, Vehicle, Customer, Pickup and Return labels to Today detail rows and reduced their height.",
+    "Fleet and Calendar search/filter controls are now collapsed by default and expand only when needed.",
+    "Compacted Suppliers, Locations & Fees and Expenses to reduce unnecessary scrolling.",
+    "Refined Reports with tighter summary cards and customer balance rows for better mobile use.",
+    "Existing drill-down, sorting, filtering and clickable-row behaviour is retained."
   ]
 };
