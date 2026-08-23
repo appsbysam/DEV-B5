@@ -1,13 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.71",
+  version: "0.8.72",
   build: "Demo Build",
   released: "2026-08-23",
-  title: "Mobile Profile & Notifications",
+  title: "Profile Notification Controls Fix",
   notes: [
-    "Added mobile access to My Profile from the navigation menu.",
-    "Added push notification controls to the user profile.",
-    "Added per-device registration and notification preferences.",
-    "Added pickup, return, overdue rental and vehicle maintenance reminders.",
-    "Added a test notification option."
+    "Fixed notification controls not appearing in My Profile on mobile.",
+    "Push notification preferences now render immediately when the profile opens.",
+    "Added clear enabled/not-enabled status for the current device.",
+    "Retained pickup, return, overdue and maintenance notification preferences."
   ]
 };
