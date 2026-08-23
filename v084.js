@@ -1,55 +1,17 @@
 /* B5 v0.8.4 — visible version indicator and dynamic Settings version */
 (function(){
   function currentVersion(){return (window.B5_VERSION&&window.B5_VERSION.version)||"0.8.4";}
+  renderSettings=function(){const info=window.B5_VERSION||{};return `<div class="grid two-col"><div class="panel"><div class="panel-head"><h3>Supabase Connection</h3></div><div class="panel-body"><p><strong>Status:</strong> ${state.live?'<span class="badge live-status">Online</span>':'<span class="badge fallback-status">Offline</span>'}</p><button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button></div></div><div class="panel"><div class="panel-head"><h3>App Version</h3><span class="badge badge-demo">v${esc(currentVersion())}</span></div><div class="panel-body"><p><strong>Current version:</strong> v${esc(currentVersion())}</p>${info.title?`<p class="note"><strong>${esc(info.title)}</strong></p>`:""}${info.released?`<p class="vehicle-meta">Released ${esc(info.released)}</p>`:""}<button class="btn btn-secondary" type="button" id="settingsReleaseNotes">View Release Notes</button></div></div></div>`;};
+  function ensureMobileVersion(){const top=document.querySelector('.topbar');if(!top)return;let badge=document.getElementById('mobileVersionBadge');if(!badge){badge=document.createElement('button');badge.type='button';badge.id='mobileVersionBadge';badge.className='mobile-version-badge';badge.title='View release notes';badge.addEventListener('click',()=>document.getElementById('versionBtn')?.click());top.appendChild(badge);}badge.textContent=`v${currentVersion()}`;const desktop=document.getElementById('versionBtn');if(desktop)desktop.textContent=`v${currentVersion()}`;}
+  const oldRender=render;render=function(){oldRender();ensureMobileVersion();};
+  const oldBind=bindPageEvents;bindPageEvents=function(){oldBind();document.getElementById('settingsReleaseNotes')?.addEventListener('click',()=>document.getElementById('versionBtn')?.click());};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensureMobileVersion);else ensureMobileVersion();
+})();
 
-  /* Replace the old hard-coded Settings build text with live version metadata. */
-  renderSettings=function(){
-    const info=window.B5_VERSION||{};
-    return `<div class="grid two-col">
-      <div class="panel"><div class="panel-head"><h3>Supabase Connection</h3></div><div class="panel-body">
-        <p><strong>Status:</strong> ${state.live?'<span class="badge live-status">Online</span>':'<span class="badge fallback-status">Offline</span>'}</p>
-        <button class="btn btn-secondary" id="refreshSupabase">Refresh Live Data</button>
-      </div></div>
-      <div class="panel"><div class="panel-head"><h3>App Version</h3><span class="badge badge-demo">v${esc(currentVersion())}</span></div><div class="panel-body">
-        <p><strong>Current version:</strong> v${esc(currentVersion())}</p>
-        ${info.title?`<p class="note"><strong>${esc(info.title)}</strong></p>`:""}
-        ${info.released?`<p class="vehicle-meta">Released ${esc(info.released)}</p>`:""}
-        <button class="btn btn-secondary" type="button" id="settingsReleaseNotes">View Release Notes</button>
-      </div></div>
-    </div>`;
-  };
-
-  /* Keep the top-bar version visible on phones instead of hiding it with the user name. */
-  function ensureMobileVersion(){
-    const top=document.querySelector('.topbar');
-    if(!top)return;
-    let badge=document.getElementById('mobileVersionBadge');
-    if(!badge){
-      badge=document.createElement('button');
-      badge.type='button';
-      badge.id='mobileVersionBadge';
-      badge.className='mobile-version-badge';
-      badge.title='View release notes';
-      badge.addEventListener('click',()=>{
-        const vb=document.getElementById('versionBtn');
-        if(vb)vb.click();
-      });
-      top.appendChild(badge);
-    }
-    badge.textContent=`v${currentVersion()}`;
-    const desktop=document.getElementById('versionBtn');
-    if(desktop)desktop.textContent=`v${currentVersion()}`;
-  }
-
-  const oldRender=render;
-  render=function(){oldRender();ensureMobileVersion();};
-
-  const oldBind=bindPageEvents;
-  bindPageEvents=function(){
-    oldBind();
-    document.getElementById('settingsReleaseNotes')?.addEventListener('click',()=>document.getElementById('versionBtn')?.click());
-  };
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensureMobileVersion);
-  else ensureMobileVersion();
+/* v0.8.83 — remove route-and-scroll behaviour from Customers and Today tiles. */
+(function(){
+ function openRentalNow(uuid){if(typeof openRentalDetails==='function')openRentalDetails(uuid);else if(typeof openRentalDirect==='function')openRentalDirect(uuid);else openRentalInRentals(uuid);}
+ function todayRows(kind){const t=todayDate();if(kind==='returns')return state.rentals.filter(r=>!["Completed","Cancelled"].includes(r.status)&&sameDay(r.end,t));if(kind==='pickups')return state.rentals.filter(r=>["Reserved","Confirmed"].includes(r.status)&&sameDay(r.start,t));if(kind==='available')return state.vehicles.filter(v=>effectiveVehicleStatus(v)==='Available');return state.vehicles.filter(v=>v.source==='External'&&effectiveVehicleStatus(v)!=='Available');}
+ function openToday(kind){const rows=todayRows(kind),rentals=kind==='returns'||kind==='pickups',title={returns:'Returns Today',pickups:'Pickups Today',available:'Vehicles Available in Office',external:'External Vehicles Requiring Action'}[kind];const body=rows.length?`<div class="today-direct-list">${rows.map(x=>rentals?`<button type="button" class="today-direct-card" data-v883-rental="${esc(x.uuid)}"><span><strong>#${esc(x.id)} · ${esc(x.customer)}</strong><small>${fmtDate(x.start)} → ${fmtDate(x.end)}</small></span><span class="badge ${statusClass(x.status)}">${esc(x.status)}</span></button>`:`<button type="button" class="today-direct-card" data-v883-vehicle="${esc(x.id)}"><span><strong>${esc(x.make)} ${esc(x.model)}</strong><small>${esc(x.plate||'No plate')} · ${esc(x.category||'')}</small></span><span class="badge ${statusClass(effectiveVehicleStatus(x))}">${esc(effectiveVehicleStatus(x))}</span></button>`).join('')}</div>`:'<div class="empty">Nothing in this group.</div>';openModal(title,body,null,'Close');document.getElementById('modalForm').onsubmit=e=>{e.preventDefault();document.getElementById('modal').close();};}
+ document.addEventListener('click',e=>{const c=e.target.closest('[data-customer-row]');if(c){e.preventDefault();e.stopImmediatePropagation();const id=c.dataset.customerRow,a=activeRentalForCustomer(id);if(a)openRentalNow(a.uuid);else openCustomerProfile(id);return;}const t=e.target.closest('[data-today-detail]');if(t){e.preventDefault();e.stopImmediatePropagation();openToday(t.dataset.todayDetail);return;}const r=e.target.closest('[data-v883-rental]');if(r){e.preventDefault();e.stopImmediatePropagation();document.getElementById('modal')?.close();setTimeout(()=>openRentalNow(r.dataset.v883Rental),20);return;}const v=e.target.closest('[data-v883-vehicle]');if(v){e.preventDefault();e.stopImmediatePropagation();document.getElementById('modal')?.close();setTimeout(()=>openVehicleDetails(v.dataset.v883Vehicle),20);}},true);
 })();
