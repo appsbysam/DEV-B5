@@ -1,14 +1,14 @@
 window.B5_VERSION = {
-  version: "0.8.51",
+  version: "0.8.6",
   build: "Demo Build",
-  released: "2026-08-22",
-  title: "Compact Mobile Layouts",
+  released: "2026-08-23",
+  title: "User Roles & Permissions",
   notes: [
-    "Compacted the Customers page so substantially more customers fit on a mobile screen.",
-    "Added clear Rental, Vehicle, Customer, Pickup and Return labels to Today detail rows and reduced their height.",
-    "Fleet and Calendar search/filter controls are now collapsed by default and expand only when needed.",
-    "Compacted Suppliers, Locations & Fees and Expenses to reduce unnecessary scrolling.",
-    "Refined Reports with tighter summary cards and customer balance rows for better mobile use.",
-    "Existing drill-down, sorting, filtering and clickable-row behaviour is retained."
+    "Added manager-controlled user access from each staff profile.",
+    "Added Manager, Office Staff, Accounts, Operations / Driver and Read Only role templates.",
+    "Added individual permissions for rentals, contracts, fleet, customers, payments, expenses, reports, maintenance and administration.",
+    "Navigation and action buttons now respond to the signed-in user's permissions.",
+    "Permission changes are designed to be recorded in the audit log.",
+    "Prepared the user profile structure for notification preferences in the next stage."
   ]
 };
