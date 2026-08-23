@@ -7,7 +7,7 @@
  function closeProfile(){const d=document.getElementById('profileModal');if(d&&d.open)d.close();}
  async function getRegistration(){if(!supportedPush())throw new Error('Push notifications are not supported by this browser.');await navigator.serviceWorker.register('./sw.js?v=0.8.74',{scope:'./'});return navigator.serviceWorker.ready;}
  async function getSubscription(){if(!supportedPush())return null;try{return await (await getRegistration()).pushManager.getSubscription();}catch(e){console.warn(e);return null;}}
- function setBusy(button,busy,label){if(!button)return;button.disabled=busy;if(label){if(busy){button.dataset.oldText=button.textContent;button.textContent=label;}else if(button.dataset.oldText){button.textContent=button.dataset.oldText;delete button.dataset.oldText;}}}
+ function setBusy(button,busy,label){if(!button)return;if(busy){button.dataset.oldText=button.textContent;button.disabled=true;if(label)button.textContent=label;}else{button.disabled=false;if(button.dataset.oldText){button.textContent=button.dataset.oldText;delete button.dataset.oldText;}}}
  async function refreshPushState(){
   const status=document.getElementById('mobilePushStatus');if(!status)return;
   if(!supportedPush()){status.textContent='Not supported';status.classList.remove('on');return;}
@@ -60,10 +60,19 @@
   finally{setBusy(btn,false);}
  }
  async function sendTest(){
-  const btn=document.getElementById('testPushBtn');setBusy(btn,true,'Sending...');
-  try{const {data,error}=await window.db.functions.invoke('b5-push-notifications',{body:{action:'test'}});if(error)throw error;if(!data?.sent)throw new Error('No active notification subscription was found for this device.');alert('Test notification sent.');}
-  catch(e){console.error('Test push failed',e);alert(e.message||'Test notification failed.');}
-  finally{setBusy(btn,false);}
+  const btn=document.getElementById('testPushBtn');if(!btn||btn.disabled)return;
+  setBusy(btn,true,'Sending...');
+  try{
+   const {data,error}=await window.db.functions.invoke('b5-push-notifications',{body:{action:'test'}});
+   if(error)throw error;
+   if(!data?.sent)throw new Error('No active notification subscription was found for this device.');
+  }catch(e){
+   console.error('Test push failed',e);
+   alert(e.message||'Test notification failed.');
+  }finally{
+   setBusy(btn,false);
+   if(document.getElementById('testPushBtn')===btn){btn.textContent='Send Test';btn.disabled=false;}
+  }
  }
  function bindControls(){
   const en=document.getElementById('enablePushBtn'),dis=document.getElementById('disablePushBtn'),save=document.getElementById('savePushPrefs'),test=document.getElementById('testPushBtn');
