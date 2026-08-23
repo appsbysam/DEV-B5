@@ -1,14 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.85",
+  version: "0.8.86",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Manager Tools & Drill-down Improvements",
+  title: "Customer Card & Promo Code Fix",
   notes: [
-    "Overdue rental rows now open the relevant rental directly.",
-    "Availability vehicle cards now open vehicle details and show a simple seven-day indicative weekly amount.",
-    "Test-rate vehicles are compact and selectable in Manager Mode.",
-    "Added Manager tiles for customers missing telephone numbers and Promo Codes.",
-    "Promo codes are now stored in the database with offer type, value, customer, validity, status and history.",
-    "Corrected the pale rental-contract panel in dark mode."
+    "Customer profile cards are more compact and now use clear labels for contact, account and rental-history information.",
+    "Rental-history entries are compact selectable cards with labelled rental, vehicle, dates, status and balance fields.",
+    "Fixed promo-code generation to match the live database schema.",
+    "Promo history now shows labelled code, offer, customer, status and expiry information."
   ]
 };
