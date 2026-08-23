@@ -56,6 +56,17 @@ function todayCompactRentalTable(rows){if(!rows.length)return `<div class="empty
 const _renderTodayDetail085=renderTodayDetail;
 renderTodayDetail=function(view,data){if(view==="returns")return `<div class="panel"><div class="panel-head"><h3>Returns Today</h3><span class="badge badge-out">${data.ret.length}</span></div><div class="table-wrap">${todayCompactRentalTable(data.ret)}</div></div>`;if(view==="pickups")return `<div class="panel"><div class="panel-head"><h3>Pickups Today</h3><span class="badge badge-reserved">${data.pick.length}</span></div><div class="table-wrap">${todayCompactRentalTable(data.pick)}</div></div>`;return _renderTodayDetail085(view,data);};
 
+/* Dashboard Today panels use the same labelled compact layout as the Today page. */
+const _renderDashboard085=renderDashboard;
+renderDashboard=function(){
+  const html=_renderDashboard085();
+  const start=html.indexOf('<div class="grid two-col">');
+  const end=html.indexOf('<div class="panel" style="margin-top:14px">',start);
+  if(start<0||end<0)return html;
+  const before=html.slice(0,start),todayPanels=html.slice(start,end),after=html.slice(end);
+  return before+todayPanels.replaceAll('<table>','<table class="today-compact-table">')+after;
+};
+
 const _renderReports085=renderReports;
 renderReports=function(){return `<div class="report-compact">${_renderReports085()}</div>`;};
 
