@@ -1,11 +1,11 @@
 window.B5_VERSION = {
-  version: "0.8.79",
+  version: "0.8.80",
   build: "Demo Build",
   released: "2026-08-23",
-  title: "Expanded Settings Centre",
+  title: "Settings Refinements",
   notes: [
-    "Rebuilt Settings as a compact mobile-friendly settings centre with dedicated sections instead of large information cards.",
-    "Added My Preferences, Notifications, This Device, Rental Defaults, Regional, Data & Sync and About B5 sections.",
-    "Added device-local preferences for landing page, display density, rental defaults and regional choices, while retaining the existing live push notification controls."
+    "Fixed the Notifications settings route so Open Notification Settings opens the current profile notification controls rather than the older profile-only view.",
+    "Added Appearance under My Preferences with System Default, Light Mode and Dark Mode options.",
+    "Added B5 dark-theme styling and automatic system-theme following when System Default is selected."
   ]
 };
