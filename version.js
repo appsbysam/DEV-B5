@@ -1,11 +1,14 @@
 window.B5_VERSION = {
-  version: "0.8.84",
+  version: "0.8.85",
   build: "Demo Build",
-  released: "2026-08-23",
-  title: "Dashboard Drill-down Fix",
+  released: "2026-08-24",
+  title: "Manager Tools & Drill-down Improvements",
   notes: [
-    "Made vehicle rows shown under Dashboard summary tiles clickable so they open the relevant vehicle card directly.",
-    "Retained direct opening for Going Out Today and Returning Today rental records.",
-    "Dashboard drill-down lists now behave consistently across all summary tiles."
+    "Overdue rental rows now open the relevant rental directly.",
+    "Availability vehicle cards now open vehicle details and show a simple seven-day indicative weekly amount.",
+    "Test-rate vehicles are compact and selectable in Manager Mode.",
+    "Added Manager tiles for customers missing telephone numbers and Promo Codes.",
+    "Promo codes are now stored in the database with offer type, value, customer, validity, status and history.",
+    "Corrected the pale rental-contract panel in dark mode."
   ]
 };
