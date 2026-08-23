@@ -1,11 +1,11 @@
-/* B5 v0.8.76 — push controls + explicit dashboard mobile labels */
+/* B5 v0.8.77 — push controls + direct rental opening */
 (function(){
  const DEFAULT_PREFS={pickup:true,return:true,overdue:true,maintenance:true};
  function supportedPush(){return 'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;}
  function prefs(){return {...DEFAULT_PREFS,...((state&&state.userProfile&&state.userProfile.notification_preferences)||{})};}
  function b64ToBytes(s){const pad='='.repeat((4-s.length%4)%4),b=(s+pad).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(b);return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));}
  function closeProfile(){const d=document.getElementById('profileModal');if(d&&d.open)d.close();}
- async function getRegistration(){if(!supportedPush())throw new Error('Push notifications are not supported by this browser.');await navigator.serviceWorker.register('./sw.js?v=0.8.76',{scope:'./'});return navigator.serviceWorker.ready;}
+ async function getRegistration(){if(!supportedPush())throw new Error('Push notifications are not supported by this browser.');await navigator.serviceWorker.register('./sw.js?v=0.8.77',{scope:'./'});return navigator.serviceWorker.ready;}
  async function getSubscription(){if(!supportedPush())return null;try{return await (await getRegistration()).pushManager.getSubscription();}catch(e){console.warn(e);return null;}}
  function setBusy(button,busy,label){if(!button)return;if(busy){button.dataset.oldText=button.textContent;button.disabled=true;if(label)button.textContent=label;}else{button.disabled=false;if(button.dataset.oldText){button.textContent=button.dataset.oldText;delete button.dataset.oldText;}}}
  async function refreshPushState(){const status=document.getElementById('mobilePushStatus');if(!status)return;if(!supportedPush()){status.textContent='Not supported';status.classList.remove('on');return;}const sub=await getSubscription();status.textContent=sub?'Enabled on this device':'Not enabled';status.classList.toggle('on',!!sub);const en=document.getElementById('enablePushBtn'),dis=document.getElementById('disablePushBtn'),test=document.getElementById('testPushBtn');if(en)en.style.display=sub?'none':'';if(dis)dis.style.display=sub?'':'none';if(test)test.style.display=sub?'':'none';}
@@ -20,21 +20,28 @@
  window.addEventListener('load',addMobileProfileButton);addMobileProfileButton();
 })();
 
-/* Explicit labels for dashboard Today's Returns / Today's Pickups.
-   Uses real label elements instead of CSS pseudo-labels so they cannot be suppressed by table styles. */
+function openRentalDirect(uuid){
+ const r=agreementByUuid(uuid);if(!r)return;
+ const v=vehicleById(r.vehicle_id),f=rentalFinancials(r.uuid);
+ openModal(`Rental #${esc(r.id)}`,`<div class="note"><strong>${esc(r.customer)}</strong><br>${v?`${esc(v.make)} ${esc(v.model)} · ${esc(v.plate||'')}`:'Unassigned vehicle'}</div><div class="price-summary"><div class="price-line"><span>Status</span><strong>${esc(r.status)}</strong></div><div class="price-line"><span>Pickup</span><strong>${fmtDate(r.start)} · ${esc(r.pickup)}</strong></div><div class="price-line"><span>Return</span><strong>${fmtDate(r.end)} · ${esc(r.dropoff)}</strong></div><div class="price-line"><span>Charges</span><strong>${money(f.chargeTotal)}</strong></div><div class="price-line"><span>Payments</span><strong>${money(f.paymentTotal)}</strong></div><div class="price-line balance"><span>Balance</span><strong>${money(f.balance)}</strong></div></div><div class="actions"><button type="button" class="btn btn-secondary" data-direct-extend="${esc(r.uuid)}">Extend</button><button type="button" class="btn btn-secondary" data-direct-swap="${esc(r.uuid)}">Change Vehicle</button><button type="button" class="btn btn-secondary" data-direct-payment="${esc(r.uuid)}">Record Payment</button><button type="button" class="btn btn-primary" data-direct-return="${esc(r.uuid)}">Return Vehicle</button></div>`,null,'Close');
+ setTimeout(()=>{document.querySelector('[data-direct-extend]')?.addEventListener('click',e=>{document.getElementById('modal')?.close();extendModal(e.currentTarget.dataset.directExtend)});document.querySelector('[data-direct-swap]')?.addEventListener('click',e=>{document.getElementById('modal')?.close();swapModal(e.currentTarget.dataset.directSwap)});document.querySelector('[data-direct-payment]')?.addEventListener('click',e=>{document.getElementById('modal')?.close();paymentModal(e.currentTarget.dataset.directPayment)});document.querySelector('[data-direct-return]')?.addEventListener('click',e=>{document.getElementById('modal')?.close();returnModal(e.currentTarget.dataset.directReturn)});},0);
+ try{logAudit('rental_opened','rental_agreement',uuid,{source:state.page});}catch(e){}
+}
+window.openRentalDirect=openRentalDirect;
+
+const _rentalTable0877=rentalTable;
+rentalTable=function(rows){
+ if(!rows.length)return '<div class="empty">Nothing scheduled.</div>';
+ return `<table><thead><tr><th>Rental</th><th>Vehicle</th><th>Customer</th><th>Pickup</th><th>Return</th><th>Status</th></tr></thead><tbody>${rows.map(r=>{const v=vehicleById(r.vehicle_id);return `<tr class="direct-rental-row" data-direct-rental="${esc(r.uuid)}"><td data-label="Rental">#${esc(r.id)}</td><td data-label="Vehicle">${v?`${esc(v.make)} ${esc(v.model)} · ${esc(v.plate)}`:'Unassigned'}</td><td data-label="Customer">${esc(r.customer)}</td><td data-label="Pickup">${fmtDate(r.start)} · ${esc(r.pickup)}</td><td data-label="Return">${fmtDate(r.end)} · ${esc(r.dropoff)}</td><td data-label="Status"><span class="badge ${statusClass(r.status)}">${esc(r.status)}</span></td></tr>`}).join('')}</tbody></table>`;
+};
+
 function dashboardLabelledRentalTable(rows){
  if(!rows.length)return '<div class="empty">Nothing scheduled.</div>';
- return `<div class="dashboard-rental-list">${rows.map(r=>{const v=vehicleById(r.vehicle_id);return `<button type="button" class="dashboard-rental-row" data-rental-row="${esc(r.uuid)}"><div class="dashboard-field"><span class="dashboard-field-label">Rental</span><span>#${esc(r.id)}</span></div><div class="dashboard-field"><span class="dashboard-field-label">Vehicle</span><span>${v?`${esc(v.make)} ${esc(v.model)} · ${esc(v.plate||'')}`:'Unassigned'}</span></div><div class="dashboard-field"><span class="dashboard-field-label">Customer</span><span>${esc(r.customer)}</span></div><div class="dashboard-field"><span class="dashboard-field-label">Pickup</span><span>${fmtDate(r.start)} · ${esc(r.pickup)}</span></div><div class="dashboard-field"><span class="dashboard-field-label">Return</span><span>${fmtDate(r.end)} · ${esc(r.dropoff)}</span></div><div class="dashboard-field dashboard-status-field"><span class="dashboard-field-label">Status</span><span class="badge ${statusClass(r.status)}">${esc(r.status)}</span></div></button>`}).join('')}</div>`;
+ return `<div class="dashboard-rental-list">${rows.map(r=>{const v=vehicleById(r.vehicle_id);return `<button type="button" class="dashboard-rental-row" data-direct-rental="${esc(r.uuid)}"><div class="dashboard-field"><span class="dashboard-field-label">Rental</span><span>#${esc(r.id)}</span></div><div class="dashboard-field"><span class="dashboard-field-label">Vehicle</span><span>${v?`${esc(v.make)} ${esc(v.model)} · ${esc(v.plate||'')}`:'Unassigned'}</span></div><div class="dashboard-field"><span class="dashboard-field-label">Customer</span><span>${esc(r.customer)}</span></div><div class="dashboard-field"><span class="dashboard-field-label">Pickup</span><span>${fmtDate(r.start)} · ${esc(r.pickup)}</span></div><div class="dashboard-field"><span class="dashboard-field-label">Return</span><span>${fmtDate(r.end)} · ${esc(r.dropoff)}</span></div><div class="dashboard-field dashboard-status-field"><span class="dashboard-field-label">Status</span><span class="badge ${statusClass(r.status)}">${esc(r.status)}</span></div></button>`}).join('')}</div>`;
 }
-const _renderDashboard0876=renderDashboard;
+const _renderDashboard0877=renderDashboard;
 renderDashboard=function(){
- const html=_renderDashboard0876();
- const now=todayDate();
- const returnsToday=state.rentals.filter(r=>['Active','Confirmed','Reserved'].includes(r.status)&&sameDay(r.end,now)).slice(0,5);
- const pickupsToday=state.rentals.filter(r=>['Reserved','Confirmed'].includes(r.status)&&sameDay(r.start,now)).slice(0,5);
- const start=html.indexOf('<div class="grid two-col">');
- const end=html.indexOf('<div class="panel" style="margin-top:14px">',start);
- if(start<0||end<0)return html;
- const replacement=`<div class="grid two-col"><div class="panel dashboard-today-panel"><div class="panel-head"><h2>Today's Returns</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div>${dashboardLabelledRentalTable(returnsToday)}</div><div class="panel dashboard-today-panel"><div class="panel-head"><h2>Today's Pickups</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div>${dashboardLabelledRentalTable(pickupsToday)}</div></div>`;
- return html.slice(0,start)+replacement+html.slice(end);
+ const html=_renderDashboard0877();const now=todayDate();const returnsToday=state.rentals.filter(r=>['Active','Confirmed','Reserved'].includes(r.status)&&sameDay(r.end,now)).slice(0,5);const pickupsToday=state.rentals.filter(r=>['Reserved','Confirmed'].includes(r.status)&&sameDay(r.start,now)).slice(0,5);const start=html.indexOf('<div class="grid two-col">');const end=html.indexOf('<div class="panel" style="margin-top:14px">',start);if(start<0||end<0)return html;const replacement=`<div class="grid two-col"><div class="panel dashboard-today-panel"><div class="panel-head"><h2>Today's Returns</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div>${dashboardLabelledRentalTable(returnsToday)}</div><div class="panel dashboard-today-panel"><div class="panel-head"><h2>Today's Pickups</h2><button class="btn btn-small btn-secondary" data-goto="today">View Today</button></div>${dashboardLabelledRentalTable(pickupsToday)}</div></div>`;return html.slice(0,start)+replacement+html.slice(end);
 };
+
+document.addEventListener('click',e=>{const row=e.target.closest('[data-direct-rental]');if(!row)return;if(e.target.closest('button,a')&&e.target.closest('button,a')!==row)return;e.preventDefault();e.stopPropagation();openRentalDirect(row.dataset.directRental);},true);
