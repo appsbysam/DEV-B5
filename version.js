@@ -1,11 +1,11 @@
 window.B5_VERSION = {
-  version: "0.8.76",
+  version: "0.8.77",
   build: "Demo Build",
   released: "2026-08-23",
-  title: "Dashboard Rental Labels Fix",
+  title: "Direct Rental Navigation",
   notes: [
-    "Fixed missing field labels in Today's Returns and Today's Pickups on the dashboard.",
-    "Rental, vehicle, customer, pickup, return and status labels are now rendered explicitly on each dashboard item.",
-    "Kept the compact dashboard layout and previous push notification fixes."
+    "Today and dashboard rental items now open the selected rental directly instead of navigating through the Rentals page first.",
+    "Removed the unnecessary page jump and auto-scroll step for rental drill-downs.",
+    "Direct rental view retains the key rental actions including extend, change vehicle, payment and return."
   ]
 };
