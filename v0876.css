@@ -1,0 +1,59 @@
+/* B5 v0.8.83 — clearer dark tiles + remaining modal contrast */
+
+/* Make dark-mode tiles visibly lighter than the page background. */
+html[data-resolved-theme="dark"] .stat,
+html[data-resolved-theme="dark"] .today-summary-tile,
+html[data-resolved-theme="dark"] .vehicle-card,
+html[data-resolved-theme="dark"] .manager-tile,
+html[data-resolved-theme="dark"] .panel{
+  background:#182437!important;
+  border-color:#34445a!important;
+}
+html[data-resolved-theme="dark"] .today-summary-tile:hover,
+html[data-resolved-theme="dark"] .today-summary-tile.active,
+html[data-resolved-theme="dark"] .dashboard-stat:hover,
+html[data-resolved-theme="dark"] .dashboard-stat.active{
+  background:#1d2c42!important;
+  border-color:#4d6786!important;
+}
+
+/* The remaining pale cards in rental/customer/vehicle/supplier detail modals. */
+html[data-resolved-theme="dark"] #modalBody .rental-detail-section,
+html[data-resolved-theme="dark"] #modalBody .customer-profile-grid .rental-detail-section,
+html[data-resolved-theme="dark"] #modalBody .detail-tabs-section .vehicle-card{
+  background:#152235!important;
+  border-color:#34445a!important;
+  color:#edf3fa!important;
+}
+html[data-resolved-theme="dark"] #modalBody .rental-detail-section h4,
+html[data-resolved-theme="dark"] #modalBody .rental-detail-section .vehicle-meta{
+  color:#aeb9c8!important;
+}
+html[data-resolved-theme="dark"] #modalBody .rental-detail-section strong{color:#f5f8fc!important}
+
+/* Contract callout is intentionally distinct, but no longer a white slab. */
+html[data-resolved-theme="dark"] #modalBody .contract-summary,
+html[data-resolved-theme="dark"] #modalBody .contract-card{
+  background:#15283e!important;
+  border-color:#365575!important;
+  color:#e7eef7!important;
+}
+
+/* Today tile direct-detail modal. */
+.today-direct-list{display:flex;flex-direction:column;gap:9px}
+.today-direct-card{
+  appearance:none;width:100%;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) auto;
+  align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;
+  background:#fff;color:var(--text);font:inherit;text-align:left;cursor:pointer;
+}
+.today-direct-card:hover{border-color:#8eb6e5;background:#f7fbff}
+.today-direct-main,.today-direct-meta{display:flex;flex-direction:column;gap:3px;min-width:0}
+.today-direct-main small,.today-direct-meta small{color:var(--muted);font-size:11px}
+.today-direct-meta strong{font-size:12px}
+html[data-resolved-theme="dark"] .today-direct-card{background:#182437;color:#edf3fa;border-color:#34445a}
+html[data-resolved-theme="dark"] .today-direct-card:hover{background:#1d2c42;border-color:#4d6786}
+
+@media(max-width:600px){
+  .today-direct-card{grid-template-columns:minmax(0,1fr) auto;gap:8px 10px}
+  .today-direct-meta{grid-column:1/-1;display:grid;grid-template-columns:auto 1fr auto 1fr;align-items:center;gap:4px 7px}
+}
