@@ -1,0 +1,56 @@
+/* B5 v0.8.99 — larger branding + compact Manager user footer */
+
+/* Login branding: use the existing optimised logo asset, simply displayed larger. */
+.auth-logo{
+  width:min(190px,46vw)!important;
+  height:auto!important;
+  max-height:190px;
+  object-fit:contain;
+  margin:0 auto 16px!important;
+}
+
+/* Manager user profile: body scrolls, action buttons stay together at the bottom. */
+.profile-dialog .profile-card{
+  max-height:min(92vh,900px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.profile-dialog .profile-body{
+  overflow-y:auto;
+  min-height:0;
+  overscroll-behavior:contain;
+}
+.profile-dialog.manager-user-open > .profile-card > .modal-actions{
+  display:none!important;
+}
+.manager-user-profile .permission-actions.manager-user-footer{
+  position:sticky;
+  bottom:0;
+  z-index:3;
+  display:grid;
+  grid-template-columns:1fr 1.25fr 1fr;
+  gap:8px;
+  padding:12px 0 2px;
+  margin-top:12px;
+  background:var(--panel,#fff);
+  border-top:1px solid var(--line,#e5eaf0);
+}
+.manager-user-profile .permission-actions.manager-user-footer .btn{
+  width:100%;
+  min-width:0;
+  white-space:normal;
+}
+
+@media(max-width:560px){
+  .auth-logo{width:min(170px,48vw)!important;}
+  .manager-user-profile .permission-actions.manager-user-footer{
+    grid-template-columns:.9fr 1.35fr 1fr;
+    gap:6px;
+  }
+  .manager-user-profile .permission-actions.manager-user-footer .btn{
+    padding:10px 7px;
+    font-size:12px;
+    line-height:1.15;
+  }
+}
