@@ -2,6 +2,17 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.8.97 — Manager User Creation
+**Released: 24 August 2026**
+- Added **Add User** to Manager Mode → Users so authorised managers can create staff accounts without leaving B5.
+- New-user setup includes Display Name / Username, email address, temporary password, base role and individual permission selection.
+- Added cryptographically generated temporary passwords plus a Copy control; managers can also enter their own temporary password.
+- Added **User must change password on first login**, enabled by default for newly created accounts.
+- Users flagged for a first-login password change are blocked from the operational app until they successfully choose and confirm a new password.
+- Added protected Supabase Edge Function `b5-manage-users` for privileged Auth user creation. The service-role credential remains server-side and is not exposed to the browser.
+- Added `staff_profiles.must_change_password` and the authenticated `b5_complete_first_login_password_change()` database function to safely clear the user's own first-login requirement after a successful password update.
+- New user creation records an audit-log event.
+
 ## v0.8.96 — Flexible Rental Sorting
 **Released: 24 August 2026**
 - Added a compact **Sort by** control to the Rentals section.
