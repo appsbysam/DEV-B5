@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.86",
+  version: "0.8.88",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Customer Card & Promo Code Fix",
+  title: "Notification Navigation & Overdue Fix",
   notes: [
-    "Customer profile cards are more compact and now use clear labels for contact, account and rental-history information.",
-    "Rental-history entries are compact selectable cards with labelled rental, vehicle, dates, status and balance fields.",
-    "Fixed promo-code generation to match the live database schema.",
-    "Promo history now shows labelled code, offer, customer, status and expiry information."
+    "Notification taps can now deep-link directly to the relevant rental card instead of only opening the Rentals page.",
+    "Fixed the first overdue-rental row so it opens its rental card consistently like the rows below it.",
+    "Security & Lock Screen remains prepared but disabled and is now a collapsible Coming Soon item in Settings.",
+    "Updated service-worker cache and app versioning for this release."
   ]
 };
