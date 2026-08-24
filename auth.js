@@ -8,8 +8,6 @@
   const logoutBtn = document.getElementById("logoutBtn");
   const signedInUser = document.getElementById("signedInUser");
 
-  // Fail-safe: never allow a missing login password control to stop a restored
-  // authenticated session from starting the application.
   if(!loginPassword && loginForm && loginBtn){
     const wrap=document.createElement("div");
     wrap.className="field";
@@ -22,10 +20,27 @@
   let loadingApp = false;
 
   function showLogin(message=""){
+    window.B5PasswordGate?.close?.();
     document.body.classList.add("auth-locked");
     authScreen.classList.remove("hidden");
     signedInUser.textContent = "";
     loginMessage.textContent = message;
+  }
+
+  async function completeShowApp(session, forceReload=false, userChanged=false){
+    document.body.classList.remove("auth-locked");
+    authScreen.classList.add("hidden");
+    signedInUser.textContent = session.user.email || "Signed in";
+    if(loginPassword) loginPassword.value = "";
+    loginMessage.textContent = "";
+
+    if(loadingApp) return;
+    loadingApp = true;
+    try {
+      if(forceReload || userChanged) await window.startB5App?.();
+    } finally {
+      loadingApp = false;
+    }
   }
 
   async function showApp(session, forceReload=false){
@@ -36,22 +51,17 @@
 
     const userChanged = activeUserId !== session.user.id;
     activeUserId = session.user.id;
-
     document.body.classList.remove("auth-locked");
     authScreen.classList.add("hidden");
     signedInUser.textContent = session.user.email || "Signed in";
     if(loginPassword) loginPassword.value = "";
     loginMessage.textContent = "";
 
-    if(loadingApp) return;
-    loadingApp = true;
-    try {
-      if(forceReload || userChanged) {
-        await window.startB5App?.();
-      }
-    } finally {
-      loadingApp = false;
+    if(window.B5PasswordGate?.enforce){
+      const blocked=await window.B5PasswordGate.enforce(session,()=>completeShowApp(session,true,userChanged));
+      if(blocked)return;
     }
+    await completeShowApp(session,forceReload,userChanged);
   }
 
   async function initialise(){
@@ -71,11 +81,7 @@
           return;
         }
 
-        if(
-          event === "INITIAL_SESSION" ||
-          event === "SIGNED_IN" ||
-          event === "TOKEN_REFRESHED"
-        ){
+        if(event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED"){
           await showApp(session, true);
         }
       }, 0);
@@ -87,11 +93,8 @@
       return;
     }
 
-    if(data?.session){
-      await showApp(data.session, true);
-    } else {
-      showLogin();
-    }
+    if(data?.session) await showApp(data.session, true);
+    else showLogin();
   }
 
   loginForm.addEventListener("submit", async (e) => {
