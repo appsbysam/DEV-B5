@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.8.96 — Flexible Rental Sorting
+**Released: 24 August 2026**
+- Added a compact **Sort by** control to the Rentals section.
+- Rentals can now be sorted by Pickup Date, Rental / Contract #, Customer Name, Vehicle, or Vehicle Type.
+- Added ascending/descending ordering; Pickup Date retains the existing **Newest First** behaviour as the default.
+- Sorting works alongside the existing rental search and Open, History and All views.
+- No Supabase schema or data changes were required for this release.
+
 ## v0.8.1 — Rental, Fleet, Finance & Maintenance Expansion
 - Added rental search by customer, phone, vehicle, plate or rental number, with Open, History and All views.
 - Added fleet filters for type, make, source/company, status and daily-rate range, plus flexible sorting.
