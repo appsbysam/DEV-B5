@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.13 — Seamless Vehicle Action Modals
+**Released: 25 August 2026**
+- Reworked the vehicle-card child-action workflow so **Purchase Details**, **Add Expense** and **Add Maintenance** no longer close the vehicle context and expose the Fleet list before opening.
+- Child forms now reuse the already-open vehicle modal and swap its contents in place.
+- Closing, cancelling or successfully completing a child form restores the same vehicle card immediately within the still-open modal.
+- Retained the financial tile order: Purchase Cost, Expenses, Rental Income, then Operating Profit.
+- No Supabase schema changes were required.
+
 ## v0.9.8 — Canonical PWA Repair
 **Released: 24 August 2026**
 - Removed the competing `service-worker.js` introduced during the previous repair and consolidated installability and push notifications onto the existing `sw.js` worker.
