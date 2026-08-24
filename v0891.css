@@ -1,0 +1,3 @@
+/* B5 v0.9.1 — sign-out placement and location mobile labels */
+.sidebar-signout{width:100%;margin-top:12px}.profile-signout-section{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}.profile-signout-section .btn{width:100%}
+@media(max-width:760px){.locations-fees-table td::before{margin-right:.35em}.locations-fees-table td{column-gap:.35em}}
