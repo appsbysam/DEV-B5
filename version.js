@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.0",
+  version: "0.9.1",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Secure Password Recovery",
+  title: "Login Resilience & Sign Out",
   notes: [
-    "Added Forgot Password to the staff sign-in screen with secure Supabase email recovery links.",
-    "Password recovery now opens a dedicated B5 reset screen where staff choose and confirm their own new password; managers do not need to know or recreate forgotten passwords.",
-    "Added Keep me logged in so staff can explicitly choose persistent access on trusted devices; unchecked sign-ins are treated as temporary browser-session access.",
-    "Kept the existing manager-created temporary-password and mandatory first-login password-change workflow for new staff accounts."
+    "Fixed the vehicle category read permission that could cause a permission-denied message and empty navigation immediately after sign-in.",
+    "Added a guarded one-time retry for transient authentication or network failures during the initial mobile/PWA data load.",
+    "Added Sign Out at the bottom of the side menu and inside My Profile, while retaining the existing desktop sign-out control.",
+    "Improved Locations & Fees mobile labels with a colon and spacing after Location, Pickup, Drop-off and Buffer."
   ]
 };
