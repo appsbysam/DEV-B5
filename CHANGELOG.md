@@ -2,6 +2,17 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.0 — Secure Password Recovery
+**Released: 24 August 2026**
+- Added **Forgot Password?** to the staff sign-in screen.
+- Staff can request a secure Supabase password-recovery email without manager intervention; the response deliberately does not reveal whether an entered email belongs to an account.
+- Recovery links return the user to B5 in password-recovery mode, where a dedicated screen requires a new password and confirmation before the recovery session is signed out.
+- The existing Manager Mode temporary-password plus **User must change password on first login** workflow remains available for new accounts and deliberate manager-assisted resets.
+- Added **Keep me logged in** to the sign-in screen. Checked sign-ins are allowed to persist on the trusted device; unchecked sign-ins are treated as temporary browser-session access and are not accepted on a later fresh browser session.
+- Explicit Sign Out clears the saved persistence preference and temporary-session marker.
+- Successful email password recovery is written to the B5 audit log when available.
+- No Supabase schema changes were required; password reset delivery uses the existing Supabase Auth recovery service.
+
 ## v0.8.99 — Branding & User Profile Polish
 **Released: 24 August 2026**
 - Increased the All Season logo on the staff sign-in screen using the existing optimised `assets/logo.webp` artwork rather than recreating the logo.
