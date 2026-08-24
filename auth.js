@@ -20,11 +20,11 @@
   let loadingApp = false;
 
   async function loadCurrentReleaseModule(){
-    if(window.B5PasswordGate)return;
+    if(window.B5PasswordGate&&window.B5AccessControl)return;
     await new Promise((resolve,reject)=>{
-      const existing=document.querySelector('script[data-b5-release="0.8.97"]');
-      if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return;}
-      const s=document.createElement('script');s.src='v0887.js?v=0.8.97';s.dataset.b5Release='0.8.97';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+      const existing=document.querySelector('script[data-b5-release="0.8.98"]');
+      if(existing){ if(existing.dataset.loaded==='true')return resolve(); existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return; }
+      const s=document.createElement('script');s.src='v0888.js?v=0.8.98';s.dataset.b5Release='0.8.98';s.onload=()=>{s.dataset.loaded='true';resolve();};s.onerror=reject;document.head.appendChild(s);
     });
   }
 
@@ -42,24 +42,24 @@
     signedInUser.textContent = session.user.email || "Signed in";
     if(loginPassword) loginPassword.value = "";
     loginMessage.textContent = "";
-
     if(loadingApp) return;
     loadingApp = true;
-    try {
-      if(forceReload || userChanged) await window.startB5App?.();
-    } finally {
-      loadingApp = false;
-    }
+    try { if(forceReload || userChanged) await window.startB5App?.(); }
+    finally { loadingApp = false; }
   }
 
   async function showApp(session, forceReload=false){
-    if(!session?.access_token || !session?.user){
-      showLogin();
+    if(!session?.access_token || !session?.user){showLogin();return;}
+    const userChanged = activeUserId !== session.user.id;
+    activeUserId = session.user.id;
+
+    const access=await window.B5AccessControl?.authoriseSession?.(session);
+    if(access && access.allowed===false){
+      await window.db.auth.signOut();
+      showLogin(access.message||"This account does not have access to B5.");
       return;
     }
 
-    const userChanged = activeUserId !== session.user.id;
-    activeUserId = session.user.id;
     document.body.classList.remove("auth-locked");
     authScreen.classList.add("hidden");
     signedInUser.textContent = session.user.email || "Signed in";
@@ -75,74 +75,34 @@
 
   async function initialise(){
     document.body.classList.add("auth-locked");
-
-    if(!window.db){
-      showLogin("Supabase connection is unavailable.");
-      return;
-    }
-
-    try{await loadCurrentReleaseModule();}catch(err){console.error('Unable to load v0.8.97 module',err);showLogin('Unable to load the current application release. Please refresh.');return;}
+    if(!window.db){showLogin("Supabase connection is unavailable.");return;}
+    try{await loadCurrentReleaseModule();}catch(err){console.error('Unable to load v0.8.98 access module',err);showLogin('Unable to load the current application release. Please refresh.');return;}
 
     window.db.auth.onAuthStateChange((event, session) => {
       setTimeout(async () => {
-        if(event === "SIGNED_OUT" || !session){
-          activeUserId = null;
-          window.resetB5App?.();
-          showLogin();
-          return;
-        }
-
-        if(event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED"){
-          await showApp(session, true);
-        }
+        if(event === "SIGNED_OUT" || !session){activeUserId = null;window.resetB5App?.();showLogin();return;}
+        if(event === "INITIAL_SESSION" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") await showApp(session, true);
       }, 0);
     });
 
     const { data, error } = await window.db.auth.getSession();
-    if(error){
-      showLogin(error.message);
-      return;
-    }
-
-    if(data?.session) await showApp(data.session, true);
-    else showLogin();
+    if(error){showLogin(error.message);return;}
+    if(data?.session) await showApp(data.session, true); else showLogin();
   }
 
   loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    loginMessage.textContent = "";
-    loginBtn.disabled = true;
-    loginBtn.textContent = "Signing In…";
-
+    e.preventDefault();loginMessage.textContent = "";loginBtn.disabled = true;loginBtn.textContent = "Signing In…";
     try {
-      const { data, error } = await window.db.auth.signInWithPassword({
-        email: loginEmail.value.trim(),
-        password: loginPassword?.value || ""
-      });
-
-      if(error){
-        loginMessage.textContent = error.message;
-        return;
-      }
-
-      if(data?.session){
-        await window.logAudit?.("login","auth",data.session.user.id,{method:"email_password"});
-        await showApp(data.session, true);
-      }
-    } finally {
-      loginBtn.disabled = false;
-      loginBtn.textContent = "Sign In";
-    }
+      const { data, error } = await window.db.auth.signInWithPassword({email: loginEmail.value.trim(),password: loginPassword?.value || ""});
+      if(error){loginMessage.textContent = error.message;return;}
+      if(data?.session){await window.logAudit?.("login","auth",data.session.user.id,{method:"email_password"});await showApp(data.session, true);}
+    } finally {loginBtn.disabled = false;loginBtn.textContent = "Sign In";}
   });
 
   logoutBtn.addEventListener("click", async () => {
     logoutBtn.disabled = true;
-    try {
-      await window.logAudit?.("logout","auth",activeUserId,{});
-      await window.db.auth.signOut();
-    } finally {
-      logoutBtn.disabled = false;
-    }
+    try {await window.logAudit?.("logout","auth",activeUserId,{});await window.db.auth.signOut();}
+    finally {logoutBtn.disabled = false;}
   });
 
   initialise();
