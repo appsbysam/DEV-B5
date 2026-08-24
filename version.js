@@ -1,12 +1,11 @@
 window.B5_VERSION = {
-  version: "0.8.88",
+  version: "0.8.89",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Notification Navigation & Overdue Fix",
+  title: "Continuous Calendar Bars",
   notes: [
-    "Rolled back the calendar layout change after it caused application data and navigation regressions.",
-    "Restored the full application shell, Settings navigation and normal online data loading.",
-    "Notification taps can deep-link directly to the relevant rental card.",
-    "Fixed the first overdue-rental row so it opens its rental card consistently."
+    "Calendar bookings spanning several days now display as one continuous bar with the customer name centred.",
+    "The calendar change is isolated from the application shell and data-loading logic.",
+    "Notification deep-links and the overdue-rental opening fix remain in place."
   ]
 };
