@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.90",
+  version: "0.8.91",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Calendar Layout Refinement",
+  title: "Calendar Sorting & Rental Colours",
   notes: [
-    "Calendar vehicle details now form a clean fixed left column aligned with the calendar edge.",
-    "The date timeline scrolls only within the area to the right of the vehicle column.",
-    "Rental bars now use clearly distinct colours so different rentals and customers are easier to distinguish.",
-    "Calendar continues to default to Out on Rental and keeps the compact vehicle, plate and rental-number display."
+    "Calendar vehicles are now sorted alphabetically by vehicle name, with plate number used as a secondary sort.",
+    "Rental bars now use only two colours: lime green for the first rental and gold for the next rental on the same vehicle.",
+    "If a third rental appears within the 14-day period, the colour alternates back to lime green, then gold again.",
+    "The fixed vehicle column and contained horizontal timeline layout remain unchanged."
   ]
 };
