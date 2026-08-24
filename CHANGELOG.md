@@ -2,6 +2,16 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.8 — Canonical PWA Repair
+**Released: 24 August 2026**
+- Removed the competing `service-worker.js` introduced during the previous repair and consolidated installability and push notifications onto the existing `sw.js` worker.
+- Added a fetch handler and shell activation lifecycle to `sw.js` so Chromium-based browsers can recognise the application consistently as a PWA.
+- Registered `sw.js` directly from `index.html` under the `/DEV-B5/` scope.
+- Removed the stale `v0.9.1` manifest/favicon references from the page and replaced them with stable canonical `/DEV-B5/` PWA paths rather than query-string cache busting.
+- Replaced browser shortcut fallback favicon/touch-icon assets with B5 artwork so Brave has a B5 image even when it uses shortcut metadata instead of the manifest.
+- Simplified `manifest.webmanifest` to stable absolute icon URLs and retained the approved standard/maskable B5 icons.
+- No Supabase changes were required.
+
 ## v0.9.7 — PWA Installability Repair
 **Released: 24 August 2026**
 - Added a dedicated service worker under the `/DEV-B5/` scope so supported Android browsers can recognise the site as an installable web application rather than only a generic website shortcut.
