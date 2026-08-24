@@ -7,9 +7,10 @@
   function openRental(ref){
     const r=rentalByRef(ref);if(!r)return false;
     const id=r.uuid||r.id;
-    if(typeof openRentalDetails==='function')openRentalDetails(id);
-    else if(typeof openRentalDirect==='function')openRentalDirect(id);
+    if(typeof openRentalFull==='function')openRentalFull(id);
+    else if(typeof openRentalDetails==='function')openRentalDetails(id);
     else if(typeof openRentalInRentals==='function')openRentalInRentals(id);
+    else if(typeof openRentalDirect==='function')openRentalDirect(id);
     return true;
   }
   function openVehicle(id){
