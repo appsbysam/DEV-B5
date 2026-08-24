@@ -27,5 +27,5 @@
 
   bindPageEvents=function(){oldBind();if(state.page==='manager'){document.getElementById('generatePromoCode')?.addEventListener('click',openPromoGenerator);document.querySelectorAll('[data-test-rate-vehicle]').forEach(b=>b.onclick=()=>openVehicleDetails(b.dataset.testRateVehicle));document.querySelectorAll('[data-missing-phone-customer]').forEach(b=>b.onclick=()=>openCustomerProfile(b.dataset.missingPhoneCustomer));}};
 
-  document.addEventListener('click',e=>{const overdue=e.target.closest('[data-overdue-rental]');if(overdue&&!e.target.closest('.overdue-actions')){e.preventDefault();e.stopImmediatePropagation();if(typeof openRentalDetails==='function')openRentalDetails(overdue.dataset.overdueRental);return;}const av=e.target.closest('[data-availability-vehicle]');if(av&&!e.target.closest('[data-book-vehicle]')){e.preventDefault();e.stopImmediatePropagation();openVehicleDetails(av.dataset.availabilityVehicle);}},true);
+  document.addEventListener('click',e=>{const av=e.target.closest('[data-availability-vehicle]');if(av&&!e.target.closest('[data-book-vehicle]')){e.preventDefault();e.stopImmediatePropagation();openVehicleDetails(av.dataset.availabilityVehicle);}},true);
 })();
