@@ -1,1 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0b1220"/><image href="../logo-approved.svg" x="46" y="72" width="420" height="307" preserveAspectRatio="xMidYMid meet"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <clipPath id="logoCard"><rect x="34" y="82" width="444" height="328" rx="38" ry="38"/></clipPath>
+  </defs>
+  <rect x="34" y="82" width="444" height="328" rx="38" ry="38" fill="#ffffff"/>
+  <image href="../logo.webp" x="34" y="82" width="444" height="328" preserveAspectRatio="xMidYMid meet" clip-path="url(#logoCard)"/>
+</svg>
