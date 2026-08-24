@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.2",
+  version: "0.9.3",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Branding Refresh",
+  title: "White Rounded Branding",
   notes: [
-    "Replaced the sign-in artwork with the newly approved transparent B5 All Season logo so it sits cleanly on the dark login card without a white rectangle.",
-    "Increased the sign-in logo presentation for stronger branding while retaining responsive sizing on mobile.",
-    "Updated the installed PWA splash/icon source to use the approved B5 artwork with a tighter, more prominent composition.",
-    "Changed the PWA splash background from white to the B5 dark navy theme for a more consistent launch experience."
+    "Restored the original white-background B5 All Season logo treatment on the staff sign-in screen.",
+    "Added rounded corners and a subtle shadow so the white logo background reads as a deliberate branding card on the dark sign-in screen.",
+    "Updated the installed PWA splash/icon artwork to use the white-background logo inside a rounded white panel rather than the transparent/dark treatment.",
+    "Kept Keep me logged in and Forgot password? on one row, with Forgot password? aligned to the right."
   ]
 };
