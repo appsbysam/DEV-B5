@@ -19,6 +19,15 @@
   let activeUserId = null;
   let loadingApp = false;
 
+  async function loadCurrentReleaseModule(){
+    if(window.B5PasswordGate)return;
+    await new Promise((resolve,reject)=>{
+      const existing=document.querySelector('script[data-b5-release="0.8.97"]');
+      if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return;}
+      const s=document.createElement('script');s.src='v0887.js?v=0.8.97';s.dataset.b5Release='0.8.97';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+    });
+  }
+
   function showLogin(message=""){
     window.B5PasswordGate?.close?.();
     document.body.classList.add("auth-locked");
@@ -71,6 +80,8 @@
       showLogin("Supabase connection is unavailable.");
       return;
     }
+
+    try{await loadCurrentReleaseModule();}catch(err){console.error('Unable to load v0.8.97 module',err);showLogin('Unable to load the current application release. Please refresh.');return;}
 
     window.db.auth.onAuthStateChange((event, session) => {
       setTimeout(async () => {
