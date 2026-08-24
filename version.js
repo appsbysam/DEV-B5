@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.98",
+  version: "0.8.99",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Permission & Access Control Hardening",
+  title: "Branding & User Profile Polish",
   notes: [
-    "Fixed custom user permissions so the signed-in user's saved role and individual permission switches are now loaded and enforced throughout B5.",
-    "Restricted navigation and operational actions now disappear when access is disabled; dependent permissions such as Create Rentals cannot bypass a disabled View Rentals permission.",
-    "Inactive staff profiles are now refused entry at sign-in, and Manager Mode visibility follows the user's saved Manager permission rather than relying only on the legacy role field.",
-    "Added database-side permission helpers and RLS hardening for core rental, customer, fleet and payment data so access controls are enforced beyond the browser interface."
+    "Increased the All Season logo on the staff sign-in screen using the existing optimised repository logo asset.",
+    "Refined the Manager User Profile modal so the permission list scrolls cleanly while its actions stay together at the bottom.",
+    "Replaced the separate Close action with a Cancel button and aligned Cancel, Reset to Role Defaults and Save User on one footer row.",
+    "Prepared the PWA branding assets for a more prominent installed-app splash presentation without recreating the company logo."
   ]
 };
