@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.5 — PWA Branding & Login Alignment
+**Released: 24 August 2026**
+- Reframed the PWA icon artwork onto a full white canvas so Android launcher masking no longer exposes dark bands above or below the B5 branding.
+- Added refreshed **192×192** and **512×512** standard and maskable PWA icon assets using the existing approved B5 artwork rather than recreating the logo.
+- Adjusted the icon artwork proportions to make the branding more prominent in the Android splash treatment while retaining the dark B5 navy splash background.
+- Corrected the staff sign-in options so **Keep me logged in** is left-aligned and **Forgot password?** is right-aligned on the same row, including narrow mobile screens.
+- No Supabase changes were required.
+
 ## v0.9.4 — PWA Install & Icon Repair
 **Released: 24 August 2026**
 - Repaired the PWA manifest after the previous single-JPEG icon configuration caused supported Android browsers to fall back to shortcut behaviour and a generic letter icon.

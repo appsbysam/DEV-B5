@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.4",
+  version: "0.9.5",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "PWA Install & Icon Repair",
+  title: "PWA Branding & Login Alignment",
   notes: [
-    "Restored a standards-compliant PWA icon set with dedicated 192x192 and 512x512 PNG assets.",
-    "Added separate maskable Android icons so installed shortcuts retain the B5 branding instead of falling back to a generic letter icon.",
-    "Repaired the web app manifest so supported browsers can recognise All Season as an installable PWA again.",
-    "Kept the approved dark-navy splash background with the white rounded B5 logo treatment."
+    "Reframed the PWA icons on a full white canvas so Android launcher masking no longer exposes dark bands above or below the B5 branding.",
+    "Adjusted the installed-app icon artwork proportions to make the B5 branding more prominent on the Android splash treatment while preserving the dark navy splash background.",
+    "Locked Keep me logged in to the left and Forgot password? to the right on the same sign-in row.",
+    "Kept the approved white rounded logo treatment on the staff sign-in screen."
   ]
 };
