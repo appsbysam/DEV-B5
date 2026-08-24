@@ -1,17 +1,5 @@
-/* B5 v0.9.7 — login resilience, sign-out access, location polish and PWA bootstrap */
+/* B5 v0.9.7 — login resilience, sign-out access and location polish */
 (function(){
-  try{
-    const head=document.head;
-    let manifest=head.querySelector('link[rel="manifest"]');
-    if(!manifest){manifest=document.createElement('link');manifest.rel='manifest';head.appendChild(manifest);}
-    manifest.href='/DEV-B5/manifest-v097.webmanifest';
-    const icon32=head.querySelector('link[rel="icon"][sizes="32x32"]')||document.createElement('link');
-    icon32.rel='icon';icon32.type='image/png';icon32.sizes='32x32';icon32.href='/DEV-B5/assets/icons/pwa-icon-192-v095.png?v=097';if(!icon32.parentNode)head.appendChild(icon32);
-    const apple=head.querySelector('link[rel="apple-touch-icon"]')||document.createElement('link');
-    apple.rel='apple-touch-icon';apple.sizes='180x180';apple.href='/DEV-B5/assets/icons/pwa-icon-192-v095.png?v=097';if(!apple.parentNode)head.appendChild(apple);
-    if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/DEV-B5/service-worker.js',{scope:'/DEV-B5/'}).catch(err=>console.warn('B5 service worker registration failed',err)));}
-  }catch(err){console.warn('B5 PWA bootstrap failed',err);}
-
   renderLocations=function(){
     return `<div class="section-title"><div><h2>Locations & Fees</h2><p>Pickup, drop-off and transfer pricing</p></div></div><div class="panel"><div class="table-wrap"><table class="locations-fees-table"><thead><tr><th>Location</th><th>Pickup Fee</th><th>Drop-off Fee</th><th>Transfer Buffer</th></tr></thead><tbody>${state.locations.map(l=>`<tr><td data-label="Location:">${esc(l.name)}</td><td data-label="Pickup:">${money(l.pickup_fee)}</td><td data-label="Drop-off:">${money(l.dropoff_fee)}</td><td data-label="Buffer:">${esc(l.turnaround_minutes||0)} mins</td></tr>`).join('')}</tbody></table></div></div>`;
   };
