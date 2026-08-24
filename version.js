@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.88",
+  version: "0.8.89",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Notification Navigation & Overdue Fix",
+  title: "Continuous Calendar Bars",
   notes: [
-    "Notification taps can now deep-link directly to the relevant rental card instead of only opening the Rentals page.",
-    "Fixed the first overdue-rental row so it opens its rental card consistently like the rows below it.",
-    "Security & Lock Screen remains prepared but disabled and is now a collapsible Coming Soon item in Settings.",
-    "Updated service-worker cache and app versioning for this release."
+    "Calendar rentals now display as one continuous bar across the days they occupy instead of repeating the customer name in separate daily blocks.",
+    "Customer names are centred within the full rental bar for a cleaner timeline view.",
+    "Calendar rental bars are clickable and open the relevant rental card.",
+    "Updated app asset versioning for this release."
   ]
 };
