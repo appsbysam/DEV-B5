@@ -1,4 +1,4 @@
-const B5_CACHE='b5-shell-0.8.88';
+const B5_CACHE='b5-shell-0.8.88-fix1';
 const APP_ROOT=new URL('./',self.registration.scope).href;
 const DEFAULT_TARGET=new URL('./#dashboard',APP_ROOT).href;
 self.addEventListener('install',()=>self.skipWaiting());
