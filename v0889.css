@@ -1,12 +1,14 @@
-/* B5 v0.8.99 — larger branding + compact Manager user footer */
+/* B5 v0.8.99+ — larger branding + compact Manager user footer */
 
-/* Login branding: use the existing optimised logo asset, simply displayed larger. */
+/* Login branding: approved transparent logo, displayed prominently without a white panel. */
 .auth-logo{
-  width:min(190px,46vw)!important;
+  content:url('assets/logo-approved.svg?v=0.9.2');
+  width:min(220px,54vw)!important;
   height:auto!important;
   max-height:190px;
   object-fit:contain;
-  margin:0 auto 16px!important;
+  margin:0 auto 14px!important;
+  background:transparent!important;
 }
 
 /* Manager user profile: body scrolls, action buttons stay together at the bottom. */
@@ -43,7 +45,7 @@
 }
 
 @media(max-width:560px){
-  .auth-logo{width:min(170px,48vw)!important;}
+  .auth-logo{width:min(210px,56vw)!important;}
   .manager-user-profile .permission-actions.manager-user-footer{
     grid-template-columns:.9fr 1.35fr 1fr;
     gap:6px;
