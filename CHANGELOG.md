@@ -2,6 +2,15 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.3 — White Rounded Branding
+**Released: 24 August 2026**
+- Reverted the staff sign-in branding from the transparent/dark treatment back to the original white-background B5 All Season logo.
+- Added rounded corners and a subtle shadow to the sign-in logo so its white background reads as a deliberate logo card rather than a hard rectangular block.
+- Reworked the installed-app/PWA splash icon to use the original white-background logo inside a rounded white panel while retaining the dark B5 splash backdrop.
+- Kept **Keep me logged in** and **Forgot password?** on the same horizontal row and explicitly right-aligned **Forgot password?**.
+- Added responsive sizing so the two login options remain on one line on smaller phones.
+- No Supabase changes were required.
+
 ## v0.9.2 — Branding Refresh
 **Released: 24 August 2026**
 - Replaced the staff sign-in artwork with the newly approved transparent B5 All Season logo so it sits directly on the dark login card without the previous white rectangular background.
