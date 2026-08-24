@@ -2,11 +2,21 @@
   const authScreen = document.getElementById("authScreen");
   const loginForm = document.getElementById("loginForm");
   const loginEmail = document.getElementById("loginEmail");
-  const loginPassword = document.getElementById("loginPassword");
+  let loginPassword = document.getElementById("loginPassword");
   const loginBtn = document.getElementById("loginBtn");
   const loginMessage = document.getElementById("loginMessage");
   const logoutBtn = document.getElementById("logoutBtn");
   const signedInUser = document.getElementById("signedInUser");
+
+  // Fail-safe: never allow a missing login password control to stop a restored
+  // authenticated session from starting the application.
+  if(!loginPassword && loginForm && loginBtn){
+    const wrap=document.createElement("div");
+    wrap.className="field";
+    wrap.innerHTML='<label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" required />';
+    loginForm.insertBefore(wrap,loginBtn);
+    loginPassword=wrap.querySelector("#loginPassword");
+  }
 
   let activeUserId = null;
   let loadingApp = false;
@@ -30,14 +40,12 @@
     document.body.classList.remove("auth-locked");
     authScreen.classList.add("hidden");
     signedInUser.textContent = session.user.email || "Signed in";
-    loginPassword.value = "";
+    if(loginPassword) loginPassword.value = "";
     loginMessage.textContent = "";
 
     if(loadingApp) return;
     loadingApp = true;
     try {
-      // Always reload after a restored initial session, fresh sign-in,
-      // or token refresh so RLS requests use the current access token.
       if(forceReload || userChanged) {
         await window.startB5App?.();
       }
@@ -54,10 +62,7 @@
       return;
     }
 
-    // Register the auth listener first so INITIAL_SESSION / token refresh
-    // cannot race ahead of the application data request.
     window.db.auth.onAuthStateChange((event, session) => {
-      // Defer async work out of the auth callback itself.
       setTimeout(async () => {
         if(event === "SIGNED_OUT" || !session){
           activeUserId = null;
@@ -76,7 +81,6 @@
       }, 0);
     });
 
-    // Explicitly recover the persisted browser session as a fallback.
     const { data, error } = await window.db.auth.getSession();
     if(error){
       showLogin(error.message);
@@ -99,7 +103,7 @@
     try {
       const { data, error } = await window.db.auth.signInWithPassword({
         email: loginEmail.value.trim(),
-        password: loginPassword.value
+        password: loginPassword?.value || ""
       });
 
       if(error){
