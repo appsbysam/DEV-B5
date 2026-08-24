@@ -1,5 +1,23 @@
-/* B5 v0.8.89 — continuous calendar rental bars */
-.continuous-calendar .continuous-row{position:relative;isolation:isolate;}
-.continuous-calendar .continuous-row>.timeline-cell{z-index:0;}
-.timeline-span-bar{position:relative;grid-column:var(--bar-start)/var(--bar-end);grid-row:1;align-self:center;height:28px;margin:0 3px;border:1px solid rgba(25,118,210,.24);border-radius:8px;background:#dbeaff;color:#174b82;font:inherit;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 10px;cursor:pointer;z-index:3;box-shadow:0 2px 5px rgba(13,27,52,.08);}
-.timeline-span-bar:active{transform:translateY(1px);}
+/* B5 v0.8.89 — safe continuous calendar rental bars */
+.timeline-row:not(.header){position:relative;}
+.timeline-continuous-bar{
+  grid-column:var(--calendar-start)/var(--calendar-end);
+  grid-row:1;
+  align-self:center;
+  height:24px;
+  margin:0 3px;
+  border-radius:7px;
+  background:#dbeaff;
+  color:#174b82;
+  font-size:10px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  padding:0 8px;
+  z-index:1;
+  pointer-events:none;
+}
