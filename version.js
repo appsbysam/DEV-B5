@@ -1,11 +1,11 @@
 window.B5_VERSION = {
-  version: "0.8.94",
+  version: "0.8.95",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Promo Code Copy Button",
+  title: "Smarter Rental Booking",
   notes: [
-    "Added a Copy button beside every promo code in Manager Mode.",
-    "One tap copies the exact promo code to the clipboard for pasting into a rental or contract.",
-    "The button briefly changes to Copied to confirm the code is ready to paste."
+    "New Rental now filters the vehicle dropdown to cars available for the complete selected pickup and return period.",
+    "Changing pickup or return dates immediately refreshes the available vehicle list, reducing overlap conflicts before a car is selected.",
+    "Added Apply Promo / Discount to an existing rental so a valid promo can be applied later as a separate adjustment without rewriting the original rental charges."
   ]
 };
