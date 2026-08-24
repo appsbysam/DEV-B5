@@ -10,9 +10,9 @@
   "background_color": "#0b1220",
   "theme_color": "#0b1220",
   "icons": [
-    {"src":"/DEV-B5/assets/icons/pwa-icon-192-v095.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"/DEV-B5/assets/icons/pwa-icon-512-v095.png","sizes":"512x512","type":"image/png","purpose":"any"},
-    {"src":"/DEV-B5/assets/icons/pwa-maskable-192-v095.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
-    {"src":"/DEV-B5/assets/icons/pwa-maskable-512-v095.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+    {"src":"assets/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"assets/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"assets/icons/icon-maskable-192.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+    {"src":"assets/icons/icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ]
 }
