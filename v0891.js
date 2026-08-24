@@ -15,20 +15,58 @@
   loadSupabaseData=async function(){await previousLoadSupabaseData();const message=String(state.error||'');const transient=!state.live&&/permission denied|jwt|not authenticated|network|fetch|failed to fetch|connection/i.test(message);if(transient&&!retryingInitialLoad){retryingInitialLoad=true;try{await new Promise(resolve=>setTimeout(resolve,650));const {data}=await window.db.auth.getSession();if(data?.session)await previousLoadSupabaseData();}finally{retryingInitialLoad=false;}}try{setManagerVisibility();applyPermissionNavigation?.();}catch(_){ }};
 })();
 
-/* B5 v0.9.12 — preserve vehicle context through child modals and reorder financial tiles. */
+/* B5 v0.9.13 — keep vehicle detail context continuously visible through child forms. */
 (function(){
-  const originalOpenVehicleDetails=openVehicleDetails;
-  function childModal(vehicleId,opener){
-    const parent=document.getElementById('modal');if(parent?.open)parent.close();
-    setTimeout(()=>{opener(vehicleId);const dlg=document.getElementById('modal');if(!dlg)return;dlg.addEventListener('close',()=>setTimeout(()=>openVehicleDetails(vehicleId),70),{once:true});},70);
-  }
-  openVehicleDetails=function(vehicleId){
-    originalOpenVehicleDetails(vehicleId);
+  const baseOpenVehicleDetails=openVehicleDetails;
+
+  function reorderVehicleTiles(){
     const summary=document.querySelector('#modalBody .vehicle-detail-summary');
-    if(summary){const tiles=[...summary.children],order=['Purchase Cost','Expenses','Rental Income','Operating Profit'];order.forEach(label=>{const tile=tiles.find(x=>x.textContent.trim().toLowerCase().startsWith(label.toLowerCase()));if(tile)summary.appendChild(tile);});}
-    const purchase=document.getElementById('editVehiclePurchase'),expense=document.getElementById('addVehicleExpense'),maintenance=document.getElementById('addVehicleMaintenance');
-    if(purchase)purchase.onclick=()=>childModal(vehicleId,vehiclePurchaseModal);
-    if(expense)expense.onclick=()=>childModal(vehicleId,vehicleExpenseModal);
-    if(maintenance)maintenance.onclick=()=>childModal(vehicleId,vehicleMaintenanceModal);
-  };
+    if(!summary)return;
+    const tiles=[...summary.children],order=['Purchase Cost','Expenses','Rental Income','Operating Profit'];
+    order.forEach(label=>{const tile=tiles.find(x=>x.textContent.trim().toLowerCase().startsWith(label.toLowerCase()));if(tile)summary.appendChild(tile);});
+  }
+
+  function renderVehicleParent(vehicleId){
+    const dlg=document.getElementById('modal');
+    if(!dlg)return;
+    const showModal=dlg.showModal;
+    if(dlg.open)dlg.showModal=()=>{};
+    try{baseOpenVehicleDetails(vehicleId);}finally{dlg.showModal=showModal;}
+    reorderVehicleTiles();
+    bindVehicleChildActions(vehicleId);
+  }
+
+  function openChildInPlace(vehicleId,opener){
+    const dlg=document.getElementById('modal');
+    if(!dlg||!dlg.open)return;
+    const nativeShowModal=dlg.showModal;
+    const nativeClose=dlg.close;
+    let restoring=false;
+
+    dlg.showModal=()=>{};
+    try{opener(vehicleId);}finally{dlg.showModal=nativeShowModal;}
+
+    const cancelHandler=e=>{e.preventDefault();restoreParent();};
+    function restoreParent(){
+      if(restoring)return;
+      restoring=true;
+      dlg.removeEventListener('cancel',cancelHandler);
+      dlg.close=nativeClose;
+      renderVehicleParent(vehicleId);
+    }
+
+    dlg.close=restoreParent;
+    dlg.addEventListener('cancel',cancelHandler);
+  }
+
+  function bindVehicleChildActions(vehicleId){
+    const purchase=document.getElementById('editVehiclePurchase');
+    const expense=document.getElementById('addVehicleExpense');
+    const maintenance=document.getElementById('addVehicleMaintenance');
+    if(purchase)purchase.onclick=()=>openChildInPlace(vehicleId,vehiclePurchaseModal);
+    if(expense)expense.onclick=()=>openChildInPlace(vehicleId,vehicleExpenseModal);
+    if(maintenance)maintenance.onclick=()=>openChildInPlace(vehicleId,vehicleMaintenanceModal);
+  }
+
+  openVehicleDetails=function(vehicleId){renderVehicleParent(vehicleId);};
 })();
