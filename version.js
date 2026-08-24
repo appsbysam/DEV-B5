@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.5",
+  version: "0.9.6",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "PWA Branding & Login Alignment",
+  title: "PWA Install Icon Recovery",
   notes: [
-    "Reframed the PWA icons on a full white canvas so Android launcher masking no longer exposes dark bands above or below the B5 branding.",
-    "Adjusted the installed-app icon artwork proportions to make the B5 branding more prominent on the Android splash treatment while preserving the dark navy splash background.",
-    "Locked Keep me logged in to the left and Forgot password? to the right on the same sign-in row.",
-    "Kept the approved white rounded logo treatment on the staff sign-in screen."
+    "Restored the previously proven standard PWA icons for browser install and shortcut previews so Brave no longer falls back to a generic letter icon.",
+    "Retained the newer white-filled maskable icons for Android launcher and splash-screen framing.",
+    "Added cache-busting to every icon URL in the manifest so browsers are forced to re-read the icon assets.",
+    "Kept the v0.9.5 login alignment and branding changes unchanged."
   ]
 };
