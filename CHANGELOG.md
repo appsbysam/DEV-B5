@@ -2,6 +2,17 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.1 — Login Resilience & Sign Out
+**Released: 24 August 2026**
+- Restored authenticated read access to `vehicle_categories` in Supabase. This fixes the **permission denied for table vehicle_categories** startup error that could leave Dashboard data at zero and navigation unavailable until the app was relaunched.
+- Added a guarded one-time retry when the initial mobile/PWA data load fails with a transient authentication, JWT, network or fetch error. The retry reuses the confirmed Supabase session and does not loop indefinitely.
+- Re-applies Manager and per-user permission navigation after the initial/retried load so menu visibility remains consistent with the signed-in user's saved access.
+- Added **Sign Out** at the bottom of the side menu for convenient mobile access.
+- Added **Sign Out** inside the signed-in user's **My Profile** window; Manager Mode's edit-user profile remains unaffected.
+- Retained the existing desktop/top-bar Sign Out control.
+- Updated **Locations & Fees** mobile labels to use natural punctuation and spacing: `LOCATION: Beirut`, `PICKUP: $65.00`, `DROP-OFF: $65.00`, `BUFFER: 180 mins`.
+- Supabase migration `restore_vehicle_categories_authenticated_read` enables RLS, grants authenticated SELECT access and adds an authenticated read policy for `vehicle_categories`.
+
 ## v0.9.0 — Secure Password Recovery
 **Released: 24 August 2026**
 - Added **Forgot Password?** to the staff sign-in screen.
