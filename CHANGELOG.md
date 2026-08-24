@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.8.99 — Branding & User Profile Polish
+**Released: 24 August 2026**
+- Increased the All Season logo on the staff sign-in screen using the existing optimised `assets/logo.webp` artwork rather than recreating the logo.
+- Refined the Manager Mode User Profile modal so the permissions area scrolls independently and remains practical on smaller/mobile screens.
+- Consolidated the user-profile actions into one bottom footer row: **Cancel**, **Reset to Role Defaults**, and **Save User**.
+- Removed the separate bottom Close action while a Manager User Profile is open; the top-right X remains available as an additional dismissal control.
+- Prepared installed/PWA branding to use the existing repository icon assets for a more prominent splash presentation; no Supabase changes were required.
+
 ## v0.8.98 — Permission & Access Control Hardening
 **Released: 24 August 2026**
 - Fixed the signed-in staff profile loader so it now retrieves `permission_role`, individual `permissions`, notification preferences and first-login password state from Supabase rather than falling back to role defaults.
