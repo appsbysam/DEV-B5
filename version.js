@@ -1,11 +1,11 @@
 window.B5_VERSION = {
-  version: "0.8.96",
+  version: "0.8.97",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Flexible Rental Sorting",
+  title: "Manager User Creation",
   notes: [
-    "Added Sort by controls to Rentals for Pickup Date, Rental / Contract #, Customer Name, Vehicle and Vehicle Type.",
-    "Added ascending/descending ordering, with Pickup Date retaining the existing Newest First default.",
-    "Rental search and Open / History / All filters continue to work together with the selected sort order."
+    "Managers can now create new staff accounts directly from Manager Mode > Users, including display name, email, base role and individual permissions.",
+    "Added secure temporary-password generation and copy controls, with an option to require the user to change the temporary password on first login.",
+    "First-login password changes are enforced before the new user can access the operational app, and account creation is handled by a protected Supabase Edge Function."
   ]
 };
