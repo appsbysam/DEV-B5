@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.7 — PWA Installability Repair
+**Released: 24 August 2026**
+- Added a dedicated service worker under the `/DEV-B5/` scope so supported Android browsers can recognise the site as an installable web application rather than only a generic website shortcut.
+- Added a fresh `manifest-v097.webmanifest` with explicit `/DEV-B5/` app ID, start URL, scope and absolute application-icon paths.
+- Added a runtime PWA bootstrap that replaces the stale `v0.9.1` manifest and shortcut-icon metadata still present in `index.html`.
+- Retained the approved B5 white-background branding and existing login layout.
+- No Supabase changes were required.
+
 ## v0.9.6 — PWA Install Icon Recovery
 **Released: 24 August 2026**
 - Restored the proven v0.9.4 standard **192×192** and **512×512** PWA icons for browser install/shortcut previews after Brave fell back to a generic letter icon with the v0.9.5 standard assets.
