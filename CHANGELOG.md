@@ -2,6 +2,17 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.8.98 — Permission & Access Control Hardening
+**Released: 24 August 2026**
+- Fixed the signed-in staff profile loader so it now retrieves `permission_role`, individual `permissions`, notification preferences and first-login password state from Supabase rather than falling back to role defaults.
+- User Profile permission switches now take effect after save/login: inaccessible sections are removed from navigation and direct navigation to restricted pages is blocked.
+- Added permission dependency enforcement so child actions cannot remain available when their parent area is disabled; for example, Create/Edit/Return Rental permissions cannot bypass a disabled View Rentals permission.
+- Re-applied permission visibility after dynamic renders so later-injected controls such as payment, return, extend/swap and promo actions remain consistent with the signed-in user's access.
+- Manager Mode visibility now follows the saved Manager permission instead of relying only on the legacy `role` field.
+- Inactive or missing staff profiles are now refused entry before the operational application starts and are signed back out with an explanatory message.
+- Added database-side permission helpers and RLS hardening for core rental, customer, fleet and payment tables so critical access restrictions are enforced by Supabase as well as by the browser UI.
+- Existing manager access was preserved during the security migration.
+
 ## v0.8.97 — Manager User Creation
 **Released: 24 August 2026**
 - Added **Add User** to Manager Mode → Users so authorised managers can create staff accounts without leaving B5.
