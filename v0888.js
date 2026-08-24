@@ -1,7 +1,5 @@
 /* B5 v0.8.98 — permission enforcement + access hardening */
 (function(){
-  const fallbackRole=(p)=>((p?.role||'').toLowerCase()==='manager'?'manager':'office');
-
   // Fix the original profile loader: custom role/permission fields must be loaded for the signed-in user.
   loadUserProfile=async function(){
     if(!window.db)return null;
@@ -36,7 +34,6 @@
       .find(page=>can(pagePermission(page),p))||null;
   }
 
-  // Manager visibility now respects the permission switch, not merely the legacy role field.
   setManagerVisibility=function(){
     const allowed=!!state.userProfile&&can('manager');
     const btn=document.getElementById('managerNav'),top=document.getElementById('managerTopBtn');
@@ -44,7 +41,6 @@
     if(state.page==='manager'&&!allowed)state.page=firstAllowedPage()||'dashboard';
   };
 
-  // Called by auth.js before B5 starts. Inactive/missing profiles are refused entry.
   async function authoriseSession(session){
     if(!session?.user?.id)return {allowed:false,message:'Please sign in.'};
     const {data,error}=await window.db.from('staff_profiles')
@@ -57,31 +53,34 @@
   }
   window.B5AccessControl={authoriseSession};
 
-  // Re-apply navigation/action visibility after every render, including later modules that add buttons.
   const oldApplyPermissionNavigation=applyPermissionNavigation;
+  let applyingPermissions=false;
   applyPermissionNavigation=function(){
-    oldApplyPermissionNavigation();
-    const rules=[
-      ['[data-payment],[data-direct-payment]','payments'],
-      ['[data-return]','rentals.return'],
-      ['[data-extend],[data-swap]','rentals.edit'],
-      ['[data-existing-promo]','promotions']
-    ];
-    rules.forEach(([selector,key])=>document.querySelectorAll(selector).forEach(el=>{el.hidden=!can(key);}));
-    const ids=[['newCustomerBtn','customers.edit'],['newVehicleBtn','fleet.edit'],['newRentalBtn','rentals.create'],['quickRental','rentals.create'],['quickAvailability','availability']];
-    ids.forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.hidden=!can(key);});
+    if(applyingPermissions)return;
+    applyingPermissions=true;
+    try{
+      oldApplyPermissionNavigation();
+      const rules=[
+        ['[data-payment],[data-direct-payment]','payments'],
+        ['[data-return]','rentals.return'],
+        ['[data-extend],[data-swap]','rentals.edit'],
+        ['[data-existing-promo]','promotions']
+      ];
+      rules.forEach(([selector,key])=>document.querySelectorAll(selector).forEach(el=>{const hide=!can(key);if(el.hidden!==hide)el.hidden=hide;}));
+      const ids=[['newCustomerBtn','customers.edit'],['newVehicleBtn','fleet.edit'],['newRentalBtn','rentals.create'],['quickRental','rentals.create'],['quickAvailability','availability']];
+      ids.forEach(([id,key])=>{const el=document.getElementById(id);if(el){const hide=!can(key);if(el.hidden!==hide)el.hidden=hide;}});
+    }finally{applyingPermissions=false;}
   };
 
   const oldRender98=render;
   render=function(){
-    if(state.userProfile?.active===false){return;}
+    if(state.userProfile?.active===false)return;
     const allowed=firstAllowedPage();
     if(allowed&&!can(pagePermission(state.page)))state.page=allowed;
     oldRender98();
     applyPermissionNavigation();
   };
 
-  // Protect the existing-rental promo action added in v0.8.95.
   if(typeof window.applyPromoToExistingRental95==='function'){
     const oldPromo98=window.applyPromoToExistingRental95;
     window.applyPromoToExistingRental95=function(uuid){
@@ -90,7 +89,11 @@
     };
   }
 
-  // Keep newly injected controls synchronised with permissions.
-  const observer=new MutationObserver(()=>{if(state.userProfile)applyPermissionNavigation();});
+  let permissionRefreshQueued=false;
+  const observer=new MutationObserver(()=>{
+    if(!state.userProfile||permissionRefreshQueued||applyingPermissions)return;
+    permissionRefreshQueued=true;
+    requestAnimationFrame(()=>{permissionRefreshQueued=false;applyPermissionNavigation();});
+  });
   window.addEventListener('load',()=>observer.observe(document.body,{childList:true,subtree:true}));
 })();
