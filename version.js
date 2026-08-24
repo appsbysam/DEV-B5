@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.3",
+  version: "0.9.4",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "White Rounded Branding",
+  title: "PWA Install & Icon Repair",
   notes: [
-    "Restored the original white-background B5 All Season logo treatment on the staff sign-in screen.",
-    "Added rounded corners and a subtle shadow so the white logo background reads as a deliberate branding card on the dark sign-in screen.",
-    "Updated the installed PWA splash/icon artwork to use the white-background logo inside a rounded white panel rather than the transparent/dark treatment.",
-    "Kept Keep me logged in and Forgot password? on one row, with Forgot password? aligned to the right."
+    "Restored a standards-compliant PWA icon set with dedicated 192x192 and 512x512 PNG assets.",
+    "Added separate maskable Android icons so installed shortcuts retain the B5 branding instead of falling back to a generic letter icon.",
+    "Repaired the web app manifest so supported browsers can recognise All Season as an installable PWA again.",
+    "Kept the approved dark-navy splash background with the white rounded B5 logo treatment."
   ]
 };
