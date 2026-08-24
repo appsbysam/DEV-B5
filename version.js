@@ -1,11 +1,11 @@
 window.B5_VERSION = {
-  version: "0.8.95",
+  version: "0.8.96",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Smarter Rental Booking",
+  title: "Flexible Rental Sorting",
   notes: [
-    "New Rental now filters the vehicle dropdown to cars available for the complete selected pickup and return period.",
-    "Changing pickup or return dates immediately refreshes the available vehicle list, reducing overlap conflicts before a car is selected.",
-    "Added Apply Promo / Discount to an existing rental so a valid promo can be applied later as a separate adjustment without rewriting the original rental charges."
+    "Added Sort by controls to Rentals for Pickup Date, Rental / Contract #, Customer Name, Vehicle and Vehicle Type.",
+    "Added ascending/descending ordering, with Pickup Date retaining the existing Newest First default.",
+    "Rental search and Open / History / All filters continue to work together with the selected sort order."
   ]
 };
