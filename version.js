@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.91",
+  version: "0.8.92",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Calendar Sorting & Rental Colours",
+  title: "Promo Code Generator Fix",
   notes: [
-    "Calendar vehicles are now sorted alphabetically by vehicle name, with plate number used as a secondary sort.",
-    "Rental bars now use only two colours: lime green for the first rental and gold for the next rental on the same vehicle.",
-    "If a third rental appears within the 14-day period, the colour alternates back to lime green, then gold again.",
-    "The fixed vehicle column and contained horizontal timeline layout remain unchanged."
+    "Fixed promo code creation so offer types match the database rules.",
+    "Percentage promo codes now use the supported 5%, 10%, 15% or 20% values.",
+    "Free-day promotions now save correctly as one free day.",
+    "New promo codes now use the correct Available status."
   ]
 };
