@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.6 — PWA Install Icon Recovery
+**Released: 24 August 2026**
+- Restored the proven v0.9.4 standard **192×192** and **512×512** PWA icons for browser install/shortcut previews after Brave fell back to a generic letter icon with the v0.9.5 standard assets.
+- Retained the v0.9.5 white-filled **maskable** icons for Android launcher and splash-screen framing, preserving the no-black-band treatment.
+- Added explicit cache-busting to all manifest icon URLs so browsers fetch the intended assets instead of reusing stale icon metadata.
+- Kept the v0.9.5 **Keep me logged in** / **Forgot password?** same-row alignment unchanged.
+- No Supabase changes were required.
+
 ## v0.9.5 — PWA Branding & Login Alignment
 **Released: 24 August 2026**
 - Reframed the PWA icon artwork onto a full white canvas so Android launcher masking no longer exposes dark bands above or below the B5 branding.
