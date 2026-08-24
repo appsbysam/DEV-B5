@@ -1,6 +1,20 @@
-/* B5 v0.9.1 — login resilience, sign-out access and location label polish */
+/* B5 v0.9.7 — login resilience, sign-out access, location polish and PWA bootstrap */
 (function(){
-  // Location rows: keep the compact mobile presentation but make labels read naturally.
+  // Force current PWA metadata into the live document. This replaces the stale v0.9.1
+  // manifest/favicon references that remained in index.html and caused Brave to create
+  // a generic-letter shortcut instead of recognising the application branding.
+  try{
+    const head=document.head;
+    let manifest=head.querySelector('link[rel="manifest"]');
+    if(!manifest){manifest=document.createElement('link');manifest.rel='manifest';head.appendChild(manifest);}
+    manifest.href='/DEV-B5/manifest-v097.webmanifest';
+    const icon32=head.querySelector('link[rel="icon"][sizes="32x32"]')||document.createElement('link');
+    icon32.rel='icon';icon32.type='image/png';icon32.sizes='32x32';icon32.href='/DEV-B5/assets/icons/pwa-icon-192-v095.png?v=097';if(!icon32.parentNode)head.appendChild(icon32);
+    const apple=head.querySelector('link[rel="apple-touch-icon"]')||document.createElement('link');
+    apple.rel='apple-touch-icon';apple.sizes='180x180';apple.href='/DEV-B5/assets/icons/pwa-icon-192-v095.png?v=097';if(!apple.parentNode)head.appendChild(apple);
+    if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/DEV-B5/service-worker.js',{scope:'/DEV-B5/'}).catch(err=>console.warn('B5 service worker registration failed',err)));}
+  }catch(err){console.warn('B5 PWA bootstrap failed',err);}
+
   renderLocations=function(){
     return `<div class="section-title"><div><h2>Locations & Fees</h2><p>Pickup, drop-off and transfer pricing</p></div></div>
       <div class="panel"><div class="table-wrap"><table class="locations-fees-table">
@@ -15,53 +29,25 @@
     window.db?.auth?.signOut?.();
   }
 
-  // Mobile-friendly sign out at the bottom of the sidebar.
   const footer=document.querySelector('.sidebar-footer');
   if(footer&&!document.getElementById('sidebarSignOut')){
-    const btn=document.createElement('button');
-    btn.type='button';
-    btn.id='sidebarSignOut';
-    btn.className='btn btn-secondary sidebar-signout';
-    btn.textContent='Sign Out';
-    btn.addEventListener('click',triggerSignOut);
-    footer.appendChild(btn);
+    const btn=document.createElement('button');btn.type='button';btn.id='sidebarSignOut';btn.className='btn btn-secondary sidebar-signout';btn.textContent='Sign Out';btn.addEventListener('click',triggerSignOut);footer.appendChild(btn);
   }
 
-  // Also expose Sign Out in the user's own profile. Manager-edited user profiles are excluded.
   const previousOpenUserProfile=openUserProfile;
   openUserProfile=async function(){
-    const result=await previousOpenUserProfile();
-    const body=document.getElementById('profileBody');
+    const result=await previousOpenUserProfile();const body=document.getElementById('profileBody');
     if(body&&!body.querySelector('.manager-user-profile')&&!document.getElementById('profileSignOut')){
-      const box=document.createElement('div');
-      box.className='profile-signout-section';
-      box.innerHTML='<button type="button" class="btn btn-secondary" id="profileSignOut">Sign Out</button>';
-      body.appendChild(box);
-      document.getElementById('profileSignOut').onclick=()=>{
-        document.getElementById('profileModal')?.close();
-        triggerSignOut();
-      };
+      const box=document.createElement('div');box.className='profile-signout-section';box.innerHTML='<button type="button" class="btn btn-secondary" id="profileSignOut">Sign Out</button>';body.appendChild(box);
+      document.getElementById('profileSignOut').onclick=()=>{document.getElementById('profileModal')?.close();triggerSignOut();};
     }
     return result;
   };
 
-  // A just-established Supabase session can occasionally race the first batch of data requests
-  // on mobile/PWA startup. Retry once for transient authentication/network failures instead of
-  // leaving the app in an empty-data state until the user fully relaunches it.
-  const previousLoadSupabaseData=loadSupabaseData;
-  let retryingInitialLoad=false;
+  const previousLoadSupabaseData=loadSupabaseData;let retryingInitialLoad=false;
   loadSupabaseData=async function(){
-    await previousLoadSupabaseData();
-    const message=String(state.error||'');
-    const transient=!state.live&&/permission denied|jwt|not authenticated|network|fetch|failed to fetch|connection/i.test(message);
-    if(transient&&!retryingInitialLoad){
-      retryingInitialLoad=true;
-      try{
-        await new Promise(resolve=>setTimeout(resolve,650));
-        const {data}=await window.db.auth.getSession();
-        if(data?.session)await previousLoadSupabaseData();
-      }finally{retryingInitialLoad=false;}
-    }
+    await previousLoadSupabaseData();const message=String(state.error||'');const transient=!state.live&&/permission denied|jwt|not authenticated|network|fetch|failed to fetch|connection/i.test(message);
+    if(transient&&!retryingInitialLoad){retryingInitialLoad=true;try{await new Promise(resolve=>setTimeout(resolve,650));const {data}=await window.db.auth.getSession();if(data?.session)await previousLoadSupabaseData();}finally{retryingInitialLoad=false;}}
     try{setManagerVisibility();applyPermissionNavigation?.();}catch(_){ }
   };
 })();
