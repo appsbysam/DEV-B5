@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.6",
+  version: "0.9.7",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "PWA Install Icon Recovery",
+  title: "PWA Installability Repair",
   notes: [
-    "Restored the previously proven standard PWA icons for browser install and shortcut previews so Brave no longer falls back to a generic letter icon.",
-    "Retained the newer white-filled maskable icons for Android launcher and splash-screen framing.",
-    "Added cache-busting to every icon URL in the manifest so browsers are forced to re-read the icon assets.",
-    "Kept the v0.9.5 login alignment and branding changes unchanged."
+    "Added a dedicated service worker so supported Android browsers can recognise B5 as an installable web application rather than only a generic website shortcut.",
+    "Added a fresh v0.9.7 manifest URL with explicit DEV-B5 scope, start URL and application icon paths.",
+    "Replaced stale v0.9.1 manifest and shortcut-icon metadata at runtime so Brave no longer falls back to the generic letter icon path.",
+    "Retained the approved B5 white-background branding and existing login layout."
   ]
 };
