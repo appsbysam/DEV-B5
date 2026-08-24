@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.8.99",
+  version: "0.9.0",
   build: "Demo Build",
   released: "2026-08-24",
-  title: "Branding & User Profile Polish",
+  title: "Secure Password Recovery",
   notes: [
-    "Increased the All Season logo on the staff sign-in screen using the existing optimised repository logo asset.",
-    "Refined the Manager User Profile modal so the permission list scrolls cleanly while its actions stay together at the bottom.",
-    "Replaced the separate Close action with a Cancel button and aligned Cancel, Reset to Role Defaults and Save User on one footer row.",
-    "Prepared the PWA branding assets for a more prominent installed-app splash presentation without recreating the company logo."
+    "Added Forgot Password to the staff sign-in screen with secure Supabase email recovery links.",
+    "Password recovery now opens a dedicated B5 reset screen where staff choose and confirm their own new password; managers do not need to know or recreate forgotten passwords.",
+    "Added Keep me logged in so staff can explicitly choose persistent access on trusted devices; unchecked sign-ins are treated as temporary browser-session access.",
+    "Kept the existing manager-created temporary-password and mandatory first-login password-change workflow for new staff accounts."
   ]
 };
