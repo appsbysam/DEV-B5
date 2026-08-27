@@ -4,10 +4,10 @@ window.B5_VERSION = {
   released: "2026-08-27",
   title: "Operational Controls & Customer Accounts",
   notes: [
-    "Added dynamic customer search by name, phone, email, licence and passport details.",
-    "Added GPS-enabled vehicle tracking data and an at-a-glance GPS badge for equipped vehicles.",
-    "Added manager-controlled ad-hoc discount requests with pending, approved and rejected audit state; only the first manager approval applies the discount.",
-    "Finalised rental agreements are now protected from modification at database level; managers can record separate contract amendments without changing the original contract.",
-    "Added monthly-account customer flags and a manager-controlled outstanding-balance reminder workflow, with reminder history ready for later automation."
+    "Customer search now dynamically filters the actual customer list; matching customer rows remain selectable and open the customer account view.",
+    "Added GPS-enabled vehicle tracking with GPS selection when adding a vehicle, editable GPS status in vehicle details, and an at-a-glance GPS badge on equipped fleet cards.",
+    "Added staff ad-hoc discount requests with manager notifications and first-manager approval; an approved discount is applied once and records who approved it.",
+    "Finalised rental agreements are protected from modification at database level; managers record separate amendments without altering the original contract.",
+    "Added monthly-account customers with outstanding-balance reminders for managers and a manual Prepare Email Reminder workflow, ready for later automation."
   ]
 };
