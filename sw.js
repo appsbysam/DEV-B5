@@ -1,4 +1,4 @@
-const B5_CACHE='b5-shell-0.9.11';
+const B5_CACHE='b5-shell-0.9.14';
 const APP_ROOT=new URL('./',self.registration.scope).href;
 const DEFAULT_TARGET=new URL('./#dashboard',APP_ROOT).href;
 self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(B5_CACHE).then(cache=>cache.addAll([APP_ROOT,new URL('manifest.webmanifest',APP_ROOT).href,new URL('assets/icons/icon-192.png',APP_ROOT).href,new URL('assets/icons/icon-512.png',APP_ROOT).href,new URL('assets/icons/icon-maskable-192.png',APP_ROOT).href,new URL('assets/icons/icon-maskable-512.png',APP_ROOT).href])));});
