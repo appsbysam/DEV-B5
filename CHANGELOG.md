@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.15 — Fixed Mobile Navigation Header
+**Released: 27 August 2026**
+- Changed the mobile topbar from sticky positioning to a genuinely fixed header so the hamburger menu remains available while scrolling long screens.
+- Added the correct mobile content offset so page content starts below the fixed header instead of being obscured by it.
+- Added safe-area handling for mobile devices with display cut-outs/status areas.
+- Ensured the open sidebar and its backdrop layer above the fixed header.
+- No Supabase/database changes were required.
+
 ## v0.9.14 — Operational Controls & Customer Accounts
 **Released: 27 August 2026**
 - Changed Customer search into a true live filter of the displayed customer list across name, phone, email, licence and passport details. Filtered customer rows remain selectable and open a customer account/history view.
