@@ -1,12 +1,13 @@
 window.B5_VERSION = {
-  version: "0.9.13",
+  version: "0.9.14",
   build: "Demo Build",
-  released: "2026-08-25",
-  title: "Seamless Vehicle Action Modals",
+  released: "2026-08-27",
+  title: "Operational Controls & Customer Accounts",
   notes: [
-    "Purchase Details, Add Expense and Add Maintenance now open within the active vehicle-detail context without exposing the Fleet list underneath.",
-    "Closing, cancelling or completing a vehicle child action restores the same vehicle card immediately inside the already-open modal.",
-    "Retained the vehicle financial tile order: Purchase Cost, Expenses, Rental Income, then Operating Profit.",
-    "No database schema changes were required."
+    "Added dynamic customer search by name, phone, email, licence and passport details.",
+    "Added GPS-enabled vehicle tracking data and an at-a-glance GPS badge for equipped vehicles.",
+    "Added manager-controlled ad-hoc discount requests with pending, approved and rejected audit state; only the first manager approval applies the discount.",
+    "Finalised rental agreements are now protected from modification at database level; managers can record separate contract amendments without changing the original contract.",
+    "Added monthly-account customer flags and a manager-controlled outstanding-balance reminder workflow, with reminder history ready for later automation."
   ]
 };
