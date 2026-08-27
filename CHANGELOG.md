@@ -4,12 +4,13 @@ All notable changes to dev-B5 are recorded here.
 
 ## v0.9.14 — Operational Controls & Customer Accounts
 **Released: 27 August 2026**
-- Added dynamic customer search/autocomplete across customer name, phone, email, licence and passport details.
-- Added `gps_enabled` to vehicles and an at-a-glance GPS indicator for equipped fleet vehicles.
-- Added manager-controlled ad-hoc discount requests with pending/approved/rejected state, requester, reason, approver and approval timestamp. The first manager approval applies the discount; later managers see the existing approval instead of approving it again.
-- Added database-level protection preventing finalised/returned rental agreements from being updated or deleted. Managers use separate `contract_amendments` records so the original contract remains intact.
-- Added monthly-account and monthly-reminder flags to customers plus a reminder log and manager-triggered email reminder workflow. This is deliberately manual initially and structured for later automation.
-- Added RLS policies for discount requests, amendments and monthly reminder records.
+- Changed Customer search into a true live filter of the displayed customer list across name, phone, email, licence and passport details. Filtered customer rows remain selectable and open a customer account/history view.
+- Added `gps_enabled` to vehicles. GPS can be selected when adding a vehicle, changed from the vehicle details card, and is shown as an at-a-glance GPS badge on equipped fleet cards.
+- Added staff ad-hoc discount requests with amount/reason, manager notifications, pending status and first-manager approval. Approval applies the discount once and records the approving manager; subsequent managers are told who already approved it.
+- Added a Manager Mode discount-approval panel in addition to rental-card approval controls.
+- Added database-level protection for finalised/returned contracts and their operational child records. Final contracts cannot be edited; managers instead add separate dated `contract_amendments`, preserving the original contract.
+- Added monthly-account customer flags and monthly reminder eligibility. Managers receive one outstanding-balance reminder per eligible customer/month and can review the customer account before manually preparing an email reminder. Reminder activity is logged for later automation.
+- Added/updated RLS and database functions supporting discount approval, contract immutability, amendments and monthly reminders.
 - Added `v0914.js` and `v0914.css` and refreshed application asset revisions to v0.9.14.
 
 ## v0.9.13 — Seamless Vehicle Action Modals
