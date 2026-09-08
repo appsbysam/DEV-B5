@@ -2,6 +2,15 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.16b — Contract Signature Integration Fix
+**Released: 8 September 2026**
+- Fixed the v0.9.16a contract-page integration so the signature enhancement reliably detects the loaded contract and renders the signing panels.
+- Updated the contract signing CSS/JS asset revisions to `0.9.16b` to force a fresh browser load.
+- Preserved the original signature field IDs behind the enhanced panels so the existing contract form-data and PDF workflow remain compatible.
+- Added a contract-loaded listener plus a guarded load check for reliable rendering regardless of script/load timing.
+- Prevented signatures from being cleared or replaced after a contract is finalised/closed.
+- No customer-search changes are included in this release.
+
 ## v0.9.16a — Contract Signature Panels
 **Released: 8 September 2026**
 - Upgraded the existing contract signature areas with restrained pale blue-grey signing panels while preserving the approved contract layout and vehicle-damage workflow.
