@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.17 — Customer Database Search
+**Released: 8 September 2026**
+- Added a permanent live search/filter field to the main **Customers** database screen.
+- Results narrow immediately as staff type, with matching across customer name, phone numbers, email, licence number and passport number.
+- Filtered customer rows remain directly tappable/clickable and keyboard selectable to open the customer's account and rental history.
+- Added a live result count showing the number of matching customer records.
+- No Supabase/database changes were required.
+
 ## v0.9.16b — Contract Signature Integration Fix
 **Released: 8 September 2026**
 - Fixed the v0.9.16a contract-page integration so the signature enhancement reliably detects the loaded contract and renders the signing panels.
