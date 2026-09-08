@@ -14,6 +14,6 @@ if (window.supabase) {
 
 // Contract-specific enhancement layer. Kept external so the approved contract layout remains untouched.
 if (/\/contract\.html$/i.test(location.pathname)) {
-  const css=document.createElement('link');css.rel='stylesheet';css.href='contract-signing.css?v=0.9.16a';document.head.appendChild(css);
-  const js=document.createElement('script');js.src='contract-signing.js?v=0.9.16a';js.defer=true;document.head.appendChild(js);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='contract-signing.css?v=0.9.16b';document.head.appendChild(css);
+  const js=document.createElement('script');js.src='contract-signing.js?v=0.9.16b';js.defer=true;document.head.appendChild(js);
 }
