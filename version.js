@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.16a",
+  version: "0.9.16b",
   build: "Demo Build",
   released: "2026-09-08",
-  title: "Contract Signature Panels",
+  title: "Contract Signature Integration Fix",
   notes: [
-    "Upgraded the existing contract signature areas into clearly shaded, professional signing panels without changing the approved contract layout.",
-    "Lessee and management can sign directly in the contract using finger, stylus or mouse, with the signature retained against the contract.",
-    "Stored signatures display with signer name and Sydney signing date/time and are included when the existing PDF renderer captures the contract pages.",
-    "Added a discreet signed-contract verification strip with contract number, signing time and verification ID."
+    "Fixed the contract page integration so the signature enhancement layer reliably detects and renders after the rental contract has loaded.",
+    "Updated contract signing assets to v0.9.16b for reliable cache refresh.",
+    "Preserved the original signature field IDs behind the enhanced panels so existing contract form and PDF behaviour continues to work.",
+    "Finalised contracts now prevent in-place signature replacement or clearing."
   ]
 };
