@@ -2,6 +2,17 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.16 — Secure Contract Signing
+**Released: 8 September 2026**
+- Added secure browser-based signing links for rental contracts; recipients do not need a B5 account or PDF software.
+- Added touch/stylus/mouse signature capture with full signer name and signing timestamp retained against the contract.
+- Added separate retained lessee and management signature fields to the contract record.
+- Added one-contract signing tokens stored only as SHA-256 hashes, with seven-day expiry and single-use signed status.
+- Added `contract_signing_requests` with RLS for staff-side request history and an Edge Function that limits public access to the specific tokenised contract/signing operation.
+- Added a **Send for Signature** action to rental contract controls and a share/copy workflow for the secure link.
+- Added `sign.html` as the customer-facing signing page and `v0916.js` for B5 signing controls.
+- Preserved the existing contract and vehicle-damage workflow.
+
 ## v0.9.15 — Fixed Mobile Navigation Header
 **Released: 27 August 2026**
 - Changed the mobile topbar from sticky positioning to a genuinely fixed header so the hamburger menu remains available while scrolling long screens.
