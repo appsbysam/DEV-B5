@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.18 — First Login Authentication Fix
+**Released: 8 September 2026**
+- Hardened the first-login temporary-password workflow so B5 verifies/restores the authenticated Supabase session before attempting `updateUser`, preventing the observed **Auth session missing** failure.
+- Added a guard against duplicate `SIGNED_IN`/manual login processing for the same user while the password gate is opening.
+- First-login and password-recovery screens now enforce the requested password rule: minimum 8 characters with at least one uppercase letter, one lowercase letter, one number and one symbol.
+- Added visible first-login password guidance before submission.
+- No database schema changes were required.
+
 ## v0.9.17 — Customer Database Search
 **Released: 8 September 2026**
 - Added a permanent live search/filter field to the main **Customers** database screen.
