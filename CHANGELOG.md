@@ -2,6 +2,15 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.16a — Contract Signature Panels
+**Released: 8 September 2026**
+- Upgraded the existing contract signature areas with restrained pale blue-grey signing panels while preserving the approved contract layout and vehicle-damage workflow.
+- Added direct in-contract signature capture for lessee and management using finger, stylus or mouse.
+- Stored signatures render back into the contract with signer name and Sydney date/time and are captured by the existing HTML-to-PDF workflow.
+- Added awaiting-signature states, clear/replace controls, and clean white signature surfaces for legible PDF output.
+- Added a discreet verification strip containing contract number, signing time and an `ASR-` verification ID.
+- Added `contract-signing.css` and `contract-signing.js`; the contract page loads this enhancement layer through its existing Supabase bootstrap so the large approved contract template itself does not need to be restructured.
+
 ## v0.9.16 — Secure Contract Signing
 **Released: 8 September 2026**
 - Added secure browser-based signing links for rental contracts; recipients do not need a B5 account or PDF software.
