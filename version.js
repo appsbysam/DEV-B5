@@ -1,11 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.15",
+  version: "0.9.16",
   build: "Demo Build",
-  released: "2026-08-27",
-  title: "Fixed Mobile Navigation Header",
+  released: "2026-09-08",
+  title: "Secure Contract Signing",
   notes: [
-    "The mobile top header is now fixed to the top of the screen so the hamburger menu remains accessible while scrolling long pages.",
-    "Page content is offset below the fixed header, including mobile safe-area spacing, so content is not hidden underneath it.",
-    "The mobile side menu and backdrop are layered above the fixed header when navigation is open."
+    "Added secure browser-based contract signing links so customers can review and sign without needing PDF software or a B5 login.",
+    "Added touch, stylus and mouse signature capture with signer name, signing time and one-contract token security.",
+    "Lessee and management signatures are retained against the contract for use in the final signed agreement.",
+    "Signing links expire after seven days and cannot be reused after signing."
   ]
 };
