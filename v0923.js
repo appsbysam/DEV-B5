@@ -1,0 +1,37 @@
+/* B5 v0.9.23 — manager password resets + self-service password changes */
+(()=>{
+  const PASSWORD_MESSAGE='Use at least 8 characters with at least one uppercase letter, one lowercase letter, one number and one symbol.';
+  const validPassword=p=>window.B5PasswordPolicy?.validate?window.B5PasswordPolicy.validate(p):(p.length>=8&&/[A-Z]/.test(p)&&/[a-z]/.test(p)&&/[0-9]/.test(p)&&/[^A-Za-z0-9]/.test(p));
+  function generateTemporaryPassword(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',bytes=new Uint32Array(10);crypto.getRandomValues(bytes);return `B5!${[...bytes].map(n=>chars[n%chars.length]).join('')}7`;}
+  function passwordFields(prefix,label='New Password'){return `<div class="grid two-col"><div class="field"><label>${label}</label><input id="${prefix}Password" type="password" autocomplete="new-password"><small>${PASSWORD_MESSAGE}</small></div><div class="field"><label>Confirm Password</label><input id="${prefix}Confirm" type="password" autocomplete="new-password"></div></div>`;}
+
+  async function changeOwnPassword(){
+    const password=document.getElementById('selfPassword')?.value||'',confirm=document.getElementById('selfConfirm')?.value||'',msg=document.getElementById('selfPasswordMessage'),btn=document.getElementById('selfPasswordSave');
+    if(msg)msg.textContent='';if(!validPassword(password)){if(msg)msg.textContent=PASSWORD_MESSAGE;return;}if(password!==confirm){if(msg)msg.textContent='The passwords do not match.';return;}
+    if(btn){btn.disabled=true;btn.textContent='Changing…';}
+    try{const {data,error}=await window.db.auth.updateUser({password});if(error)throw error;try{await window.logAudit?.('password_changed','auth',data?.user?.id||state.userProfile?.user_id||null,{method:'self_service'});}catch(_){}if(msg){msg.textContent='Password changed successfully.';msg.classList.add('success-text');}document.getElementById('selfPassword').value='';document.getElementById('selfConfirm').value='';}
+    catch(err){if(msg)msg.textContent=err?.message||'Unable to change your password.';}
+    finally{if(btn){btn.disabled=false;btn.textContent='Change Password';}}
+  }
+
+  const baseOpenUserProfile=window.openUserProfile||openUserProfile;
+  const enhancedOpenUserProfile=async function(){const result=await baseOpenUserProfile.apply(this,arguments);setTimeout(()=>{const body=document.getElementById('profileBody');if(!body||body.querySelector('.manager-user-profile')||document.getElementById('selfPasswordCard'))return;const box=document.createElement('div');box.id='selfPasswordCard';box.className='profile-password-card';box.innerHTML=`<div class="profile-password-head"><strong>Change Password</strong><span>Update the password you use to sign in to B5.</span></div>${passwordFields('self')}<div id="selfPasswordMessage" class="auth-message" aria-live="polite"></div><button type="button" class="btn btn-primary" id="selfPasswordSave">Change Password</button>`;const signout=body.querySelector('.profile-signout-section');if(signout)body.insertBefore(box,signout);else body.appendChild(box);document.getElementById('selfPasswordSave').onclick=changeOwnPassword;},0);return result;};
+  try{openUserProfile=enhancedOpenUserProfile;}catch(_){}window.openUserProfile=enhancedOpenUserProfile;
+
+  async function resetManagerUserPassword(user){
+    const temp=generateTemporaryPassword();
+    openModal('Reset User Password',`<div class="note"><strong>${esc(user.display_name||user.email||'User')}</strong><br>${esc(user.email||'')}</div><div class="field"><label>Temporary Password</label><div class="new-user-password-row"><input id="managerResetPassword" type="text" autocomplete="new-password" value="${esc(temp)}"><button type="button" class="btn btn-secondary btn-small" id="managerGeneratePassword">Generate</button><button type="button" class="btn btn-secondary btn-small" id="managerCopyPassword">Copy</button></div><small>${PASSWORD_MESSAGE}</small></div><div class="note">The user will be required to replace this temporary password the next time they sign in.</div>`,async()=>{
+      const password=document.getElementById('managerResetPassword')?.value||'';if(!validPassword(password)){alert(PASSWORD_MESSAGE);return false;}
+      const {data:{session}}=await window.db.auth.getSession();if(!session){alert('Please sign in again.');return false;}
+      const {data,error}=await window.db.functions.invoke('b5-manage-users',{body:{action:'reset_password',user_id:user.user_id,password},headers:{Authorization:`Bearer ${session.access_token}`}});if(error){console.error(error);alert(error.message||'Unable to reset password.');return false;}if(data?.error){alert(data.error);return false;}
+      if(user)user.must_change_password=true;setTimeout(()=>alert(`Password reset successfully.\n\nLogin: ${user.email}\nTemporary password: ${password}\n\nThe user must change this password on their next login.`),20);return true;
+    },'Reset Password');
+    document.getElementById('managerGeneratePassword').onclick=()=>{document.getElementById('managerResetPassword').value=generateTemporaryPassword();};
+    document.getElementById('managerCopyPassword').onclick=async()=>{const btn=document.getElementById('managerCopyPassword');try{await navigator.clipboard.writeText(document.getElementById('managerResetPassword').value);const old=btn.textContent;btn.textContent='Copied';setTimeout(()=>btn.textContent=old,1000);}catch(_){alert('Copy is not available on this device.');}};
+  }
+
+  const baseManagerProfile=window.openManagerUserProfile;
+  if(typeof baseManagerProfile==='function')window.openManagerUserProfile=function(email){baseManagerProfile(email);setTimeout(()=>{const p=(state.staffProfiles||[]).find(x=>(x.email||'')===email),profile=document.querySelector('.manager-user-profile'),actions=profile?.querySelector('.permission-actions');if(!p||!actions||document.getElementById('managerResetUserPassword'))return;const btn=document.createElement('button');btn.type='button';btn.id='managerResetUserPassword';btn.className='btn btn-secondary';btn.textContent='Reset Password';btn.onclick=()=>resetManagerUserPassword(p);actions.insertBefore(btn,actions.querySelector('#saveManagerUser'));},0);};
+
+  if(!document.getElementById('v0923Styles')){const st=document.createElement('style');st.id='v0923Styles';st.textContent='.profile-password-card{margin-top:16px;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel,#fff)}.profile-password-head{display:flex;flex-direction:column;gap:3px;margin-bottom:12px}.profile-password-head span{font-size:12px;color:var(--muted)}.profile-password-card .btn{margin-top:8px}@media(max-width:700px){.profile-password-card .two-col{grid-template-columns:1fr}}';document.head.appendChild(st);}
+})();
