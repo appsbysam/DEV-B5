@@ -2,6 +2,16 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.23 — User Password Management
+**Released: 9 September 2026**
+- Added manager-controlled password resets from **Manager Mode → Users**.
+- Managers can generate or enter a temporary password for an existing user; the reset is performed securely by the existing manager-only Supabase Edge Function.
+- A manager-reset password automatically sets **must change password**, so the user must replace the temporary password on their next login.
+- Added self-service **Change Password** controls to **My Profile** for any signed-in user.
+- Applied the existing B5 password policy to manager resets and self-service password changes.
+- Manager password resets and self-service password changes are recorded in the audit log.
+- Added **User password management** to the Manager Action List and marked it completed.
+
 ## v0.9.22b — Action List Collapse Fix
 **Released: 9 September 2026**
 - Fixed the Action List category collapse behaviour so checklist rows are actually hidden when their category is collapsed.
