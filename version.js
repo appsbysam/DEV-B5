@@ -1,11 +1,11 @@
 window.B5_VERSION = {
-  version: "0.9.24b",
+  version: "0.9.24c",
   build: "Demo Build",
   released: "2026-09-09",
-  title: "Fleet Sales Navigation Integration",
+  title: "Fleet Lifecycle UI Completion",
   notes: [
-    "Integrated Fleet Sales with the existing persistent page router so navigation, refresh and browser history use the same route flow as the rest of B5.",
-    "Retained the lifecycle data loading and new-booking protection from v0.9.24a.",
-    "Retained the complete Fleet Lifecycle & Sales feature set from v0.9.24."
+    "Added lifecycle controls directly into the existing Fleet vehicle details popup, including Move to Sales and Deactivate / Retire.",
+    "Added a dedicated Deactivated / Retired Vehicles section to Fleet Sales with Reactivate controls.",
+    "Added visible Edit, Record Sale, Reactivate and safe mistaken-entry controls to the appropriate lifecycle sections."
   ]
 };

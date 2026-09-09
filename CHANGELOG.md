@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.24c — Fleet Lifecycle UI Completion
+**Released: 9 September 2026**
+- Fixed the missing lifecycle controls in the existing Fleet vehicle-details popup: **Edit Vehicle**, **Move to Sales**, **Deactivate / Retire**, and safe mistaken-entry deletion are now presented in the same vehicle workflow users already open from Fleet.
+- Added **Deactivated / Retired Vehicles** as a third Fleet Sales section alongside Vehicles For Sale and Sold Vehicles / History.
+- Retired vehicles now have a visible **Reactivate Vehicle** action; For Sale vehicles have **Record Sale** and **Return to Active Fleet** actions.
+- Lifecycle controls are also visible directly on Fleet Sales cards, rather than depending on a separate hidden profile UI.
+- Kept For Sale, Retired and Sold vehicles out of the normal active Fleet board and blocked them from all new rental availability while preserving history.
+
 ## v0.9.24b — Fleet Sales Navigation Integration
 **Released: 9 September 2026**
 - Integrated **Fleet Sales** with B5's existing persistent `go()`/hash routing flow.
