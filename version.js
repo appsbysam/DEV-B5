@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.24g",
+  version: "0.9.24h",
   build: "Demo Build",
   released: "2026-09-10",
-  title: "Action List Re-render Fix",
+  title: "Action List & Mobile Navigation Fix",
   notes: [
-    "Fixed Action List category controls disappearing after checking or unchecking an item.",
-    "Completed-category green highlighting is reapplied after every Action List rebuild.",
-    "Expand/collapse state and the Add New Action control remain available after status changes without reintroducing the previous observer freeze."
+    "Restored Action List expand/collapse controls and completed-category green highlighting, including after checking or unchecking an item.",
+    "Action List presentation is safely reapplied after its asynchronous database refresh without creating a MutationObserver feedback loop.",
+    "On mobile, selecting any sidebar navigation item now automatically closes the sidebar after navigation."
   ]
 };
-(()=>{const s=document.createElement('script');s.src='v0924d.js?v=0.9.24g';s.defer=true;document.head.appendChild(s);})();
+(()=>{const s=document.createElement('script');s.src='v0924d.js?v=0.9.24h';s.defer=true;document.head.appendChild(s);})();

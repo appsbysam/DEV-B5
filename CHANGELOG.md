@@ -2,6 +2,12 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.24h — Action List & Mobile Navigation Fix
+**Released: 10 September 2026**
+- Restored Action List category expand/collapse controls and green completed-category highlighting after asynchronous checklist loads and checkbox status changes.
+- Reapplies the Action List presentation after database-driven list rebuilds without observing its own nested presentation changes, avoiding the earlier freeze loop.
+- Added a direct mobile sidebar safeguard so tapping any navigation item closes the sidebar after navigation.
+
 ## v0.9.24c — Fleet Lifecycle UI Completion
 **Released: 9 September 2026**
 - Fixed the missing lifecycle controls in the existing Fleet vehicle-details popup: **Edit Vehicle**, **Move to Sales**, **Deactivate / Retire**, and safe mistaken-entry deletion are now presented in the same vehicle workflow users already open from Fleet.
