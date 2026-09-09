@@ -1,6 +1,15 @@
-/* B5 v0.9.22 — supplier/GPS fleet filters + refined Action List */
+/* B5 v0.9.22a — refresh polish + reliable Action List controls */
 (()=>{
   Object.assign(state,{fleetSupplier:state.fleetSupplier||'',fleetGps:state.fleetGps||''});
+
+  /* Prime the requested route before app.js performs its first visible render.
+     Manager-only routes stay hidden until the existing access check has finished. */
+  const startupPages=new Set(['dashboard','today','availability','rentals','calendar','fleet','customers','suppliers','locations','expenses','reports','settings','manager','actionlist']);
+  const readStartupRoute=()=>{try{const raw=location.hash.replace(/^#\/?/,'');const [page='dashboard']=raw.split('/').map(decodeURIComponent);return startupPages.has(page)?page:'dashboard';}catch{return 'dashboard';}};
+  const startupPage=readStartupRoute(),startupRestricted=startupPage==='manager'||startupPage==='actionlist',startupApp=document.getElementById('app');
+  if(startupRestricted){if(startupApp)startupApp.style.visibility='hidden';}else state.page=startupPage;
+  const routedStart=window.startB5App;
+  window.startB5App=async function(){try{return await routedStart.apply(this,arguments);}finally{if(startupRestricted&&startupApp)requestAnimationFrame(()=>{startupApp.style.visibility='';});}};
 
   const baseFiltered=window.filteredFleetVehicles;
   window.filteredFleetVehicles=function(){
@@ -36,16 +45,23 @@
     return out;
   };
 
-  function enhanceActionList(){
-    const body=document.getElementById('actionListBody');if(!body||body.dataset.v0922)return;body.dataset.v0922='1';
+  function processActionList(body){
     const panel=body.closest('.panel'),head=panel?.querySelector('.panel-head');
     if(head&&!document.getElementById('addActionItemBtn')){const b=document.createElement('button');b.id='addActionItemBtn';b.className='btn btn-primary';b.type='button';b.textContent='+ Add New Action';b.onclick=openAddAction;head.appendChild(b);}
-    body.querySelectorAll('.action-category').forEach((section,index)=>{
-      const h=section.querySelector('h3');if(!h)return;const items=[...section.querySelectorAll('.action-item')],done=items.filter(x=>x.classList.contains('is-done')).length,cat=h.textContent.trim();
-      const key='b5-action-open:'+cat;const open=localStorage.getItem(key)==='1';
-      const toggle=document.createElement('button');toggle.type='button';toggle.className='action-category-toggle';toggle.innerHTML=`<span><strong>${escapeHtml(cat)}</strong><small>${done} of ${items.length} completed</small></span><span class="action-chevron">${open?'▾':'▸'}</span>`;
-      h.replaceWith(toggle);items.forEach(x=>x.hidden=!open);toggle.onclick=()=>{const now=items[0]?.hidden!==false;items.forEach(x=>x.hidden=!now);toggle.querySelector('.action-chevron').textContent=now?'▾':'▸';localStorage.setItem(key,now?'1':'0');};
+    body.querySelectorAll('.action-category').forEach(section=>{
+      const items=[...section.querySelectorAll('.action-item')];
+      let toggle=section.querySelector('.action-category-toggle'),cat=toggle?.dataset.category||'';
+      if(!toggle){const h=section.querySelector('h3');if(!h)return;cat=h.textContent.trim();toggle=document.createElement('button');toggle.type='button';toggle.className='action-category-toggle';toggle.dataset.category=cat;h.replaceWith(toggle);}
+      const done=items.filter(x=>x.classList.contains('is-done')).length,key='b5-action-open:'+cat,open=localStorage.getItem(key)==='1';
+      toggle.innerHTML=`<span><strong>${escapeHtml(cat)}</strong><small>${done} of ${items.length} completed</small></span><span class="action-chevron">${open?'▾':'▸'}</span>`;
+      toggle.setAttribute('aria-expanded',String(open));items.forEach(x=>x.hidden=!open);
+      toggle.onclick=()=>{const next=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(next));items.forEach(x=>x.hidden=!next);toggle.querySelector('.action-chevron').textContent=next?'▾':'▸';localStorage.setItem(key,next?'1':'0');};
     });
+  }
+  function enhanceActionList(){
+    const body=document.getElementById('actionListBody');if(!body)return;
+    if(!body._b5ActionObserver){body._b5ActionObserver=new MutationObserver(()=>processActionList(body));body._b5ActionObserver.observe(body,{childList:true});}
+    processActionList(body);
   }
   function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
   async function openAddAction(){
