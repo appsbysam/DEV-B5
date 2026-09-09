@@ -2,6 +2,12 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.24b — Fleet Sales Navigation Integration
+**Released: 9 September 2026**
+- Integrated **Fleet Sales** with B5's existing persistent `go()`/hash routing flow.
+- Fleet Sales now participates correctly in normal navigation, refresh restoration and browser history.
+- Retained the lifecycle data integration and new-booking protection from v0.9.24a.
+
 ## v0.9.24a — Fleet Lifecycle Data Fix
 **Released: 9 September 2026**
 - Fixed integration of the new lifecycle and sale database fields so they are retained in the live vehicle state after every Supabase load/refresh.
