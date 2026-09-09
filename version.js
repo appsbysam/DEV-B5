@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.20",
+  version: "0.9.21",
   build: "Demo Build",
   released: "2026-09-09",
-  title: "Editable Action List",
+  title: "Persistent Page Navigation",
   notes: [
-    "Added a three-dot edit control to every manager Action List item.",
-    "Managers can edit the requirement title and add or expand description and implementation notes.",
-    "Action List edits are saved in Supabase and recorded in the audit log with the before and after details.",
-    "Kept deletion out of the Action List to protect the original client requirements from accidental removal."
+    "Refreshing the app now returns you to the page you were viewing instead of always returning to Dashboard.",
+    "Manager Mode remembers its selected section when refreshed.",
+    "Current app location is stored in the URL hash so browser Back and Forward navigation can follow page changes.",
+    "Restricted manager-only pages safely fall back to Dashboard when the signed-in user does not have manager access."
   ]
 };
