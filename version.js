@@ -1,12 +1,11 @@
 window.B5_VERSION = {
-  version: "0.9.23",
+  version: "0.9.23a",
   build: "Demo Build",
   released: "2026-09-09",
-  title: "User Password Management",
+  title: "Window Focus Navigation Fix",
   notes: [
-    "Managers can reset a staff user's password from Manager Mode and issue a generated or chosen temporary password.",
-    "A manager-reset password automatically requires the user to choose a new password on their next login.",
-    "Signed-in users can now change their own password securely from My Profile.",
-    "Password changes use the existing B5 password policy and password-management actions are audit logged."
+    "Fixed navigation jumping back to an older remembered page after switching away from the B5 window and returning.",
+    "The currently visible page and Manager Mode section are now preserved if authentication/session startup is re-entered while the app is already running.",
+    "Normal browser refresh continues to restore the latest page from the URL route."
   ]
 };
