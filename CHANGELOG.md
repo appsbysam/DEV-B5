@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.22a — Navigation & Action List Polish
+**Released: 9 September 2026**
+- Changed refresh startup so the URL route is applied before the first visible app render, removing the brief Dashboard jump on normal pages.
+- Manager-only routes are kept hidden until the existing role/access check completes, avoiding an incorrect Dashboard or restricted-page flash.
+- Fixed Action List category enhancement timing so category controls are applied after the asynchronous checklist data has actually loaded.
+- Category headers now reliably expand/collapse and show their own completed/total counts.
+- Retained remembered open/closed category state on the device.
+
 ## v0.9.22 — Fleet Filters & Action List Refinement
 **Released: 9 September 2026**
 - Added Fleet filtering by individual external supplier/company as well as Own Fleet.
