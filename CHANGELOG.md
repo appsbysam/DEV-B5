@@ -2,6 +2,17 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.24 — Fleet Lifecycle & Sales
+**Released: 9 September 2026**
+- Added a dedicated **Fleet Sales** area with vehicles currently For Sale and permanent Sold Vehicle history.
+- Added vehicle lifecycle states for **Active**, **For Sale**, **Sold** and **Retired**, including reactivation.
+- Moving a vehicle to sales can remove it from hire immediately or allow its current rental to finish first; it is then excluded from new rental availability.
+- Added sale completion details: purchaser, sale date, sale price, odometer at sale and sale notes while preserving the vehicle's historical record.
+- Expanded Add/Edit Vehicle to capture make, model, year, registration, colour, category, transmission, fuel, seats, rate, odometer, GPS, source/supplier, purchase date/cost/currency and notes.
+- Added safe Deactivate/Retire controls and restricted permanent deletion to mistaken entries with no rental history.
+- Added lifecycle and sale fields to the Supabase vehicles table.
+- Completed the five Fleet & Vehicles Action List requirements introduced for this release.
+
 ## v0.9.23a — Window Focus Navigation Fix
 **Released: 9 September 2026**
 - Fixed the page rollback seen after Alt-Tabbing or switching away from B5 and returning to the window.
