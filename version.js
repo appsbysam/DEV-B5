@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.18",
+  version: "0.9.19",
   build: "Demo Build",
-  released: "2026-09-08",
-  title: "First Login Authentication Fix",
+  released: "2026-09-09",
+  title: "Manager Action List",
   notes: [
-    "Hardened the first-login password-change flow so it verifies and restores the authenticated Supabase session before changing a temporary password.",
-    "Added protection against duplicate sign-in/auth-state handling while the same user is entering the app.",
-    "New and recovered passwords must be at least 8 characters and contain an uppercase letter, lowercase letter, number and symbol.",
-    "Updated first-login guidance so staff can see the password requirements before submitting."
+    "Added a manager-only Action List containing the consolidated B5 client requirements and outstanding work.",
+    "Managers can tick completed items or reopen them, with status saved permanently in Supabase.",
+    "Every Action List status change is recorded in the existing audit log with the responsible manager.",
+    "Added progress tracking and grouped requirements for fleet, rentals, customers, payments, reports, suppliers, system and marketing work."
   ]
 };
