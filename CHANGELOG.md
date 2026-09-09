@@ -2,6 +2,13 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.20 — Editable Action List
+**Released: 9 September 2026**
+- Added a three-dot control to the far right of every manager Action List item.
+- Managers can edit each requirement title and its description/additional notes from a dedicated popup.
+- Edits are stored persistently in Supabase and every edit is written to the audit log with the before/after details.
+- Deliberately excluded a delete option to protect client requirements from accidental removal.
+
 ## v0.9.19 — Manager Action List
 **Released: 9 September 2026**
 - Added a manager-only **Action List** to the sidebar containing the consolidated B5 client requirements and outstanding work.
