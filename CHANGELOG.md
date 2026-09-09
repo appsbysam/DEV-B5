@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.19 — Manager Action List
+**Released: 9 September 2026**
+- Added a manager-only **Action List** to the sidebar containing the consolidated B5 client requirements and outstanding work.
+- Added persistent check/uncheck status stored in Supabase with manager-only RLS protection.
+- Every Action List status change is recorded in the existing audit log, including the responsible manager and whether the item was completed or reopened.
+- Added grouped requirements and an overall completion count/percentage.
+- Seeded the checklist with the agreed completed and outstanding items covering fleet, rentals, customers, payments, reports, suppliers, system/business setup and marketing.
+
 ## v0.9.18 — First Login Authentication Fix
 **Released: 8 September 2026**
 - Hardened the first-login temporary-password workflow so B5 verifies/restores the authenticated Supabase session before attempting `updateUser`, preventing the observed **Auth session missing** failure.
