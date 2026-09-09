@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.24e",
+  version: "0.9.24f",
   build: "Demo Build",
-  released: "2026-09-09",
-  title: "Action List Completion Sync",
+  released: "2026-09-10",
+  title: "Action List Freeze Fix",
   notes: [
-    "Fixed Action List category totals so the displayed completed count reflects the current Supabase checklist state after refresh.",
-    "Categories automatically highlight green when every action in that category is completed.",
-    "If a new incomplete action is later added to a completed category, the category automatically returns to the normal grey state."
+    "Fixed the Action List freeze introduced by the completed-category highlighting update.",
+    "Removed the MutationObserver feedback loop while retaining live category completion counts and green completed-category headers.",
+    "Completed categories still return to grey automatically when a new incomplete action is added."
   ]
 };
-(()=>{const s=document.createElement('script');s.src='v0924d.js?v=0.9.24e';s.defer=true;document.head.appendChild(s);})();
+(()=>{const s=document.createElement('script');s.src='v0924d.js?v=0.9.24f';s.defer=true;document.head.appendChild(s);})();
