@@ -2,6 +2,12 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.22b — Action List Collapse Fix
+**Released: 9 September 2026**
+- Fixed the Action List category collapse behaviour so checklist rows are actually hidden when their category is collapsed.
+- Added an explicit hidden-state CSS rule to prevent the Action List grid display rule from overriding the browser's `hidden` attribute.
+- Preserved the existing expand/collapse arrows and remembered open/closed category state.
+
 ## v0.9.22a — Navigation & Action List Polish
 **Released: 9 September 2026**
 - Changed refresh startup so the URL route is applied before the first visible app render, removing the brief Dashboard jump on normal pages.
