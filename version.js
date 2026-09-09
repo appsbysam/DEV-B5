@@ -9,3 +9,4 @@ window.B5_VERSION = {
     "Incorrect confirmation text or cancelling either step leaves the vehicle untouched."
   ]
 };
+(()=>{const s=document.createElement('script');s.src='v0924d.js?v=0.9.24d';s.defer=true;document.head.appendChild(s);})();
