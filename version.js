@@ -1,13 +1,13 @@
 window.B5_VERSION = {
-  version: "0.9.22",
+  version: "0.9.22a",
   build: "Demo Build",
   released: "2026-09-09",
-  title: "Fleet Filters & Action List Refinement",
+  title: "Navigation & Action List Polish",
   notes: [
-    "Added individual company/supplier filtering to the Fleet screen, including Own Fleet.",
-    "Added GPS filtering for all vehicles, GPS fitted, or no GPS.",
-    "Action List categories are now collapsible and show completed-item progress.",
-    "Managers can add new Action List items with a title, description and existing category.",
-    "Expanded/collapsed Action List categories are remembered on the device."
+    "Refresh now restores the current page before the first visible app render, removing the brief Dashboard jump.",
+    "Manager-only routes remain hidden until access is confirmed so restricted pages do not flash incorrectly.",
+    "Fixed Action List category headers so they reliably expand and collapse after the checklist finishes loading.",
+    "Each Action List category now displays its own completed-versus-total count.",
+    "Expanded and collapsed category choices continue to be remembered on the device."
   ]
 };
