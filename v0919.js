@@ -1,48 +1,25 @@
-/* v0.9.19 — Manager Action List */
+/* v0.9.20 — Editable Manager Action List */
 (()=>{
-  const $=(s,r=document)=>r.querySelector(s);
+  const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
   const esc2=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
   const originalRender=window.render;
-
+  let actionItems=[];
   function manager(){ return window.state?.userProfile?.role==='manager' || (typeof isManager==='function' && isManager()); }
-
-  function ensureNav(){
-    const nav=$('#nav'); if(!nav) return;
-    let btn=$('#actionListNav');
-    if(!btn){
-      btn=document.createElement('button'); btn.id='actionListNav'; btn.className='nav-btn manager-only'; btn.dataset.page='actionlist'; btn.textContent='Action List';
-      const managerBtn=$('#managerNav'); nav.insertBefore(btn,managerBtn||null);
-      btn.onclick=()=>{ if(!manager()) return; state.page='actionlist'; render(); document.body.classList.remove('sidebar-open'); };
-    }
-    btn.hidden=!manager();
-  }
-
+  function ensureNav(){const nav=$('#nav');if(!nav)return;let btn=$('#actionListNav');if(!btn){btn=document.createElement('button');btn.id='actionListNav';btn.className='nav-btn manager-only';btn.dataset.page='actionlist';btn.textContent='Action List';const managerBtn=$('#managerNav');nav.insertBefore(btn,managerBtn||null);btn.onclick=()=>{if(!manager())return;state.page='actionlist';render();document.body.classList.remove('sidebar-open');};}btn.hidden=!manager();}
   async function renderActionList(){
-    if(!manager()){ state.page='dashboard'; return originalRender(); }
-    const title=$('#pageTitle'),sub=$('#pageSubtitle'),content=$('#content');
-    if(title) title.textContent='Action List'; if(sub) sub.textContent='B5 client requirements and implementation checklist';
-    $$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page==='actionlist'));
-    content.innerHTML='<div class="panel"><div class="panel-head"><div><h2>Client Requirements</h2><p>Manager-only working checklist. Every status change is recorded in the audit log.</p></div></div><div id="actionListBody" class="action-list-loading">Loading…</div></div>';
-    const {data,error}=await window.db.from('action_items').select('*').order('sort_order');
-    const body=$('#actionListBody'); if(!body) return;
-    if(error){ body.innerHTML='<div class="empty-state">Could not load the action list.</div>'; return; }
-    const groups={}; (data||[]).forEach(x=>(groups[x.category]??=[]).push(x));
-    const done=(data||[]).filter(x=>x.completed).length,total=(data||[]).length;
-    body.innerHTML=`<div class="action-summary"><strong>${done} of ${total} completed</strong><span>${total?Math.round(done/total*100):0}%</span></div>`+Object.entries(groups).map(([cat,items])=>`<section class="action-category"><h3>${esc2(cat)}</h3>${items.map(i=>`<label class="action-item ${i.completed?'is-done':''}"><input type="checkbox" data-action-id="${i.id}" ${i.completed?'checked':''}><span><strong>${esc2(i.title)}</strong>${i.notes?`<small>${esc2(i.notes)}</small>`:''}</span></label>`).join('')}</section>`).join('');
-    body.querySelectorAll('[data-action-id]').forEach(cb=>cb.onchange=()=>toggleItem(cb));
+    if(!manager()){state.page='dashboard';return originalRender();}
+    const title=$('#pageTitle'),sub=$('#pageSubtitle'),content=$('#content');if(title)title.textContent='Action List';if(sub)sub.textContent='B5 client requirements and implementation checklist';$$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.page==='actionlist'));
+    content.innerHTML='<div class="panel"><div class="panel-head"><div><h2>Client Requirements</h2><p>Manager-only working checklist. Status changes and edits are recorded in the audit log.</p></div></div><div id="actionListBody" class="action-list-loading">Loading…</div></div>';
+    const {data,error}=await window.db.from('action_items').select('*').order('sort_order');const body=$('#actionListBody');if(!body)return;if(error){body.innerHTML='<div class="empty-state">Could not load the action list.</div>';return;}actionItems=data||[];
+    const groups={};actionItems.forEach(x=>(groups[x.category]??=[]).push(x));const done=actionItems.filter(x=>x.completed).length,total=actionItems.length;
+    body.innerHTML=`<div class="action-summary"><strong>${done} of ${total} completed</strong><span>${total?Math.round(done/total*100):0}%</span></div>`+Object.entries(groups).map(([cat,items])=>`<section class="action-category"><h3>${esc2(cat)}</h3>${items.map(i=>`<div class="action-item ${i.completed?'is-done':''}"><input type="checkbox" data-action-id="${i.id}" ${i.completed?'checked':''}><div class="action-copy"><strong>${esc2(i.title)}</strong>${i.notes?`<small>${esc2(i.notes)}</small>`:''}</div><button type="button" class="action-more" data-edit-id="${i.id}" aria-label="Edit ${esc2(i.title)}">⋮</button></div>`).join('')}</section>`).join('');
+    body.querySelectorAll('[data-action-id]').forEach(cb=>cb.onchange=()=>toggleItem(cb));body.querySelectorAll('[data-edit-id]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();openEdit(btn.dataset.editId);});
   }
-
-  async function toggleItem(cb){
-    const id=cb.dataset.actionId, completed=cb.checked, label=cb.closest('.action-item'), title=label?.querySelector('strong')?.textContent||'Action item';
-    cb.disabled=true;
-    const {data:userData}=await window.db.auth.getUser(); const uid=userData?.user?.id||null;
-    const {error}=await window.db.from('action_items').update({completed,updated_at:new Date().toISOString(),updated_by:uid}).eq('id',id);
-    if(error){ cb.checked=!completed; cb.disabled=false; alert('Could not update this item.'); return; }
-    if(typeof window.logAudit==='function') await window.logAudit(completed?'action_item_completed':'action_item_reopened','action_item',id,{title,completed});
-    renderActionList();
+  async function toggleItem(cb){const id=cb.dataset.actionId,completed=cb.checked,item=actionItems.find(x=>String(x.id)===String(id)),title=item?.title||'Action item';cb.disabled=true;const {data:userData}=await window.db.auth.getUser();const uid=userData?.user?.id||null;const {error}=await window.db.from('action_items').update({completed,updated_at:new Date().toISOString(),updated_by:uid}).eq('id',id);if(error){cb.checked=!completed;cb.disabled=false;alert('Could not update this item.');return;}if(typeof window.logAudit==='function')await window.logAudit(completed?'action_item_completed':'action_item_reopened','action_item',id,{title,completed});renderActionList();}
+  function openEdit(id){
+    if(!manager())return;const item=actionItems.find(x=>String(x.id)===String(id));if(!item)return;
+    const dlg=document.createElement('dialog');dlg.className='action-edit-dialog';dlg.innerHTML=`<form method="dialog" class="action-edit-card"><div class="modal-head"><div><h3>Edit Action Item</h3><div class="vehicle-meta">Update the requirement or add more detail.</div></div><button class="icon-btn" type="button" data-close aria-label="Close">✕</button></div><div class="field"><label>Title</label><input name="title" maxlength="160" value="${esc2(item.title)}" required></div><div class="field"><label>Description / Additional Notes</label><textarea name="notes" rows="7" placeholder="Add any extra information, clarification or implementation notes here…">${esc2(item.notes||'')}</textarea></div><div class="modal-actions"><button class="btn btn-secondary" type="button" data-cancel>Cancel</button><button class="btn btn-primary" type="submit">Save Changes</button></div></form>`;
+    document.body.appendChild(dlg);const close=()=>{dlg.close();dlg.remove();};dlg.querySelector('[data-close]').onclick=close;dlg.querySelector('[data-cancel]').onclick=close;dlg.addEventListener('cancel',e=>{e.preventDefault();close();});dlg.querySelector('form').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,newTitle=form.title.value.trim(),newNotes=form.notes.value.trim();if(!newTitle)return;const save=form.querySelector('[type="submit"]');save.disabled=true;const {data:userData}=await window.db.auth.getUser();const uid=userData?.user?.id||null;const before={title:item.title,notes:item.notes||''};const {error}=await window.db.from('action_items').update({title:newTitle,notes:newNotes||null,updated_at:new Date().toISOString(),updated_by:uid}).eq('id',item.id);if(error){save.disabled=false;alert('Could not save this action item.');return;}if(typeof window.logAudit==='function')await window.logAudit('action_item_edited','action_item',item.id,{before,after:{title:newTitle,notes:newNotes}});close();renderActionList();};dlg.showModal();
   }
-
-  window.render=function(){ ensureNav(); if(state.page==='actionlist') return renderActionList(); return originalRender.apply(this,arguments); };
-  document.addEventListener('DOMContentLoaded',ensureNav);
-  setTimeout(ensureNav,800);
+  window.render=function(){ensureNav();if(state.page==='actionlist')return renderActionList();return originalRender.apply(this,arguments);};document.addEventListener('DOMContentLoaded',ensureNav);setTimeout(ensureNav,800);
 })();
