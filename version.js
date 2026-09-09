@@ -1,11 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.24c",
+  version: "0.9.24d",
   build: "Demo Build",
   released: "2026-09-09",
-  title: "Fleet Lifecycle UI Completion",
+  title: "Vehicle Delete Safeguard",
   notes: [
-    "Added lifecycle controls directly into the existing Fleet vehicle details popup, including Move to Sales and Deactivate / Retire.",
-    "Added a dedicated Deactivated / Retired Vehicles section to Fleet Sales with Reactivate controls.",
-    "Added visible Edit, Record Sale, Reactivate and safe mistaken-entry controls to the appropriate lifecycle sections."
+    "Added a second confirmation step before a vehicle can be permanently deleted.",
+    "After accepting the existing warning, the user must type DELETE into a confirmation field before permanent deletion proceeds.",
+    "Incorrect confirmation text or cancelling either step leaves the vehicle untouched."
   ]
 };
+(()=>{const s=document.createElement('script');s.src='v0924d.js?v=0.9.24d';s.defer=true;document.head.appendChild(s);})();
