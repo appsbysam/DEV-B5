@@ -2,6 +2,12 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.23a — Window Focus Navigation Fix
+**Released: 9 September 2026**
+- Fixed the page rollback seen after Alt-Tabbing or switching away from B5 and returning to the window.
+- Authentication/session re-entry now preserves the page and Manager Mode section that are currently visible instead of reapplying the route captured when the page first loaded.
+- Normal F5/browser refresh continues to restore the latest URL route.
+
 ## v0.9.23 — User Password Management
 **Released: 9 September 2026**
 - Added manager-controlled password resets from **Manager Mode → Users**.
