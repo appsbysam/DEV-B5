@@ -2,6 +2,12 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.24a — Fleet Lifecycle Data Fix
+**Released: 9 September 2026**
+- Fixed integration of the new lifecycle and sale database fields so they are retained in the live vehicle state after every Supabase load/refresh.
+- Ensured every **For Sale** vehicle is excluded from new availability searches and new bookings, including vehicles that are still completing an existing rental.
+- Preserved all Fleet Sales, sold-history, vehicle management and sale-recording features introduced in v0.9.24.
+
 ## v0.9.24 — Fleet Lifecycle & Sales
 **Released: 9 September 2026**
 - Added a dedicated **Fleet Sales** area with vehicles currently For Sale and permanent Sold Vehicle history.
