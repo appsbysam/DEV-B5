@@ -2,6 +2,21 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.22 — Fleet Filters & Action List Refinement
+**Released: 9 September 2026**
+- Added Fleet filtering by individual external supplier/company as well as Own Fleet.
+- Added GPS filtering for all vehicles, GPS fitted, or no GPS.
+- Made Action List categories collapsible with per-category completed/total progress and remembered open/closed state.
+- Added manager-only **Add New Action** with title, description/additional notes and existing-category selection.
+- New Action List items are stored in Supabase as incomplete items and creation is written to the audit log.
+
+## v0.9.21 — Persistent Page Navigation
+**Released: 9 September 2026**
+- Refreshing the app now restores the current page instead of always returning to Dashboard.
+- Manager Mode restores its selected section on refresh.
+- Current location is stored in the URL hash for refresh and browser navigation support.
+- Restricted manager-only routes fall back safely for non-managers.
+
 ## v0.9.20 — Editable Action List
 **Released: 9 September 2026**
 - Added a three-dot control to the far right of every manager Action List item.
@@ -68,7 +83,7 @@ All notable changes to dev-B5 are recorded here.
 - Added the correct mobile content offset so page content starts below the fixed header instead of being obscured by it.
 - Added safe-area handling for mobile devices with display cut-outs/status areas.
 - Ensured the open sidebar and its backdrop layer above the fixed header.
-- No Supabase/database changes were required.
+- No Supabase schema changes were required.
 
 ## v0.9.14 — Operational Controls & Customer Accounts
 **Released: 27 August 2026**
