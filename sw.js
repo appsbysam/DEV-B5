@@ -1,1 +1,1 @@
-const B5_CACHE='b5-shell-0.9.25a';
+const B5_CACHE='b5-shell-0.9.25b';
