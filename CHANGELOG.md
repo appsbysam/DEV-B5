@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.28 — Supplier Management & Birthday Messages
+**Released: 10 September 2026**
+- Audited the Suppliers Action List against the existing app and completed the remaining supplier workflows.
+- Preserved the existing supplier management, edit/deactivate and cars-supplied functionality, and added safe permanent deletion for suppliers with no linked history.
+- Added supplier types for vehicle, tyre, brake, parts, product and service suppliers.
+- Added persistent products/services supplier history, including date, type, description, amount, vehicle, reference and notes.
+- Added a per-customer Happy Birthday message preference. It can only be enabled when the customer has a date of birth and provides a prepared WhatsApp birthday message for staff.
+
 ## v0.9.27 — Monthly Reminders & Calendar Filters
 **Released: 10 September 2026**
 - Added per-customer monthly reminder preferences: Automatic Email, Automatic SMS, Automatic Email + SMS, Manager Review / Manual Send, and Automatic WhatsApp.
