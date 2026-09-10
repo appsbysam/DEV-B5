@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.29 — Client Testing Checklist
+**Released: 10 September 2026**
+- Added a temporary 73-item operational client acceptance-testing checklist, grouped by B5 business area.
+- Added per-tester statuses: Not Tested, Passed, Needs Fixing and Retest Required.
+- Automatically records the signed-in tester against each result and displays status counts with tester names available from each status bubble.
+- Requires a comment when a tester selects Needs Fixing and retains the tester's latest result plus an audit/history record.
+- Added progress totals at the top of the testing page and a temporary Client Testing navigation entry separate from the Manager Action List.
+
 ## v0.9.28 — Supplier Management & Birthday Messages
 **Released: 10 September 2026**
 - Audited the Suppliers Action List against the existing app and completed the remaining supplier workflows.
@@ -78,27 +86,3 @@ All notable changes to dev-B5 are recorded here.
 ## v0.9.19 — Manager Action List
 **Released: 9 September 2026**
 - Added the manager-only persistent Action List.
-
-## v0.9.18 — First Login Authentication Fix
-**Released: 8 September 2026**
-- Hardened first-login temporary-password handling and password policy.
-
-## v0.9.17 — Customer Database Search
-**Released: 8 September 2026**
-- Added live Customer search across name, phone, email, licence and passport details.
-
-## v0.9.16 — Secure Contract Signing
-**Released: 8 September 2026**
-- Added secure browser-based contract signing.
-
-## v0.9.15 — Fixed Mobile Navigation Header
-**Released: 27 August 2026**
-- Made the mobile navigation header fixed while scrolling.
-
-## v0.9.14 — Operational Controls & Customer Accounts
-**Released: 27 August 2026**
-- Added customer filtering, GPS, discount approvals, contract protections and monthly-account controls.
-
-## v0.9.13 — Seamless Vehicle Action Modals
-**Released: 25 August 2026**
-- Kept vehicle financial and maintenance actions inside the open vehicle context.
