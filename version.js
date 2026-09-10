@@ -1,12 +1,12 @@
 window.B5_VERSION = {
-  version: "0.9.25a",
+  version: "0.9.25b",
   build: "Demo Build",
   released: "2026-09-10",
-  title: "Scroll Persistence & Customer Search",
+  title: "Focus Refresh Fix",
   notes: [
-    "Refreshing now restores the current page at the same vertical scroll position instead of returning to the top.",
-    "Added live Customer search across name, phone, email, licence number and passport number.",
-    "Customer search shows a live matching-record count and keeps customer rows directly selectable."
+    "Switching browser tabs or Alt-Tabbing away and back no longer triggers an unnecessary app re-render.",
+    "Silent Supabase token refreshes now keep the current screen exactly as-is while preserving the signed-in session.",
+    "Normal browser refresh, route restoration, scroll restoration and navigation continue to work as before."
   ]
 };
-(()=>{const load=(src)=>{const s=document.createElement('script');s.src=src;s.defer=true;document.head.appendChild(s);};load('v0924d.js?v=0.9.25a');load('v0925.js?v=0.9.25a');load('v0925a.js?v=0.9.25a');})();
+(()=>{const load=(src)=>{const s=document.createElement('script');s.src=src;s.defer=true;document.head.appendChild(s);};load('v0924d.js?v=0.9.25b');load('v0925.js?v=0.9.25b');load('v0925a.js?v=0.9.25b');})();
