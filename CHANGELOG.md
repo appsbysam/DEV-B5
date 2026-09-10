@@ -2,6 +2,16 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.31 — Unified Customer & Rental Modals
+**Released: 10 September 2026**
+- Streamlined the Rental, Customer Profile and Add Customer dialogs so they use a more consistent modal layout, spacing and footer treatment.
+- Reworked Monthly account from a large full-width control into a compact inline option while preserving existing account/reminder behaviour.
+- Kept rental actions, monthly reminder preferences and birthday-message functionality unchanged.
+
+## v0.9.30 — Customer Search Cleanup
+**Released: 10 September 2026**
+- Removed the two redundant customer search bars and retained the existing working customer search.
+
 ## v0.9.29 — Client Testing Checklist
 **Released: 10 September 2026**
 - Added a temporary 73-item operational client acceptance-testing checklist, grouped by B5 business area.
