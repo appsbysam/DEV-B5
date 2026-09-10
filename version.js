@@ -1,13 +1,13 @@
 window.B5_VERSION = {
-  version: "0.9.28",
+  version: "0.9.29",
   build: "Demo Build",
   released: "2026-09-10",
-  title: "Supplier Management & Birthday Messages",
+  title: "Client Testing Checklist",
   notes: [
-    "Completed supplier management with add, edit, safe delete/deactivate and retained supplier history.",
-    "Added supplier types for vehicle, tyres, brakes, parts, product and service suppliers.",
-    "Added cars-supplied visibility and a persistent products/services history for every supplier.",
-    "Added an optional customer Happy Birthday message preference that can only be enabled when a date of birth is recorded."
+    "Added a temporary 73-item operational Client Testing checklist for client acceptance testing.",
+    "Added per-tester statuses: Not Tested, Passed, Needs Fixing and Retest Required.",
+    "Recorded tester identity automatically from the signed-in B5 account, with tester counts and names visible from each status bubble.",
+    "Added required comments for Needs Fixing, persistent tester results, progress summaries and testing history."
   ]
 };
-(()=>{const load=(src)=>{const s=document.createElement('script');s.src=src;s.defer=true;document.head.appendChild(s);};load('v0924d.js?v=0.9.28');load('v0925.js?v=0.9.28');load('v0925a.js?v=0.9.28');load('v0926.js?v=0.9.28');load('v0927.js?v=0.9.28');load('v0928.js?v=0.9.28');})();
+(()=>{const load=(src)=>{const s=document.createElement('script');s.src=src;s.defer=true;document.head.appendChild(s);};load('v0924d.js?v=0.9.29');load('v0925.js?v=0.9.29');load('v0925a.js?v=0.9.29');load('v0926.js?v=0.9.29');load('v0927.js?v=0.9.29');load('v0928.js?v=0.9.29');load('v0929.js?v=0.9.29');})();

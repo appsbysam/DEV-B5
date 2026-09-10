@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.29 — Client Testing Checklist
+**Released: 10 September 2026**
+- Added a temporary 73-item operational client acceptance-testing checklist, grouped by B5 business area.
+- Added per-tester statuses: Not Tested, Passed, Needs Fixing and Retest Required.
+- Automatically records the signed-in tester against each result and displays status counts with tester names available from each status bubble.
+- Requires a comment when a tester selects Needs Fixing and retains the tester's latest result plus an audit/history record.
+- Added progress totals at the top of the testing page and a temporary Client Testing navigation entry separate from the Manager Action List.
+
 ## v0.9.28 — Supplier Management & Birthday Messages
 **Released: 10 September 2026**
 - Audited the Suppliers Action List against the existing app and completed the remaining supplier workflows.
