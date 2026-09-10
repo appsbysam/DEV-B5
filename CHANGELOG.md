@@ -2,227 +2,73 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.25a — Scroll Persistence & Customer Search
+**Released: 10 September 2026**
+- Refreshing the app now restores the same vertical scroll position on the current page instead of jumping to the top.
+- Preserved the existing current-page/hash refresh behaviour.
+- Restored a permanent live search field to Customers, matching name, phone/mobile, email, licence number and passport number.
+- Added a live matching-customer count while retaining direct customer-row access.
+
+## v0.9.25 — Reports Completion & Future Income
+**Released: 10 September 2026**
+- Completed the remaining Reports requirements.
+- Added a combined individual-vehicle report showing rental income, vehicle expenses and net result.
+- Added an overall business income, expense and net-result report.
+- Consolidated expected income into Next 7 days, Next calendar month and Custom date range selections.
+
 ## v0.9.24h — Action List & Mobile Navigation Fix
 **Released: 10 September 2026**
-- Restored Action List category expand/collapse controls and green completed-category highlighting after asynchronous checklist loads and checkbox status changes.
-- Reapplies the Action List presentation after database-driven list rebuilds without observing its own nested presentation changes, avoiding the earlier freeze loop.
-- Added a direct mobile sidebar safeguard so tapping any navigation item closes the sidebar after navigation.
-
-## v0.9.24c — Fleet Lifecycle UI Completion
-**Released: 9 September 2026**
-- Fixed the missing lifecycle controls in the existing Fleet vehicle-details popup: **Edit Vehicle**, **Move to Sales**, **Deactivate / Retire**, and safe mistaken-entry deletion are now presented in the same vehicle workflow users already open from Fleet.
-- Added **Deactivated / Retired Vehicles** as a third Fleet Sales section alongside Vehicles For Sale and Sold Vehicles / History.
-- Retired vehicles now have a visible **Reactivate Vehicle** action; For Sale vehicles have **Record Sale** and **Return to Active Fleet** actions.
-- Lifecycle controls are also visible directly on Fleet Sales cards, rather than depending on a separate hidden profile UI.
-- Kept For Sale, Retired and Sold vehicles out of the normal active Fleet board and blocked them from all new rental availability while preserving history.
-
-## v0.9.24b — Fleet Sales Navigation Integration
-**Released: 9 September 2026**
-- Integrated **Fleet Sales** with B5's existing persistent `go()`/hash routing flow.
-- Fleet Sales now participates correctly in normal navigation, refresh restoration and browser history.
-- Retained the lifecycle data integration and new-booking protection from v0.9.24a.
-
-## v0.9.24a — Fleet Lifecycle Data Fix
-**Released: 9 September 2026**
-- Fixed integration of the new lifecycle and sale database fields so they are retained in the live vehicle state after every Supabase load/refresh.
-- Ensured every **For Sale** vehicle is excluded from new availability searches and new bookings, including vehicles that are still completing an existing rental.
-- Preserved all Fleet Sales, sold-history, vehicle management and sale-recording features introduced in v0.9.24.
+- Restored Action List category expand/collapse controls and completed-category highlighting.
+- Added a direct mobile sidebar safeguard so selecting navigation closes the sidebar.
 
 ## v0.9.24 — Fleet Lifecycle & Sales
 **Released: 9 September 2026**
-- Added a dedicated **Fleet Sales** area with vehicles currently For Sale and permanent Sold Vehicle history.
-- Added vehicle lifecycle states for **Active**, **For Sale**, **Sold** and **Retired**, including reactivation.
-- Moving a vehicle to sales can remove it from hire immediately or allow its current rental to finish first; it is then excluded from new rental availability.
-- Added sale completion details: purchaser, sale date, sale price, odometer at sale and sale notes while preserving the vehicle's historical record.
-- Expanded Add/Edit Vehicle to capture make, model, year, registration, colour, category, transmission, fuel, seats, rate, odometer, GPS, source/supplier, purchase date/cost/currency and notes.
-- Added safe Deactivate/Retire controls and restricted permanent deletion to mistaken entries with no rental history.
-- Added lifecycle and sale fields to the Supabase vehicles table.
-- Completed the five Fleet & Vehicles Action List requirements introduced for this release.
+- Added Fleet Sales, vehicle lifecycle controls, sale recording and expanded vehicle management.
 
 ## v0.9.23a — Window Focus Navigation Fix
 **Released: 9 September 2026**
-- Fixed the page rollback seen after Alt-Tabbing or switching away from B5 and returning to the window.
-- Authentication/session re-entry now preserves the page and Manager Mode section that are currently visible instead of reapplying the route captured when the page first loaded.
-- Normal F5/browser refresh continues to restore the latest URL route.
+- Fixed page rollback after switching away from B5 and returning while preserving normal refresh routing.
 
 ## v0.9.23 — User Password Management
 **Released: 9 September 2026**
-- Added manager-controlled password resets from **Manager Mode → Users**.
-- Managers can generate or enter a temporary password for an existing user; the reset is performed securely by the existing manager-only Supabase Edge Function.
-- A manager-reset password automatically sets **must change password**, so the user must replace the temporary password on their next login.
-- Added self-service **Change Password** controls to **My Profile** for any signed-in user.
-- Applied the existing B5 password policy to manager resets and self-service password changes.
-- Manager password resets and self-service password changes are recorded in the audit log.
-- Added **User password management** to the Manager Action List and marked it completed.
-
-## v0.9.22b — Action List Collapse Fix
-**Released: 9 September 2026**
-- Fixed the Action List category collapse behaviour so checklist rows are actually hidden when their category is collapsed.
-- Added an explicit hidden-state CSS rule to prevent the Action List grid display rule from overriding the browser's `hidden` attribute.
-- Preserved the existing expand/collapse arrows and remembered open/closed category state.
-
-## v0.9.22a — Navigation & Action List Polish
-**Released: 9 September 2026**
-- Changed refresh startup so the URL route is applied before the first visible app render, removing the brief Dashboard jump on normal pages.
-- Manager-only routes are kept hidden until the existing role/access check completes, avoiding an incorrect Dashboard or restricted-page flash.
-- Fixed Action List category enhancement timing so category controls are applied after the asynchronous checklist data has actually loaded.
-- Category headers now reliably expand/collapse and show their own completed/total counts.
-- Retained remembered open/closed category state on the device.
+- Added manager password resets and self-service password changes.
 
 ## v0.9.22 — Fleet Filters & Action List Refinement
 **Released: 9 September 2026**
-- Added Fleet filtering by individual external supplier/company as well as Own Fleet.
-- Added GPS filtering for all vehicles, GPS fitted, or no GPS.
-- Made Action List categories collapsible with per-category completed/total progress and remembered open/closed state.
-- Added manager-only **Add New Action** with title, description/additional notes and existing-category selection.
-- New Action List items are stored in Supabase as incomplete items and creation is written to the audit log.
+- Added Fleet filters and Action List category controls.
 
 ## v0.9.21 — Persistent Page Navigation
 **Released: 9 September 2026**
-- Refreshing the app now restores the current page instead of always returning to Dashboard.
-- Manager Mode restores its selected section on refresh.
-- Current location is stored in the URL hash for refresh and browser navigation support.
-- Restricted manager-only routes fall back safely for non-managers.
+- Refreshing restores the current page and Manager subsection through URL routing.
 
 ## v0.9.20 — Editable Action List
 **Released: 9 September 2026**
-- Added a three-dot control to the far right of every manager Action List item.
-- Managers can edit each requirement title and its description/additional notes from a dedicated popup.
-- Edits are stored persistently in Supabase and every edit is written to the audit log with the before/after details.
-- Deliberately excluded a delete option to protect client requirements from accidental removal.
+- Added editing for Action List requirements.
 
 ## v0.9.19 — Manager Action List
 **Released: 9 September 2026**
-- Added a manager-only **Action List** to the sidebar containing the consolidated B5 client requirements and outstanding work.
-- Added persistent check/uncheck status stored in Supabase with manager-only RLS protection.
-- Every Action List status change is recorded in the existing audit log, including the responsible manager and whether the item was completed or reopened.
-- Added grouped requirements and an overall completion count/percentage.
-- Seeded the checklist with the agreed completed and outstanding items covering fleet, rentals, customers, payments, reports, suppliers, system/business setup and marketing.
+- Added the manager-only persistent Action List.
 
 ## v0.9.18 — First Login Authentication Fix
 **Released: 8 September 2026**
-- Hardened the first-login temporary-password workflow so B5 verifies/restores the authenticated Supabase session before attempting `updateUser`, preventing the observed **Auth session missing** failure.
-- Added a guard against duplicate `SIGNED_IN`/manual login processing for the same user while the password gate is opening.
-- First-login and password-recovery screens now enforce the requested password rule: minimum 8 characters with at least one uppercase letter, one lowercase letter, one number and one symbol.
-- Added visible first-login password guidance before submission.
-- No database schema changes were required.
+- Hardened first-login temporary-password handling and password policy.
 
 ## v0.9.17 — Customer Database Search
 **Released: 8 September 2026**
-- Added a permanent live search/filter field to the main **Customers** database screen.
-- Results narrow immediately as staff type, with matching across customer name, phone numbers, email, licence number and passport number.
-- Filtered customer rows remain directly tappable/clickable and keyboard selectable to open the customer's account and rental history.
-- Added a live result count showing the number of matching customer records.
-- No Supabase/database changes were required.
-
-## v0.9.16b — Contract Signature Integration Fix
-**Released: 8 September 2026**
-- Fixed the v0.9.16a contract-page integration so the signature enhancement reliably detects the loaded contract and renders the signing panels.
-- Updated the contract signing CSS/JS asset revisions to `0.9.16b` to force a fresh browser load.
-- Preserved the original signature field IDs behind the enhanced panels so the existing contract form-data and PDF workflow remain compatible.
-- Added a contract-loaded listener plus a guarded load check for reliable rendering regardless of script/load timing.
-- Prevented signatures from being cleared or replaced after a contract is finalised/closed.
-- No customer-search changes are included in this release.
-
-## v0.9.16a — Contract Signature Panels
-**Released: 8 September 2026**
-- Upgraded the existing contract signature areas with restrained pale blue-grey signing panels while preserving the approved contract layout and vehicle-damage workflow.
-- Added direct in-contract signature capture for lessee and management using finger, stylus or mouse.
-- Stored signatures render back into the contract with signer name and Sydney date/time and are captured by the existing HTML-to-PDF workflow.
-- Added awaiting-signature states, clear/replace controls, and clean white signature surfaces for legible PDF output.
-- Added a discreet verification strip containing contract number, signing time and an `ASR-` verification ID.
-- Added `contract-signing.css` and `contract-signing.js`; the contract page loads this enhancement layer through its existing Supabase bootstrap so the large approved contract template itself does not need to be restructured.
+- Added live Customer search across name, phone, email, licence and passport details.
 
 ## v0.9.16 — Secure Contract Signing
 **Released: 8 September 2026**
-- Added secure browser-based signing links for rental contracts; recipients do not need a B5 account or PDF software.
-- Added touch/stylus/mouse signature capture with full signer name and signing timestamp retained against the contract.
-- Added separate retained lessee and management signature fields to the contract record.
-- Added one-contract signing tokens stored only as SHA-256 hashes, with seven-day expiry and single-use signed status.
-- Added `contract_signing_requests` with RLS for staff-side request history and an Edge Function that limits public access to the specific tokenised contract/signing operation.
-- Added a **Send for Signature** action to rental contract controls and a share/copy workflow for the secure link.
-- Added `sign.html` as the customer-facing signing page and `v0916.js` for B5 signing controls.
-- Preserved the existing contract and vehicle-damage workflow.
+- Added secure browser-based contract signing.
 
 ## v0.9.15 — Fixed Mobile Navigation Header
 **Released: 27 August 2026**
-- Changed the mobile topbar from sticky positioning to a genuinely fixed header so the hamburger menu remains available while scrolling long screens.
-- Added the correct mobile content offset so page content starts below the fixed header instead of being obscured by it.
-- Added safe-area handling for mobile devices with display cut-outs/status areas.
-- Ensured the open sidebar and its backdrop layer above the fixed header.
-- No Supabase schema changes were required.
+- Made the mobile navigation header fixed while scrolling.
 
 ## v0.9.14 — Operational Controls & Customer Accounts
 **Released: 27 August 2026**
-- Changed Customer search into a true live filter of the displayed customer list across name, phone, email, licence and passport details. Filtered customer rows remain selectable and open a customer account/history view.
-- Added `gps_enabled` to vehicles. GPS can be selected when adding a vehicle, changed from the vehicle details card, and is shown as an at-a-glance GPS badge on equipped fleet cards.
-- Added staff ad-hoc discount requests with amount/reason, manager notifications, pending status and first-manager approval. Approval applies the discount once and records the approving manager; subsequent managers are told who already approved it.
-- Added a Manager Mode discount-approval panel in addition to rental-card approval controls.
-- Added database-level protection for finalised/returned contracts and their operational child records. Final contracts cannot be edited; managers instead add separate dated `contract_amendments`, preserving the original contract.
-- Added monthly-account customer flags and monthly reminder eligibility. Managers receive one outstanding-balance reminder per eligible customer/month and can review the customer account before manually preparing an email reminder. Reminder activity is logged for later automation.
-- Added/updated RLS and database functions supporting discount approval, contract immutability, amendments and monthly reminders.
-- Added `v0914.js` and `v0914.css` and refreshed application asset revisions to v0.9.14.
+- Added customer filtering, GPS, discount approvals, contract protections and monthly-account controls.
 
 ## v0.9.13 — Seamless Vehicle Action Modals
 **Released: 25 August 2026**
-- Reworked the vehicle-card child-action workflow so **Purchase Details**, **Add Expense** and **Add Maintenance** no longer close the vehicle context and expose the Fleet list before opening.
-- Child forms now reuse the already-open vehicle modal and swap its contents in place.
-- Closing, cancelling or successfully completing a child form restores the same vehicle card immediately within the still-open modal.
-- Retained the financial tile order: Purchase Cost, Expenses, Rental Income, then Operating Profit.
-- No Supabase schema changes were required.
-
-## v0.9.8 — Canonical PWA Repair
-**Released: 24 August 2026**
-- Removed the competing `service-worker.js` introduced during the previous repair and consolidated installability and push notifications onto the existing `sw.js` worker.
-- Added a fetch handler and shell activation lifecycle to `sw.js` so Chromium-based browsers can recognise the application consistently as a PWA.
-- Registered `sw.js` directly from `index.html` under the `/DEV-B5/` scope.
-- Removed stale manifest/favicon references and restored canonical PWA paths.
-- No Supabase changes were required.
-
-## v0.9.7 — PWA Installability Repair
-**Released: 24 August 2026**
-- Added PWA installability repair work and refreshed application metadata.
-
-## v0.9.6 — PWA Install Icon Recovery
-**Released: 24 August 2026**
-- Restored standard PWA icons while retaining maskable artwork.
-
-## v0.9.5 — PWA Branding & Login Alignment
-**Released: 24 August 2026**
-- Refined PWA branding and aligned Keep me logged in / Forgot password on one row.
-
-## v0.9.4 — PWA Install & Icon Repair
-**Released: 24 August 2026**
-- Restored a complete installable PWA icon/manifest configuration.
-
-## v0.9.3 — White Rounded Branding
-**Released: 24 August 2026**
-- Restored white-background rounded B5 branding.
-
-## v0.9.2 — Branding Refresh
-**Released: 24 August 2026**
-- Added refreshed B5 branding assets.
-
-## v0.9.1 — Login Resilience & Sign Out
-**Released: 24 August 2026**
-- Improved startup resilience and added Sign Out access.
-
-## v0.9.0 — Secure Password Recovery
-**Released: 24 August 2026**
-- Added secure password recovery and Keep me logged in.
-
-## v0.8.99 — Branding & User Profile Polish
-**Released: 24 August 2026**
-- Improved sign-in branding and Manager user profile controls.
-
-## v0.8.98 — Permission & Access Control Hardening
-**Released: 24 August 2026**
-- Enforced saved staff permissions across navigation and operational actions.
-
-## v0.8.97 — Manager User Creation
-**Released: 24 August 2026**
-- Added Manager Mode user creation and first-login password-change workflow.
-
-## v0.8.96 — Flexible Rental Sorting
-**Released: 24 August 2026**
-- Added configurable rental sorting.
+- Kept vehicle financial and maintenance actions inside the open vehicle context.
