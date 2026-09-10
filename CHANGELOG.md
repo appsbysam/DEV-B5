@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.27 — Monthly Reminders & Calendar Filters
+**Released: 10 September 2026**
+- Added per-customer monthly reminder preferences: Automatic Email, Automatic SMS, Automatic Email + SMS, Manager Review / Manual Send, and Automatic WhatsApp.
+- Enforced one reminder choice at a time and disabled choices when the customer profile is missing the required email address or mobile number.
+- Restricted month-end reminder generation to the last day of the month for enabled monthly-account customers with an outstanding balance, with monthly deduplication retained.
+- Added prepared Email, SMS and WhatsApp actions for manager/manual sending; automatic external delivery remains provider-ready until sender integrations are configured.
+- Added Calendar filtering by Customer Name and Vehicle Make alongside the existing vehicle filters.
+
 ## v0.9.26 — Payments & Finance Completion
 **Released: 10 September 2026**
 - Completed the remaining Payments & Finance Action List requirements.
