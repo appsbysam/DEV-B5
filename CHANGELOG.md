@@ -2,6 +2,14 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.26 — Payments & Finance Completion
+**Released: 10 September 2026**
+- Completed the remaining Payments & Finance Action List requirements.
+- Added persistent customer-level visibility of outstanding balances across rentals and later visits.
+- Added database-generated unique payment references and configurable accepted payment methods in Settings.
+- Confirmed Card as a payment method and added the configured 5% card surcharge, with staff able to turn the surcharge off for an individual card payment.
+- Added base/surcharge payment tracking and a Full Cash Flow report combining rental receipts, other cash inflows and business/vehicle expenses while reducing duplicate expense counting.
+
 ## v0.9.25b — Focus Refresh Fix
 **Released: 10 September 2026**
 - Returning to B5 after switching browser tabs or Alt-Tabbing no longer triggers an unnecessary visual app refresh/re-render.
