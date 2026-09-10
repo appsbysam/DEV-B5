@@ -2,6 +2,12 @@
 
 All notable changes to dev-B5 are recorded here.
 
+## v0.9.25b — Focus Refresh Fix
+**Released: 10 September 2026**
+- Returning to B5 after switching browser tabs or Alt-Tabbing no longer triggers an unnecessary visual app refresh/re-render.
+- Silent Supabase token refresh events keep the current screen, route and scroll position intact for the same signed-in user.
+- Preserved normal browser refresh, route restoration, scroll restoration, sign-in/sign-out handling and sidebar navigation.
+
 ## v0.9.25a — Scroll Persistence & Customer Search
 **Released: 10 September 2026**
 - Refreshing the app now restores the same vertical scroll position on the current page instead of jumping to the top.
