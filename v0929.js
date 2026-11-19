@@ -223,7 +223,8 @@
     await loadTesting();
   }
 
-  function bindTesting(){\n    $('[data-ct-step]').forEach(b=>b.onchange=()=>{const [n,i]=b.dataset.ctStep.split('|').map(Number);setStep(n,i,b.checked);});
+  function bindTesting(){
+    $('[data-ct-step]').forEach(b=>b.onchange=()=>{const [n,i]=b.dataset.ctStep.split('|').map(Number);setStep(n,i,b.checked);});
     $$('[data-set-test]').forEach(b=>b.onclick=()=>{const [n,status]=b.dataset.setTest.split('|');setStatus(Number(n),status);});
     $$('[data-show-testers]').forEach(b=>b.onclick=()=>{
       const [n,status]=b.dataset.showTesters.split('|'),rows=resultsFor(Number(n),status),label=statusMeta[status][0];
