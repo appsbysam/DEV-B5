@@ -187,7 +187,7 @@
   function bubbles(n){
     return Object.entries(statusMeta).map(([key,[label,symbol]])=>{
       const rows=resultsFor(n,key);
-      return `<button type="button" class="ct-bubble ct-${key}" data-show-testers="${n}|${key}" title="${esc(statusDetails(n,key))}"><span>${symbol}</span> ${label} <b>${rows.length}</b></button>`;
+      return `<button type="button" class="ct-bubble ct-${key} ${resultFor(n)?.status===key?'ct-selected':''}" data-set-test="${n}|${key}" title="${esc(statusDetails(n,key))}"><span>${symbol}</span> ${label} <b>${rows.length}</b></button>`;
     }).join('');
   }
 
@@ -215,7 +215,7 @@
           return `<div class="ct-item">
             <div class="ct-main"><strong>${n}. ${esc(title)}</strong><div class="vehicle-meta">${esc(description)}</div>${mine.comment?`<div class="ct-my-comment">My comment: ${esc(mine.comment)}</div>`:''}${guidedChecklist(n)}</div>
             <div class="ct-bubbles">${bubbles(n)}</div>
-            <div class="ct-actions">${Object.entries(statusMeta).map(([key,[label]])=>`<button type="button" class="btn btn-small ${mine.status===key?'btn-primary':'btn-secondary'}" data-set-test="${n}|${key}">${label}</button>`).join('')}</div>
+            
           </div>`;
         }).join('')}
       </div></div>`).join('')}`;
@@ -241,16 +241,12 @@
   function bindTesting(){
     $('[data-ct-step]').forEach(b=>b.onchange=()=>{const [n,i]=b.dataset.ctStep.split('|').map(Number);setStep(n,i,b.checked);});
     $$('[data-set-test]').forEach(b=>b.onclick=()=>{const [n,status]=b.dataset.setTest.split('|');setStatus(Number(n),status);});
-    $$('[data-show-testers]').forEach(b=>b.onclick=()=>{
-      const [n,status]=b.dataset.showTesters.split('|'),rows=resultsFor(Number(n),status),label=statusMeta[status][0];
-      const text=rows.length?rows.map(r=>`${displayName(r)}${r.comment?`\n${r.comment}`:''}${r.updated_at?`\n${fmtWhen(r.updated_at)}`:''}`).join('\n\n'): 'Nobody has selected this status yet.';
-      alert(`${label}\n\n${text}`);
-    });
+
   }
 
   const style=document.createElement('style');
   style.textContent=`
-    .ct-guide{margin-top:12px;padding:12px;border:1px solid var(--border,#ddd);border-radius:10px}.ct-guide-title{font-weight:700;display:flex;justify-content:space-between;margin-bottom:8px}.ct-step{display:flex;align-items:flex-start;gap:9px;padding:6px 0;font-size:13px;cursor:pointer}.ct-step input{margin-top:3px;flex-shrink:0}\n    .ct-item{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:10px;padding:14px 0;border-bottom:1px solid var(--border,#ddd)}
+    .ct-bubble.ct-selected{outline:2px solid #147ac6;outline-offset:2px;font-weight:700}.ct-guide{margin-top:12px;padding:12px;border:1px solid var(--border,#ddd);border-radius:10px}.ct-guide-title{font-weight:700;display:flex;justify-content:space-between;margin-bottom:8px}.ct-step{display:flex;align-items:flex-start;gap:9px;padding:6px 0;font-size:13px;cursor:pointer}.ct-step input{margin-top:3px;flex-shrink:0}\n    .ct-item{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:10px;padding:14px 0;border-bottom:1px solid var(--border,#ddd)}
     .ct-item:last-child{border-bottom:0}.ct-main{min-width:0}.ct-my-comment{margin-top:6px;font-size:13px;font-weight:600}
     .ct-actions{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}.ct-bubbles{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start}
     .ct-bubble{border:1px solid var(--border,#ccc);background:transparent;border-radius:999px;padding:5px 8px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}.ct-bubble b{margin-left:3px}.ct-needs_fixing b{font-weight:800}
