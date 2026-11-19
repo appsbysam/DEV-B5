@@ -214,7 +214,8 @@
       if(!comment.trim())return alert('A comment is required when marking Needs Fixing.');
     }
     if(status==='passed'||status==='not_tested')comment='';
-    if(status==='passed'&&guidedSteps[n]&&completedFor(n).length!==guidedSteps[n].length)return alert('Complete every checklist step before marking this test Passed.');\n    const payload={test_number:n,user_id:uid(),tester_name:myName(),status,comment:comment||null,completed_steps:completedFor(n),updated_at:new Date().toISOString()};
+    if(status==='passed'&&guidedSteps[n]&&completedFor(n).length!==guidedSteps[n].length)return alert('Complete every checklist step before marking this test Passed.');
+    const payload={test_number:n,user_id:uid(),tester_name:myName(),status,comment:comment||null,completed_steps:completedFor(n),updated_at:new Date().toISOString()};
     const {error}=await window.db.from('client_testing_results').upsert(payload,{onConflict:'test_number,user_id'});
     if(error)return alert(`Could not save this test result. ${error.message}`);
     const {error:historyError}=await window.db.from('client_testing_history').insert({test_number:n,user_id:uid(),tester_name:myName(),status,comment:comment||null});
