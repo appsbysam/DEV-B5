@@ -239,7 +239,7 @@
   }
 
   function bindTesting(){
-    $('[data-ct-step]').forEach(b=>b.onchange=()=>{const [n,i]=b.dataset.ctStep.split('|').map(Number);setStep(n,i,b.checked);});
+    $$('[data-ct-step]').forEach(b=>b.onchange=()=>{const [n,i]=b.dataset.ctStep.split('|').map(Number);setStep(n,i,b.checked);});
     $$('[data-set-test]').forEach(b=>b.onclick=()=>{const [n,status]=b.dataset.setTest.split('|');setStatus(Number(n),status);});
 
   }
