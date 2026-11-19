@@ -154,6 +154,7 @@
     const {error}=await window.db.from('client_testing_results').upsert(payload,{onConflict:'test_number,user_id'});
     if(error)return alert('Could not save checklist step: '+error.message);
     await loadTesting();
+    recordTestingActivity('step_changed',n);
   }
 
   const statusMeta={
@@ -236,6 +237,7 @@
     const {error:historyError}=await window.db.from('client_testing_history').insert({test_number:n,user_id:uid(),tester_name:myName(),status,comment:comment||null});
     if(historyError)console.warn('Testing history could not be recorded',historyError);
     await loadTesting();
+    recordTestingActivity('status_changed',n);
   }
 
   function bindTesting(){
@@ -254,8 +256,65 @@
   `;
   document.head.appendChild(style);
 
+
+  // Manager-only activity reporting; the database enforces the same restriction via RLS.
+  state.testingActivity=[];
+  state.testingActivityLoaded=false;
+  async function recordTestingActivity(type,testNumber=null){
+    if(!uid()||!window.db)return;
+    const {error}=await window.db.from('client_testing_activity').insert({user_id:uid(),activity_type:type,test_number:testNumber});
+    if(error)console.warn('Testing activity could not be recorded',error.message);
+  }
+  async function loadManagerTestingActivity(){
+    if(!isManager()||!window.db)return;
+    state.testingActivityLoaded=false;
+    const [activity,results]=await Promise.all([
+      window.db.from('client_testing_activity').select('*').order('created_at',{ascending:false}).limit(3000),
+      window.db.from('client_testing_results').select('user_id,test_number,status,updated_at')
+    ]);
+    state.testingActivity=activity.error?[]:(activity.data||[]);
+    state.testingManagerResults=results.error?[]:(results.data||[]);
+    state.testingActivityError=activity.error?.message||results.error?.message||'';
+    state.testingActivityLoaded=true;
+    if(state.page==='manager'&&state.managerView==='testing')render();
+  }
+  function renderManagerTesting(){
+    if(!isManager())return '<div class="alert">Manager access required.</div>';
+    const activities=state.testingActivity||[];
+    const results=state.testingManagerResults||[];
+    const profiles=state.staffProfiles||[];
+    const ids=[...new Set([...profiles.map(p=>p.user_id),...activities.map(a=>a.user_id),...results.map(r=>r.user_id)])];
+    const fmt=d=>d?new Date(d).toLocaleString():'—';
+    return `<div class="section-title"><div><h2>Testing Activity</h2><p>Manager-only staff testing overview</p></div><button class="btn btn-secondary" id="testingBack">Back to Manager Mode</button></div>
+      <div class="panel"><div class="panel-body"><button class="btn btn-secondary" id="testingRefresh">Refresh Activity</button>
+      ${state.testingActivityError?`<p class="alert">${esc(state.testingActivityError)}</p>`:''}
+      <p class="vehicle-meta">Sessions count each time Client Testing is opened from the menu, not time spent testing. Only activity since this feature was enabled is counted.</p>
+      <div class="table-wrap"><table><thead><tr><th>Staff member</th><th>Testing opens</th><th>Last activity</th><th>Passed</th><th>Needs fixing</th><th>Retest</th><th>Steps checked</th></tr></thead><tbody>
+      ${ids.map(id=>{const profile=profiles.find(p=>p.user_id===id)||{},a=activities.filter(x=>x.user_id===id),r=results.filter(x=>x.user_id===id);return `<tr><td>${esc(profile.display_name||profile.email||String(id).slice(0,8))}</td><td>${a.filter(x=>x.activity_type==='opened').length}</td><td>${fmt(a[0]?.created_at||r.sort((x,y)=>String(y.updated_at).localeCompare(String(x.updated_at)))[0]?.updated_at)}</td><td>${r.filter(x=>x.status==='passed').length}</td><td>${r.filter(x=>x.status==='needs_fixing').length}</td><td>${r.filter(x=>x.status==='retest_required').length}</td><td>${a.filter(x=>x.activity_type==='step_changed').length} actions</td></tr>`}).join('')}
+      </tbody></table></div></div></div>`;
+  }
+
   const previousRender=render;
   render=function(){
+    if(state.page==='manager'&&isManager()&&state.managerView==='testing'){
+      $('#pageTitle').textContent='Testing Activity';
+      $('#pageSubtitle').textContent='Manager-only staff testing overview';
+      $('#content').innerHTML=renderManagerTesting();
+      $('#testingBack')?.addEventListener('click',()=>{state.managerView='activity';render();});
+      $('#testingRefresh')?.addEventListener('click',loadManagerTestingActivity);
+      return $('#content').innerHTML;
+    }
+    if(state.page==='manager'&&isManager()){
+      const output=previousRender.apply(this,arguments);
+      const tiles=document.querySelector('.manager-dashboard');
+      if(tiles&&!tiles.querySelector('#testingActivityTile')){
+        const btn=document.createElement('button');btn.type='button';btn.id='testingActivityTile';btn.className='manager-tile';
+        btn.innerHTML='<div class="manager-tile-label">Testing Activity</div><div class="manager-tile-value">Staff</div><div class="manager-tile-sub">Testing sessions and results · managers only</div>';
+        btn.onclick=()=>{state.managerView='testing';render();loadManagerTestingActivity();};
+        tiles.appendChild(btn);
+      }
+      return output;
+    }
     if(state.page!=='clienttesting')return previousRender.apply(this,arguments);
     const meta=pageMeta.clienttesting;
     $('#pageTitle').textContent=meta[0];
@@ -277,6 +336,7 @@
     nav.insertBefore(btn,document.getElementById('managerNav')||null);
     btn.addEventListener('click',()=>{
       state.page='clienttesting';
+      recordTestingActivity('opened');
       render();
       if(typeof closeSidebar==='function')closeSidebar();
     });
