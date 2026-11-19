@@ -110,6 +110,38 @@
     ]
   };
 
+  // Phase 2: guided acceptance steps. Each tester's progress is saved in Supabase.
+  const guidedSteps={
+    14:['Open Check Availability','Choose pickup and return dates','Confirm available vehicles match the dates','Check displayed prices and category filters','Try dates that overlap an existing rental'],
+    15:['Open New Rental','Select an existing imported customer','Select an available imported vehicle','Enter pickup and return dates and locations','Check the sample daily rate and calculated total','Save the rental without finalising the contract','Reopen it and verify the saved details','Check that the vehicle is no longer offered for overlapping dates'],
+    16:['Open the saved rental','Verify customer and vehicle details','Verify pickup, return and location information','Check charges and payment summary'],
+    17:['Open an active, non-finalised rental','Change an allowed field','Save and reopen the rental','Confirm the change appears in the calendar and totals where relevant'],
+    18:['Open an active rental','Extend the return date','Check for conflicting vehicle bookings','Verify updated charges','Save and confirm the new date'],
+    19:['Open an active rental','Select a replacement available vehicle','Save the vehicle swap','Check that the original and replacement vehicle history is correct','Verify availability of both vehicles'],
+    20:['Open an active rental due for return','Record the return details','Check any final charges','Complete the rental','Verify the rental status and vehicle availability'],
+    21:['Search for an imported customer or rental','Try status and date filters','Open a matching result','Confirm the correct rental is displayed']
+  };
+  const phase2Ids=Object.keys(guidedSteps).map(Number);
+  const completedFor=n=>{const v=resultFor(n)?.completed_steps;return Array.isArray(v)?v:[];};
+  const progressFor=n=>guidedSteps[n]?completedFor(n).length+'/'+guidedSteps[n].length:'';
+  function guidedChecklist(n){
+    if(!guidedSteps[n])return '';
+    const done=completedFor(n);
+    return `<div class="ct-guide"><div class="ct-guide-title">Step-by-step checklist <span>${done.length}/${guidedSteps[n].length}</span></div>
+      ${guidedSteps[n].map((step,i)=>`<label class="ct-step"><input type="checkbox" data-ct-step="${n}|${i}" ${done.includes(i)?'checked':''}><span>${i+1}. ${esc(step)}</span></label>`).join('')}
+      <div class="vehicle-meta">Tick each step as you complete it. Progress saves to your staff account. Mark Passed only after verifying the outcome; use Needs Fixing to report a problem.</div></div>`;
+  }
+  async function setStep(n,i,checked){
+    if(!uid())return alert('Please sign in again.');
+    const old=resultFor(n);
+    const done=new Set(completedFor(n));
+    if(checked)done.add(i);else done.delete(i);
+    const payload={test_number:n,user_id:uid(),tester_name:myName(),status:old?.status||'not_tested',comment:old?.comment||null,completed_steps:[...done].sort((a,b)=>a-b),updated_at:new Date().toISOString()};
+    const {error}=await window.db.from('client_testing_results').upsert(payload,{onConflict:'test_number,user_id'});
+    if(error)return alert('Could not save checklist step: '+error.message);
+    await loadTesting();
+  }
+
   const statusMeta={
     not_tested:['Not Tested','○'],
     passed:['Passed','✓'],
@@ -155,7 +187,7 @@
   function renderTesting(){
     if(!state.clientTestingLoaded){loadTesting();return '<div class="panel"><div class="panel-body">Loading testing checklist…</div></div>';}
     const s=summary();
-    return `<div class="section-title"><div><h2>Client Testing</h2><p>Choose your result for each item. B5 records your name automatically.</p></div></div>
+    return `<div class="section-title"><div><h2>Client Testing</h2><p>Choose your result for each item. B5 records your name automatically.</p></div></div>\n      <div class="panel"><div class="panel-body"><h3>Phase 2 — Reservations &amp; Rentals</h3><p>Start with tests 14–21 under Availability &amp; Rentals. Tick each action as you perform it, then select Passed, Needs Fixing or Retest Required. Your checklist and results save to your staff login. The original 73 tests remain below.</p><p><strong>Phase 2 progress:</strong> ${phase2Ids.filter(n=>resultFor(n)?.status==='passed').length}/8 tests passed by you.</p></div></div>
       <div class="panel"><div class="panel-body"><div class="kpi-mini">
         ${stat('Items Tested',`${s.tested}/73`,'At least one tester')}
         ${stat('Passed',s.passed,'Tester results')}
@@ -166,7 +198,7 @@
         ${items.map(([n,title,description])=>{
           const mine=resultFor(n)||{status:'not_tested',comment:''};
           return `<div class="ct-item">
-            <div class="ct-main"><strong>${n}. ${esc(title)}</strong><div class="vehicle-meta">${esc(description)}</div>${mine.comment?`<div class="ct-my-comment">My comment: ${esc(mine.comment)}</div>`:''}</div>
+            <div class="ct-main"><strong>${n}. ${esc(title)}</strong><div class="vehicle-meta">${esc(description)}</div>${mine.comment?`<div class="ct-my-comment">My comment: ${esc(mine.comment)}</div>`:''}${guidedChecklist(n)}</div>
             <div class="ct-bubbles">${bubbles(n)}</div>
             <div class="ct-actions">${Object.entries(statusMeta).map(([key,[label]])=>`<button type="button" class="btn btn-small ${mine.status===key?'btn-primary':'btn-secondary'}" data-set-test="${n}|${key}">${label}</button>`).join('')}</div>
           </div>`;
@@ -182,7 +214,7 @@
       if(!comment.trim())return alert('A comment is required when marking Needs Fixing.');
     }
     if(status==='passed'||status==='not_tested')comment='';
-    const payload={test_number:n,user_id:uid(),tester_name:myName(),status,comment:comment||null,updated_at:new Date().toISOString()};
+    if(status==='passed'&&guidedSteps[n]&&completedFor(n).length!==guidedSteps[n].length)return alert('Complete every checklist step before marking this test Passed.');\n    const payload={test_number:n,user_id:uid(),tester_name:myName(),status,comment:comment||null,completed_steps:completedFor(n),updated_at:new Date().toISOString()};
     const {error}=await window.db.from('client_testing_results').upsert(payload,{onConflict:'test_number,user_id'});
     if(error)return alert(`Could not save this test result. ${error.message}`);
     const {error:historyError}=await window.db.from('client_testing_history').insert({test_number:n,user_id:uid(),tester_name:myName(),status,comment:comment||null});
@@ -190,7 +222,7 @@
     await loadTesting();
   }
 
-  function bindTesting(){
+  function bindTesting(){\n    $('[data-ct-step]').forEach(b=>b.onchange=()=>{const [n,i]=b.dataset.ctStep.split('|').map(Number);setStep(n,i,b.checked);});
     $$('[data-set-test]').forEach(b=>b.onclick=()=>{const [n,status]=b.dataset.setTest.split('|');setStatus(Number(n),status);});
     $$('[data-show-testers]').forEach(b=>b.onclick=()=>{
       const [n,status]=b.dataset.showTesters.split('|'),rows=resultsFor(Number(n),status),label=statusMeta[status][0];
@@ -201,7 +233,7 @@
 
   const style=document.createElement('style');
   style.textContent=`
-    .ct-item{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:10px;padding:14px 0;border-bottom:1px solid var(--border,#ddd)}
+    .ct-guide{margin-top:12px;padding:12px;border:1px solid var(--border,#ddd);border-radius:10px}.ct-guide-title{font-weight:700;display:flex;justify-content:space-between;margin-bottom:8px}.ct-step{display:flex;align-items:flex-start;gap:9px;padding:6px 0;font-size:13px;cursor:pointer}.ct-step input{margin-top:3px;flex-shrink:0}\n    .ct-item{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:10px;padding:14px 0;border-bottom:1px solid var(--border,#ddd)}
     .ct-item:last-child{border-bottom:0}.ct-main{min-width:0}.ct-my-comment{margin-top:6px;font-size:13px;font-weight:600}
     .ct-actions{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}.ct-bubbles{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:flex-start}
     .ct-bubble{border:1px solid var(--border,#ccc);background:transparent;border-radius:999px;padding:5px 8px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}.ct-bubble b{margin-left:3px}.ct-needs_fixing b{font-weight:800}
