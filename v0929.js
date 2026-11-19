@@ -112,6 +112,19 @@
 
   // Phase 2: guided acceptance steps. Each tester's progress is saved in Supabase.
   const guidedSteps={
+    1:["Sign in with staff account","Confirm user identity","Sign out","Sign in again"],
+    2:["Open dashboard","Navigate to Customers","Navigate to Fleet and Rentals","Verify pages load"],
+    3:["Check logos and headings","Check text and buttons","Check spacing and layout","Record problems"],
+    4:["Open on phone or tablet","Navigate main pages","Check form layout","Try a safe test entry"],
+    5:["Open Dashboard","Verify imported customer and vehicle counts","Review alerts","Try shortcuts"],
+    6:["Open Today","Review pickups","Review returns","Note if no test records exist yet"],
+    7:["Open Quick Actions","Try New Rental","Try Check Availability","Verify destinations"],
+    8:["Open Customers","Verify nine imported customers","Search by name","Search by phone","Open matching profile"],
+    9:["Open Add Customer","Enter fictional test details","Save customer","Search for saved customer","Check required fields"],
+    10:["Open fictional test customer","Edit notes or phone","Save","Reopen and verify"],
+    11:["Open customer profile","Verify name and phone","Review rental history","Review balances","Note any untestable empty sections"],
+    12:["Open fictional customer","Find monthly settings","Change a setting","Save and reopen","Check saved value"],
+    13:["Open fictional customer","Find birthday setting","Check birth date requirement","Enter fictional date","Save and reopen"],
     14:['Open Check Availability','Choose pickup and return dates','Confirm available vehicles match the dates','Check displayed prices and category filters','Try dates that overlap an existing rental'],
     15:['Open New Rental','Select an existing imported customer','Select an available imported vehicle','Enter pickup and return dates and locations','Check the sample daily rate and calculated total','Save the rental without finalising the contract','Reopen it and verify the saved details','Check that the vehicle is no longer offered for overlapping dates'],
     16:['Open the saved rental','Verify customer and vehicle details','Verify pickup, return and location information','Check charges and payment summary'],
@@ -121,7 +134,8 @@
     20:['Open an active rental due for return','Record the return details','Check any final charges','Complete the rental','Verify the rental status and vehicle availability'],
     21:['Search for an imported customer or rental','Try status and date filters','Open a matching result','Confirm the correct rental is displayed']
   };
-  const phase2Ids=Object.keys(guidedSteps).map(Number);
+  const phase2Ids=[14,15,16,17,18,19,20,21];
+  const phase1Ids=Array.from({length:13},(_,i)=>i+1);
   const completedFor=n=>{const v=resultFor(n)?.completed_steps;return Array.isArray(v)?v:[];};
   const progressFor=n=>guidedSteps[n]?completedFor(n).length+'/'+guidedSteps[n].length:'';
   function guidedChecklist(n){
@@ -187,7 +201,8 @@
   function renderTesting(){
     if(!state.clientTestingLoaded){loadTesting();return '<div class="panel"><div class="panel-body">Loading testing checklist…</div></div>';}
     const s=summary();
-    return `<div class="section-title"><div><h2>Client Testing</h2><p>Choose your result for each item. B5 records your name automatically.</p></div></div>\n      <div class="panel"><div class="panel-body"><h3>Phase 2 — Reservations &amp; Rentals</h3><p>Start with tests 14–21 under Availability &amp; Rentals. Tick each action as you perform it, then select Passed, Needs Fixing or Retest Required. Your checklist and results save to your staff login. The original 73 tests remain below.</p><p><strong>Phase 2 progress:</strong> ${phase2Ids.filter(n=>resultFor(n)?.status==='passed').length}/8 tests passed by you.</p></div></div>
+    return `<div class="section-title"><div><h2>Client Testing</h2><p>Choose your result for each item. B5 records your name automatically.</p></div></div>\n      <div class="panel"><div class="panel-body"><h3>Phase 1 — General &amp; Customers</h3><p>Complete tests 1–13 below using the guided checklists.</p><p><strong>Phase 1 progress:</strong> ${phase1Ids.filter(n=>resultFor(n)?.status==="passed").length}/13 passed by you.</p></div></div>
+      <div class="panel"><div class="panel-body"><h3>Phase 2 — Reservations &amp; Rentals</h3><p>Start with tests 14–21 under Availability &amp; Rentals. Tick each action as you perform it, then select Passed, Needs Fixing or Retest Required. Your checklist and results save to your staff login. The original 73 tests remain below.</p><p><strong>Phase 2 progress:</strong> ${phase2Ids.filter(n=>resultFor(n)?.status==='passed').length}/8 tests passed by you.</p></div></div>
       <div class="panel"><div class="panel-body"><div class="kpi-mini">
         ${stat('Items Tested',`${s.tested}/73`,'At least one tester')}
         ${stat('Passed',s.passed,'Tester results')}
